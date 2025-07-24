@@ -1,0 +1,1673 @@
+"use client"
+
+import type React from "react"
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import AnimatedSection from "@/components/animated-section"
+import {
+  CheckCircle,
+  Search,
+  MapPin,
+  Calendar,
+  Mail,
+  AlertCircle,
+  TagIcon,
+  ChevronDown,
+  ChevronUp,
+  LogIn,
+  UserPlus,
+  Loader2,
+  CreditCard,
+  KeyRound,
+  User,
+} from "lucide-react"
+import Image from "next/image"
+import { supabase } from "@/lib/supabase"
+import Link from "next/link"
+
+// Types for the registration flow
+interface School {
+  id: string
+  name: string
+  location: string
+  logo?: string
+  teams: Team[]
+}
+
+interface Team {
+  id: string
+  name: string
+  schoolId: string
+  schoolName: string
+  sport: string
+  ageGroup: string
+  skillLevel: string
+  sessions: Session[]
+  coach: {
+    name: string
+    email: string
+    phone: string
+  }
+  price: number
+  description: string
+}
+
+interface Session {
+  id: string
+  dayOfWeek: string
+  time: string
+  duration: string
+  location: string
+  startDate: string
+  endDate: string
+  totalSessions: number
+  trainingType?: string
+  formattedDate?: string
+  coachName?: string
+}
+
+interface ParentRegistrationData {
+  parentFirstName: string
+  parentLastName: string
+  parentEmail: string
+  parentPhone: string
+  childFirstName: string
+  childLastName: string
+  childBirthdate: string
+  childGrade: string
+  emergencyContactName: string
+  emergencyContactPhone: string
+  emergencyContactRelation: string
+  selectedTeam: Team | null
+  medicalConditions: string
+  specialInstructions: string
+  registrationDate: string
+  status: "pending"
+  paymentStatus: "unpaid"
+  userId: string
+}
+
+interface UserType {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+}
+
+export default function RegisterSection() {
+  const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+
+  // Search functionality for Step 1
+  const [searchQuery, setSearchQuery] = useState("")
+  const [schools, setSchools] = useState<School[]>([])
+  const [filteredSchools, setFilteredSchools] = useState<School[]>([])
+  const [isLoadingSchools, setIsLoadingSchools] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const [hasSearched, setHasSearched] = useState(false)
+
+  const [allSchoolsData, setAllSchoolsData] = useState<any[]>([])
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+
+  // Selected team for Step 2
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
+  const [showAllSessions, setShowAllSessions] = useState(false)
+
+  // Authentication state
+  const [authMode, setAuthMode] = useState<"login" | "register">("login")
+  const [authFirstName, setAuthFirstName] = useState("")
+  const [authLastName, setAuthLastName] = useState("")
+  const [authEmail, setAuthEmail] = useState("")
+  const [authPhone, setAuthPhone] = useState("")
+  const [authPassword, setAuthPassword] = useState("")
+  const [authConfirmPassword, setAuthConfirmPassword] = useState("")
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [isAuthLoading, setIsAuthLoading] = useState(false)
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+
+  // Registration data
+  const [registrationResult, setRegistrationResult] = useState<any>(null)
+
+  const [formData, setFormData] = useState<ParentRegistrationData>({
+    parentFirstName: "",
+    parentLastName: "",
+    parentEmail: "",
+    parentPhone: "",
+    childFirstName: "",
+    childLastName: "",
+    childBirthdate: "",
+    childGrade: "",
+    emergencyContactName: "",
+    emergencyContactPhone: "",
+    emergencyContactRelation: "",
+    selectedTeam: null,
+    medicalConditions: "",
+    specialInstructions: "",
+    registrationDate: "",
+    status: "pending",
+    paymentStatus: "unpaid",
+    userId: "",
+  })
+
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const [message, setMessage] = useState<string | null>(null)
+  const [isEmailConfirmationSent, setIsEmailConfirmationSent] = useState(false)
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        setIsCheckingSession(true)
+        console.log("🔄 Checking for existing session...")
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (session?.user) {
+          console.log("✅ Found existing session:", session.user.id)
+
+          const { data: parentData, error: parentError } = await supabase
+            .from("parent")
+            .select("*")
+            .eq("parentid", session.user.id)
+            .single()
+
+          if (!parentError && parentData) {
+            const user: UserType = {
+              id: session.user.id,
+              email: session.user.email || "",
+              firstName: parentData.firstname || "",
+              lastName: parentData.lastname || "",
+              phone: parentData.phone || "",
+            }
+            setCurrentUser(user)
+            setFormData((prev) => ({
+              ...prev,
+              userId: user.id,
+              parentEmail: user.email,
+              parentFirstName: user.firstName,
+              parentLastName: user.lastName,
+              parentPhone: user.phone,
+            }))
+            console.log("✅ User data loaded from parent record")
+          } else {
+            // Parent record doesn't exist, but user is logged in
+            const user: UserType = {
+              id: session.user.id,
+              email: session.user.email || "",
+              firstName: session.user.user_metadata?.firstName || "",
+              lastName: session.user.user_metadata?.lastName || "",
+              phone: session.user.user_metadata?.phone || "",
+            }
+            setCurrentUser(user)
+            setFormData((prev) => ({
+              ...prev,
+              userId: user.id,
+              parentEmail: user.email,
+              parentFirstName: user.firstName,
+              parentLastName: user.lastName,
+              parentPhone: user.phone,
+            }))
+            console.log("✅ User data loaded from auth metadata")
+          }
+        } else {
+          console.log("ℹ️ No existing session found")
+        }
+      } catch (error) {
+        console.error("❌ Error checking session:", error)
+      } finally {
+        setIsCheckingSession(false)
+      }
+    }
+
+    checkSession()
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+      console.log("🔄 Auth state changed:", event, session?.user?.id)
+
+      if (event === "SIGNED_IN" && session?.user) {
+        const { data: parentData } = await supabase.from("parent").select("*").eq("parentid", session.user.id).single()
+
+        const user: UserType = {
+          id: session.user.id,
+          email: session.user.email || "",
+          firstName: parentData?.firstname || session.user.user_metadata?.firstName || "",
+          lastName: parentData?.lastname || session.user.user_metadata?.lastName || "",
+          phone: parentData?.phone || session.user.user_metadata?.phone || "",
+        }
+
+        setCurrentUser(user)
+        setFormData((prev) => ({
+          ...prev,
+          userId: user.id,
+          parentEmail: user.email,
+          parentFirstName: user.firstName,
+          parentLastName: user.lastName,
+          parentPhone: user.phone,
+        }))
+        console.log("✅ Auth state change - user logged in")
+      } else if (event === "SIGNED_OUT") {
+        setCurrentUser(null)
+        setFormData((prev) => ({
+          ...prev,
+          userId: "",
+          parentEmail: "",
+          parentFirstName: "",
+          parentLastName: "",
+          parentPhone: "",
+        }))
+        console.log("ℹ️ Auth state change - user logged out")
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Transform database data to component format
+  const transformSchoolData = (dbSchools: any[]): School[] => {
+    if (!Array.isArray(dbSchools)) {
+      console.warn("Invalid schools data received:", dbSchools)
+      return []
+    }
+
+    return dbSchools.map((school) => ({
+      id: school.schoolid || "",
+      name: school.name || "Unknown School",
+      location: school.location || "Unknown Location",
+      logo: `/placeholder.svg?height=60&width=60&text=${encodeURIComponent(school.name || "School")}`,
+      teams:
+        school.teams?.map((team: any) => ({
+          id: team.teamid || "",
+          name: team.name || "Unknown Team",
+          schoolId: school.schoolid || "",
+          schoolName: school.name || "Unknown School",
+          sport: "Volleyball",
+          ageGroup: "12-18",
+          skillLevel: "All Levels",
+          price: team.price || 299,
+          description: team.description || "Elite training program",
+          coach: {
+            name: team.session?.[0]?.staff?.name || "TBD",
+            email: team.session?.[0]?.staff?.email || "",
+            phone: team.session?.[0]?.staff?.phone || "",
+          },
+          sessions:
+            team.session?.flatMap((session: any) => {
+              const individualSessions = session.individualSessions || []
+              if (individualSessions.length === 0) {
+                // Create default sessions if none exist
+                return [
+                  {
+                    id: `default-${session.sessionid || "session"}`,
+                    dayOfWeek: "Monday",
+                    time: "3:00 PM - 4:30 PM",
+                    duration: "1h 30m",
+                    location: school.location || "TBD",
+                    startDate: session.startdate || new Date().toISOString().split("T")[0],
+                    endDate:
+                      session.enddate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+                    totalSessions: 12,
+                    formattedDate: "Mondays, starting soon",
+                    coachName: session.staff?.name || "TBD",
+                    trainingType: "General Training",
+                  },
+                ]
+              }
+              return individualSessions.map((indSession: any) => ({
+                id: indSession.id || "",
+                dayOfWeek: indSession.dayOfWeek || "",
+                time: indSession.time || "",
+                duration: indSession.duration || "",
+                location: indSession.location || "",
+                startDate: session.startdate || "",
+                endDate: session.enddate || "",
+                totalSessions: individualSessions.length,
+                formattedDate: indSession.formattedDate || "",
+                coachName: indSession.coachName || "",
+                trainingType: "General Training",
+              }))
+            }) || [],
+        })) || [],
+    }))
+  }
+
+  // Load all data on component mount
+  useEffect(() => {
+    async function loadAllData() {
+      setIsInitialLoading(true)
+      setSearchError(null)
+
+      try {
+        console.log("[CLIENT] 🔄 Fetching schools data...")
+        const response = await fetch("/api/schools/all", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+
+        console.log("[CLIENT] Response status:", response.status)
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error("[CLIENT] ❌ Response not OK:", errorText)
+          throw new Error(`HTTP ${response.status}: ${errorText}`)
+        }
+
+        const data = await response.json()
+        console.log("[CLIENT] ✅ Loaded schools data:", data)
+
+        const transformedData = transformSchoolData(data.schools || [])
+        console.log("[CLIENT] ✅ Transformed schools data:", transformedData)
+
+        setAllSchoolsData(transformedData)
+      } catch (error) {
+        console.error("[CLIENT] ❌ Error loading all data:", error)
+        setSearchError(
+          error instanceof Error ? error.message : "An unexpected error occurred while loading schools data.",
+        )
+
+        // Set mock data as fallback
+        console.log("[CLIENT] 🔄 Using mock data as fallback...")
+        const mockData = [
+          {
+            id: "mock-school-1",
+            name: "Lincoln High School",
+            location: "Springfield, IL",
+            logo: "/placeholder.svg?height=60&width=60&text=Lincoln",
+            teams: [
+              {
+                id: "mock-team-1",
+                name: "Varsity Volleyball",
+                schoolId: "mock-school-1",
+                schoolName: "Lincoln High School",
+                sport: "Volleyball",
+                ageGroup: "14-18",
+                skillLevel: "Advanced",
+                price: 299,
+                description: "Elite high school volleyball training program",
+                coach: {
+                  name: "Coach Johnson",
+                  email: "coach.johnson@lincoln.edu",
+                  phone: "(555) 123-4567",
+                },
+                sessions: [
+                  {
+                    id: "mock-session-1",
+                    dayOfWeek: "Monday",
+                    time: "3:00 PM - 4:30 PM",
+                    duration: "1h 30m",
+                    location: "Lincoln High School Gym",
+                    startDate: "2024-02-01",
+                    endDate: "2024-05-01",
+                    totalSessions: 12,
+                    formattedDate: "Mondays, starting February 1st",
+                    coachName: "Coach Johnson",
+                    trainingType: "General Training",
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        setAllSchoolsData(mockData)
+      } finally {
+        setIsInitialLoading(false)
+      }
+    }
+
+    loadAllData()
+  }, [])
+
+  // Filter data when search query changes
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim() === "") {
+      setFilteredSchools([])
+      setHasSearched(false)
+      return
+    }
+
+    setHasSearched(true)
+    setIsLoadingSchools(true)
+
+    try {
+      const filtered = allSchoolsData
+        .filter((school) => {
+          const schoolMatches =
+            (school.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (school.location || "").toLowerCase().includes(searchQuery.toLowerCase())
+
+          const teamMatches = school.teams.some(
+            (team: any) =>
+              (team.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (team.description || "").toLowerCase().includes(searchQuery.toLowerCase()),
+          )
+
+          return schoolMatches || teamMatches
+        })
+        .map((school) => {
+          const schoolMatches =
+            (school.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (school.location || "").toLowerCase().includes(searchQuery.toLowerCase())
+
+          if (schoolMatches) {
+            return school
+          }
+
+          return {
+            ...school,
+            teams: school.teams.filter(
+              (team: any) =>
+                (team.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (team.description || "").toLowerCase().includes(searchQuery.toLowerCase()),
+            ),
+          }
+        })
+
+      setSchools(filtered)
+      setFilteredSchools(filtered)
+    } catch (error) {
+      console.error("Error filtering:", error)
+      setSearchError("Error filtering schools")
+    } finally {
+      setIsLoadingSchools(false)
+    }
+  }, [searchQuery, allSchoolsData])
+
+  const handleTeamSelect = (team: Team) => {
+    console.log("Selected team:", team)
+    setSelectedTeam(team)
+    setFormData((prev) => ({ ...prev, selectedTeam: team }))
+    setErrors({})
+    setShowAllSessions(false)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
+  }
+
+  const handleAuthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    if (name === "authFirstName") setAuthFirstName(value)
+    if (name === "authLastName") setAuthLastName(value)
+    if (name === "authEmail") setAuthEmail(value)
+    if (name === "authPhone") setAuthPhone(value)
+    if (name === "authPassword") setAuthPassword(value)
+    if (name === "authConfirmPassword") setAuthConfirmPassword(value)
+    setAuthError(null)
+  }
+
+  const validateAuthForm = (): boolean => {
+    const newAuthErrors: Record<string, string> = {}
+
+    if (authMode === "register") {
+      if (!authFirstName.trim()) newAuthErrors.firstName = "First name is required"
+      if (!authLastName.trim()) newAuthErrors.lastName = "Last name is required"
+      if (!authPhone.trim()) newAuthErrors.phone = "Phone number is required"
+      else if (!/^\d{10}$/.test(authPhone.replace(/\D/g, ""))) newAuthErrors.phone = "Invalid 10-digit phone number"
+      if (authPassword !== authConfirmPassword) newAuthErrors.confirmPassword = "Passwords do not match"
+    }
+
+    if (!authEmail.trim()) newAuthErrors.email = "Email is required"
+    else if (!/\S+@\S+\.\S+/.test(authEmail)) newAuthErrors.email = "Invalid email format"
+    if (!authPassword.trim()) newAuthErrors.password = "Password is required"
+    else if (authPassword.length < 6) newAuthErrors.password = "Password must be at least 6 characters"
+
+    setErrors(newAuthErrors)
+    return Object.keys(newAuthErrors).length === 0
+  }
+
+  const handleLogin = async () => {
+    if (!validateAuthForm()) return
+    setIsAuthLoading(true)
+    setAuthError(null)
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: authEmail, password: authPassword }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed")
+      }
+
+      // Create user object from response
+      const user: UserType = {
+        id: data.user.id,
+        email: data.user.email,
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        phone: data.user.phone,
+      }
+
+      // Set Supabase session if provided
+      if (data.session) {
+        await supabase.auth.setSession(data.session)
+      }
+
+      // Update user state and form data
+      setCurrentUser(user)
+      setFormData((prev) => ({
+        ...prev,
+        userId: user.id,
+        parentEmail: user.email,
+        parentFirstName: user.firstName,
+        parentLastName: user.lastName,
+        parentPhone: user.phone,
+      }))
+
+      // Clear any auth errors
+      setAuthError(null)
+      
+      // Show success message
+      if (data.alreadyLoggedIn) {
+        setMessage(`You are already logged in as ${data.user.email}`)
+      }
+      
+      // Go directly to step 4 (Parent Info) after successful login
+      setTimeout(() => {
+        setStep(4)
+        setTimeout(() => {
+          document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
+        }, 100)
+      }, 200)
+
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "An unknown error occurred.")
+    } finally {
+      setIsAuthLoading(false)
+    }
+  }
+
+  const handleRegister = async () => {
+    if (!validateAuthForm()) return
+    setIsAuthLoading(true)
+    setAuthError(null)
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: authFirstName,
+          lastName: authLastName,
+          email: authEmail,
+          phone: authPhone,
+          password: authPassword,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed")
+      }
+
+      setAuthError(null)
+
+      // Check if email confirmation is required
+      if (data.requiresEmailConfirmation) {
+        // Show email confirmation message
+        setMessage(data.message)
+        setIsEmailConfirmationSent(true)
+      } else {
+        // Registration successful without email confirmation - switch to login
+        setMessage("Registration successful! Please log in with your new account.")
+        setAuthMode("login")
+        setIsEmailConfirmationSent(false)
+        
+        // Clear registration fields but keep email and password for easy login
+        setAuthFirstName("")
+        setAuthLastName("")
+        setAuthPhone("")
+        setAuthConfirmPassword("")
+      }
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "An unknown error occurred.")
+    } finally {
+      setIsAuthLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      setCurrentUser(null)
+      setMessage(null)
+      setAuthError(null)
+      console.log("✅ User logged out")
+    } catch (error) {
+      console.error("❌ Logout error:", error)
+    }
+  }
+
+  const validateStep = (currentStep: number): boolean => {
+    const newErrors: Record<string, string> = {}
+    if (currentStep === 2 && !selectedTeam) {
+      newErrors.team = "Please select a team to proceed."
+      setErrors(newErrors)
+      return false
+    }
+    if (currentStep === 3 && !currentUser) {
+      newErrors.auth = "Please log in or create an account to continue."
+      setAuthError("Please log in or create an account to continue.")
+      setErrors(newErrors)
+      return false
+    }
+    if (currentStep === 4) {
+      if (!formData.parentFirstName.trim()) newErrors.parentFirstName = "Parent first name is required"
+      if (!formData.parentLastName.trim()) newErrors.parentLastName = "Parent last name is required"
+      if (!formData.parentEmail.trim()) newErrors.parentEmail = "Parent email is required"
+      else if (!/\S+@\S+\.\S+/.test(formData.parentEmail)) newErrors.parentEmail = "Invalid email format"
+      if (!formData.parentPhone.trim()) newErrors.parentPhone = "Parent phone is required"
+      else if (!/^\d{10}$/.test(formData.parentPhone.replace(/\D/g, "")))
+        newErrors.parentPhone = "Invalid 10-digit phone"
+
+      if (!formData.childFirstName.trim()) newErrors.childFirstName = "Child first name is required"
+      if (!formData.childLastName.trim()) newErrors.childLastName = "Child last name is required"
+      if (!formData.childBirthdate) newErrors.childBirthdate = "Child date of birth is required"
+      if (!formData.childGrade.trim()) newErrors.childGrade = "Child grade is required"
+
+      if (!formData.emergencyContactName.trim()) newErrors.emergencyContactName = "Emergency contact name is required"
+      if (!formData.emergencyContactPhone.trim())
+        newErrors.emergencyContactPhone = "Emergency contact phone is required"
+      else if (!/^\d{10}$/.test(formData.emergencyContactPhone.replace(/\D/g, "")))
+        newErrors.emergencyContactPhone = "Invalid 10-digit phone"
+      if (!formData.emergencyContactRelation.trim())
+        newErrors.emergencyContactRelation = "Emergency contact relation is required"
+    }
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const nextStep = () => {
+    if (validateStep(step)) {
+      setStep((prev) => prev + 1)
+      setTimeout(() => {
+        document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
+      }, 100)
+    }
+  }
+
+  const prevStep = () => {
+    setStep((prev) => prev - 1)
+    setTimeout(() => {
+      document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    }, 100)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validateStep(step)) return
+
+    try {
+      setIsSubmitting(true)
+      setSubmissionError(null)
+      const submissionData = { ...formData, registrationDate: new Date().toISOString() }
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submissionData),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Registration failed.")
+      }
+      const responseData = await response.json()
+      setRegistrationResult(responseData)
+      setStep((prev) => prev + 1)
+      document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    } catch (error) {
+      setSubmissionError(error instanceof Error ? error.message : "An unexpected error occurred")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Simplified payment handler that always uses direct redirect
+  const handlePayment = async () => {
+    if (!selectedTeam || !registrationResult) return
+
+    try {
+      setIsProcessingPayment(true)
+      setSubmissionError(null)
+
+      console.log("🔄 Creating Checkout Session...")
+
+      // Create Checkout Session on the server
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamId: selectedTeam.id,
+          enrollmentId: registrationResult.enrollmentId,
+          amount: selectedTeam.price,
+          description: `${selectedTeam.name} - ${selectedTeam.schoolName}`,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.message || "Unable to start payment")
+      }
+
+      const data = await res.json()
+      console.log("✅ Checkout session response:", data)
+
+      // Development fallback
+      if (data.isDevelopment) {
+        console.log("🛠 Development mode – skipping real checkout.")
+        setTimeout(() => {
+          setStep(7)
+          document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })
+        }, 1500)
+        return
+      }
+
+      // Always use direct redirect to Stripe Checkout
+      if (data.url) {
+        console.log("🔄 Redirecting to Stripe Checkout:", data.url)
+        // Use window.location.href for immediate redirect
+        window.location.href = data.url
+      } else {
+        throw new Error("No checkout URL provided by server")
+      }
+    } catch (error) {
+      console.error("❌ Payment error:", error)
+      setSubmissionError(error instanceof Error ? error.message : "An unexpected payment error occurred")
+      setIsProcessingPayment(false)
+    }
+    // Note: Don't set setIsProcessingPayment(false) here if redirect is successful
+    // because the page will be redirected away
+  }
+
+  const returnToHome = () => {
+    window.location.href = "/"
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  }
+
+  return (
+    <section className="py-20 bg-white" id="register">
+      <div className="container px-4">
+        <AnimatedSection animation="fade-down" className="text-center">
+          <h2 className="text-4xl md:text-5xl wild-youth-text-blue mb-6">REGISTER NOW</h2>
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-16">
+            Find your school and team to get started with registration.
+          </p>
+        </AnimatedSection>
+
+        <div className="max-w-4xl mx-auto">
+          {/* Progress Steps */}
+          <div className="flex justify-between mb-12">
+            {[1, 2, 3, 4, 5, 6, 7].map((s) => (
+              <div key={s} className="flex flex-col items-center flex-1">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                    step >= s ? "bg-dr-blue" : "bg-gray-300"
+                  }`}
+                >
+                  {s}
+                </div>
+                <span
+                  className={`mt-2 text-sm text-center ${step >= s ? "text-dr-blue font-medium" : "text-gray-500"}`}
+                >
+                  {s === 1
+                    ? "Search"
+                    : s === 2
+                      ? "Select Team"
+                      : s === 3
+                        ? "Account"
+                        : s === 4
+                          ? "Parent Info"
+                          : s === 5
+                            ? "Review"
+                            : s === 6
+                              ? "Payment"
+                              : "Confirmation"}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Step 1: Search Schools/Teams */}
+          {step === 1 && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">Find Your School or Team</h3>
+                <div className="relative mb-6">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    placeholder="Search for your school or team..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 text-lg"
+                  />
+                </div>
+                {hasSearched && (
+                  <>
+                    {searchError && (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                        <p className="font-semibold">Connection Error</p>
+                        <p className="text-sm">{searchError}</p>
+                        <p className="text-sm mt-2">Showing sample data for demonstration purposes.</p>
+                      </div>
+                    )}
+                    {isInitialLoading && (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dr-blue mx-auto"></div>
+                        <p className="mt-2 text-gray-600">Loading schools and teams...</p>
+                      </div>
+                    )}
+                    {isLoadingSchools && (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dr-blue mx-auto"></div>
+                        <p className="mt-2 text-gray-600">Searching...</p>
+                      </div>
+                    )}
+                    {!isLoadingSchools && !isInitialLoading && (
+                      <div className="space-y-6">
+                        {filteredSchools.length === 0 ? (
+                          <div className="text-center py-8">
+                            <p className="text-gray-600">No schools or teams found matching "{searchQuery}"</p>
+                            <p className="text-sm text-gray-500 mt-2">
+                              Try a different search term or browse all schools
+                            </p>
+                          </div>
+                        ) : (
+                          filteredSchools.map((school) => (
+                            <div key={school.id} className="border border-gray-200 rounded-lg p-6">
+                              <div className="flex items-center mb-4">
+                                <Image
+                                  src={school.logo || "/placeholder.svg?height=60&width=60&text=School"}
+                                  alt={school.name}
+                                  width={60}
+                                  height={60}
+                                  className="rounded-lg mr-4"
+                                />
+                                <div>
+                                  <h4 className="text-xl font-bold text-dr-blue">{school.name}</h4>
+                                  <p className="text-gray-600 flex items-center">
+                                    <MapPin className="h-4 w-4 mr-1" />
+                                    {school.location}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="space-y-3">
+                                {school.teams.map((team) => (
+                                  <div
+                                    key={team.id}
+                                    className="bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                                    onClick={() => {
+                                      handleTeamSelect(team)
+                                      nextStep()
+                                    }}
+                                  >
+                                    <div className="flex justify-between items-start">
+                                      <div className="flex-1">
+                                        <h5 className="font-semibold text-dr-blue">{team.name}</h5>
+                                        <p className="text-sm text-gray-600 mb-2">{team.description}</p>
+                                        <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                                          <span className="bg-white px-2 py-1 rounded">
+                                            <TagIcon className="inline h-3 w-3 mr-1" />
+                                            {team.sport}
+                                          </span>
+                                          <span className="bg-white px-2 py-1 rounded">Ages {team.ageGroup}</span>
+                                          <span className="bg-white px-2 py-1 rounded">{team.skillLevel}</span>
+                                        </div>
+                                      </div>
+                                      <div className="text-right ml-4">
+                                        <div className="text-2xl font-bold text-dr-blue">${team.price}</div>
+                                        <div className="text-sm text-gray-600">per season</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </AnimatedSection>
+          )}
+
+          {/* Step 2: Team Details */}
+          {step === 2 && selectedTeam && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">Team Details</h3>
+                <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="text-xl font-bold text-dr-blue">{selectedTeam.name}</h4>
+                      <p className="text-gray-600">{selectedTeam.schoolName}</p>
+                      <p className="text-sm text-gray-600 mt-2">{selectedTeam.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-dr-blue">${selectedTeam.price}</div>
+                      <div className="text-sm text-gray-600">per season</div>
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-semibold">Sport:</span> {selectedTeam.sport}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Age Group:</span> {selectedTeam.ageGroup}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Skill Level:</span> {selectedTeam.skillLevel}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Coach:</span> {selectedTeam.coach.name}
+                    </div>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <h5 className="font-semibold text-dr-blue mb-3">Training Sessions</h5>
+                  <div className="space-y-3">
+                    {selectedTeam.sessions
+                      .slice(0, showAllSessions ? selectedTeam.sessions.length : 3)
+                      .map((session) => (
+                        <div key={session.id} className="bg-white border border-gray-200 p-4 rounded-lg">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-semibold text-dr-blue">
+                                {session.dayOfWeek} - {session.time}
+                              </div>
+                              <div className="text-sm text-gray-600 mt-1">
+                                <Calendar className="inline h-4 w-4 mr-1" />
+                                {formatDate(session.startDate)} - {formatDate(session.endDate)}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                <MapPin className="inline h-4 w-4 mr-1" />
+                                {session.location}
+                              </div>
+                            </div>
+                            <div className="text-right text-sm text-gray-600">
+                              <div>Duration: {session.duration}</div>
+                              <div>Coach: {session.coachName}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                  {selectedTeam.sessions.length > 3 && (
+                    <button
+                      onClick={() => setShowAllSessions(!showAllSessions)}
+                      className="mt-3 text-dr-blue hover:text-blue-700 text-sm font-medium flex items-center"
+                    >
+                      {showAllSessions ? (
+                        <>
+                          Show Less <ChevronUp className="ml-1 h-4 w-4" />
+                        </>
+                      ) : (
+                        <>
+                          Show All {selectedTeam.sessions.length} Sessions <ChevronDown className="ml-1 h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-4">
+                  <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                    Back
+                  </Button>
+                  <Button onClick={nextStep} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            </AnimatedSection>
+          )}
+
+          {/* Step 3: Authentication */}
+          {step === 3 && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">Account Required</h3>
+                <p className="text-gray-600 mb-6">
+                  To complete your registration, you need to log in to your account or create a new one.
+                </p>
+
+                {/* Show session check loading */}
+                {isCheckingSession && (
+                  <div className="text-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-dr-blue" />
+                    <p className="text-gray-600">Checking your session...</p>
+                  </div>
+                )}
+
+                {/* Show already logged in message */}
+                {!isCheckingSession && currentUser && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-center">
+                      <User className="h-5 w-5 text-green-600 mr-2" />
+                      <div>
+                        <p className="font-semibold text-green-800">Already Logged In</p>
+                        <p className="text-green-700">You are already logged in as {currentUser.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show login/register form only if not logged in */}
+                {!isCheckingSession && !currentUser && (
+                  <>
+                    {/* Auth Mode Toggle */}
+                    <div className="flex mb-6">
+                      <button
+                        onClick={() => setAuthMode("login")}
+                        className={`flex-1 py-3 px-4 text-center font-medium rounded-l-lg border ${
+                          authMode === "login"
+                            ? "bg-dr-blue text-white border-dr-blue"
+                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                        }`}
+                      >
+                        <LogIn className="inline h-4 w-4 mr-2" />
+                        Login
+                      </button>
+                      <button
+                        onClick={() => setAuthMode("register")}
+                        className={`flex-1 py-3 px-4 text-center font-medium rounded-r-lg border-t border-r border-b ${
+                          authMode === "register"
+                            ? "bg-dr-blue text-white border-dr-blue"
+                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                        }`}
+                      >
+                        <UserPlus className="inline h-4 w-4 mr-2" />
+                        Create Account
+                      </button>
+                    </div>
+
+                    {/* Registration Form */}
+                    {authMode === "register" && (
+                      <div className="space-y-4 mb-6">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <Input
+                              name="authFirstName"
+                              value={authFirstName}
+                              onChange={handleAuthChange}
+                              className={errors.firstName ? "border-red-500" : ""}
+                            />
+                            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <Input
+                              name="authLastName"
+                              value={authLastName}
+                              onChange={handleAuthChange}
+                              className={errors.lastName ? "border-red-500" : ""}
+                            />
+                            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                          <Input
+                            name="authPhone"
+                            value={authPhone}
+                            onChange={handleAuthChange}
+                            placeholder="(555) 123-4567"
+                            className={errors.phone ? "border-red-500" : ""}
+                          />
+                          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Common Fields */}
+                    <div className="space-y-4 mb-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <Input
+                          name="authEmail"
+                          type="email"
+                          value={authEmail}
+                          onChange={handleAuthChange}
+                          className={errors.email ? "border-red-500" : ""}
+                        />
+                        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <Input
+                          name="authPassword"
+                          type="password"
+                          value={authPassword}
+                          onChange={handleAuthChange}
+                          className={errors.password ? "border-red-500" : ""}
+                        />
+                        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                      </div>
+                      {authMode === "register" && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                          <Input
+                            name="authConfirmPassword"
+                            type="password"
+                            value={authConfirmPassword}
+                            onChange={handleAuthChange}
+                            className={errors.confirmPassword ? "border-red-500" : ""}
+                          />
+                          {errors.confirmPassword && (
+                            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {authMode === "login" && (
+                      <div className="text-center mb-6">
+                        <Link href="/auth/forgot-password" className="text-dr-blue hover:text-blue-700 text-sm">
+                          <KeyRound className="inline h-4 w-4 mr-1" />
+                          Forgot your password?
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Messages */}
+                {authError && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    <AlertCircle className="inline h-4 w-4 mr-2" />
+                    {authError}
+                  </div>
+                )}
+
+                {message && (
+                  <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">
+                    <CheckCircle className="inline h-4 w-4 mr-2" />
+                    {message}
+                  </div>
+                )}
+
+                {isEmailConfirmationSent && (
+                  <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-6">
+                    <div className="flex items-start">
+                      <Mail className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Check Your Email</p>
+                        <p className="text-sm mt-1">
+                          We've sent a confirmation link to <strong>{authEmail}</strong>. Please check your email and
+                          click the link to verify your account.
+                        </p>
+                        <p className="text-sm mt-2">
+                          After confirming your email, you'll be automatically logged in and can continue with
+                          registration.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                    Back
+                  </Button>
+
+                  {!isCheckingSession && currentUser ? (
+                    <div className="flex gap-2 flex-1">
+                      <Button onClick={handleLogout} variant="outline" className="flex-1 bg-transparent">
+                        Logout
+                      </Button>
+                      <Button onClick={nextStep} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                        Continue
+                      </Button>
+                    </div>
+                  ) : !isCheckingSession && !isEmailConfirmationSent ? (
+                    <Button
+                      onClick={authMode === "login" ? handleLogin : handleRegister}
+                      disabled={isAuthLoading}
+                      className="flex-1 bg-dr-blue hover:bg-blue-700"
+                    >
+                      {isAuthLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {authMode === "login" ? "Logging in..." : "Creating Account..."}
+                        </>
+                      ) : (
+                        <>
+                          {authMode === "login" ? (
+                            <>
+                              <LogIn className="mr-2 h-4 w-4" />
+                              Login & Continue
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Create Account
+                            </>
+                          )}
+                        </>
+                      )}
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            </AnimatedSection>
+          )}
+
+          {/* Step 4: Parent and Child Information */}
+          {step === 4 && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">Parent and Child Information</h3>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Parent Information */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Parent/Guardian Information</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <Input
+                          name="parentFirstName"
+                          value={formData.parentFirstName}
+                          onChange={handleChange}
+                          className={errors.parentFirstName ? "border-red-500" : ""}
+                        />
+                        {errors.parentFirstName && (
+                          <p className="text-red-500 text-sm mt-1">{errors.parentFirstName}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <Input
+                          name="parentLastName"
+                          value={formData.parentLastName}
+                          onChange={handleChange}
+                          className={errors.parentLastName ? "border-red-500" : ""}
+                        />
+                        {errors.parentLastName && <p className="text-red-500 text-sm mt-1">{errors.parentLastName}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <Input
+                          name="parentEmail"
+                          type="email"
+                          value={formData.parentEmail}
+                          onChange={handleChange}
+                          className={errors.parentEmail ? "border-red-500" : ""}
+                        />
+                        {errors.parentEmail && <p className="text-red-500 text-sm mt-1">{errors.parentEmail}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <Input
+                          name="parentPhone"
+                          value={formData.parentPhone}
+                          onChange={handleChange}
+                          placeholder="(555) 123-4567"
+                          className={errors.parentPhone ? "border-red-500" : ""}
+                        />
+                        {errors.parentPhone && <p className="text-red-500 text-sm mt-1">{errors.parentPhone}</p>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Child Information */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Child Information</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <Input
+                          name="childFirstName"
+                          value={formData.childFirstName}
+                          onChange={handleChange}
+                          className={errors.childFirstName ? "border-red-500" : ""}
+                        />
+                        {errors.childFirstName && <p className="text-red-500 text-sm mt-1">{errors.childFirstName}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <Input
+                          name="childLastName"
+                          value={formData.childLastName}
+                          onChange={handleChange}
+                          className={errors.childLastName ? "border-red-500" : ""}
+                        />
+                        {errors.childLastName && <p className="text-red-500 text-sm mt-1">{errors.childLastName}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                        <Input
+                          name="childBirthdate"
+                          type="date"
+                          value={formData.childBirthdate}
+                          onChange={handleChange}
+                          className={errors.childBirthdate ? "border-red-500" : ""}
+                        />
+                        {errors.childBirthdate && <p className="text-red-500 text-sm mt-1">{errors.childBirthdate}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Grade</label>
+                        <select
+                          name="childGrade"
+                          value={formData.childGrade}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue ${
+                            errors.childGrade ? "border-red-500" : "border-gray-300"
+                          }`}
+                        >
+                          <option value="">Select Grade</option>
+                          {Array.from({ length: 13 }, (_, i) => (
+                            <option key={i} value={i === 0 ? "K" : i.toString()}>
+                              {i === 0 ? "Kindergarten" : `Grade ${i}`}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.childGrade && <p className="text-red-500 text-sm mt-1">{errors.childGrade}</p>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Emergency Contact */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Emergency Contact</h4>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                        <Input
+                          name="emergencyContactName"
+                          value={formData.emergencyContactName}
+                          onChange={handleChange}
+                          className={errors.emergencyContactName ? "border-red-500" : ""}
+                        />
+                        {errors.emergencyContactName && (
+                          <p className="text-red-500 text-sm mt-1">{errors.emergencyContactName}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <Input
+                          name="emergencyContactPhone"
+                          value={formData.emergencyContactPhone}
+                          onChange={handleChange}
+                          placeholder="(555) 123-4567"
+                          className={errors.emergencyContactPhone ? "border-red-500" : ""}
+                        />
+                        {errors.emergencyContactPhone && (
+                          <p className="text-red-500 text-sm mt-1">{errors.emergencyContactPhone}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Relationship</label>
+                        <select
+                          name="emergencyContactRelation"
+                          value={formData.emergencyContactRelation}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue ${
+                            errors.emergencyContactRelation ? "border-red-500" : "border-gray-300"
+                          }`}
+                        >
+                          <option value="">Select Relationship</option>
+                          <option value="Parent">Parent</option>
+                          <option value="Guardian">Guardian</option>
+                          <option value="Grandparent">Grandparent</option>
+                          <option value="Aunt/Uncle">Aunt/Uncle</option>
+                          <option value="Family Friend">Family Friend</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        {errors.emergencyContactRelation && (
+                          <p className="text-red-500 text-sm mt-1">{errors.emergencyContactRelation}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Optional Information */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Additional Information (Optional)</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Medical Conditions</label>
+                        <textarea
+                          name="medicalConditions"
+                          value={formData.medicalConditions}
+                          onChange={handleChange}
+                          rows={3}
+                          placeholder="Please list any medical conditions, allergies, or medications we should be aware of..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                        <textarea
+                          name="specialInstructions"
+                          value={formData.specialInstructions}
+                          onChange={handleChange}
+                          rows={3}
+                          placeholder="Any special instructions or additional information for coaches..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Button type="button" onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                      Back
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Continue to Review"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+
+                {submissionError && (
+                  <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    <AlertCircle className="inline h-4 w-4 mr-2" />
+                    {submissionError}
+                  </div>
+                )}
+              </div>
+            </AnimatedSection>
+          )}
+
+          {/* Step 5: Review */}
+          {step === 5 && selectedTeam && registrationResult && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">Review Your Registration</h3>
+                <div className="space-y-6">
+                  {/* Team Information */}
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h4 className="font-semibold text-dr-blue mb-3">Selected Team</h4>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">Team:</span> {selectedTeam.name}
+                      </div>
+                      <div>
+                        <span className="font-medium">School:</span> {selectedTeam.schoolName}
+                      </div>
+                      <div>
+                        <span className="font-medium">Coach:</span> {selectedTeam.coach.name}
+                      </div>
+                      <div>
+                        <span className="font-medium">Price:</span> ${selectedTeam.price}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Registration Information */}
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h4 className="font-semibold text-dr-blue mb-3">Registration Details</h4>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">Parent:</span> {formData.parentFirstName}{" "}
+                        {formData.parentLastName}
+                      </div>
+                      <div>
+                        <span className="font-medium">Email:</span> {formData.parentEmail}
+                      </div>
+                      <div>
+                        <span className="font-medium">Phone:</span> {formData.parentPhone}
+                      </div>
+                      <div>
+                        <span className="font-medium">Child:</span> {formData.childFirstName} {formData.childLastName}
+                      </div>
+                      <div>
+                        <span className="font-medium">Grade:</span> {formData.childGrade}
+                      </div>
+                      <div>
+                        <span className="font-medium">Emergency Contact:</span> {formData.emergencyContactName} (
+                        {formData.emergencyContactRelation})
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Success Message */}
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                    <CheckCircle className="inline h-4 w-4 mr-2" />
+                    Registration submitted successfully! Your enrollment ID is:{" "}
+                    <strong>{registrationResult.enrollmentId}</strong>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                      Back to Edit
+                    </Button>
+                    <Button onClick={nextStep} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                      Proceed to Payment
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
+          )}
+
+          {/* Step 6: Payment */}
+          {step === 6 && selectedTeam && registrationResult && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">Payment</h3>
+                <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                  <h4 className="font-semibold text-dr-blue mb-3">Payment Summary</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>
+                        {selectedTeam.name} - {selectedTeam.schoolName}
+                      </span>
+                      <span>${selectedTeam.price}</span>
+                    </div>
+                    <div className="border-t pt-2 flex justify-between font-semibold">
+                      <span>Total</span>
+                      <span>${selectedTeam.price}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center mb-6">
+                  <p className="text-gray-600 mb-4">Click below to proceed to secure payment processing.</p>
+                  <Button
+                    onClick={handlePayment}
+                    disabled={isProcessingPayment}
+                    className="bg-dr-blue hover:bg-blue-700 px-8 py-3"
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Pay ${selectedTeam.price}
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {submissionError && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    <AlertCircle className="inline h-4 w-4 mr-2" />
+                    {submissionError}
+                  </div>
+                )}
+                <div className="flex gap-4">
+                  <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                    Back
+                  </Button>
+                </div>
+              </div>
+            </AnimatedSection>
+          )}
+
+          {/* Step 7: Confirmation */}
+          {step === 7 && selectedTeam && registrationResult && (
+            <AnimatedSection animation="fade-up">
+              <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+                <div className="bg-green-100 rounded-full p-6 w-24 h-24 mx-auto mb-6">
+                  <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
+                </div>
+                <h3 className="text-3xl font-bold text-dr-blue mb-4">Registration Complete!</h3>
+                <p className="text-xl text-gray-700 mb-6">
+                  Welcome to {selectedTeam.name}! Your registration has been successfully processed.
+                </p>
+                <div className="bg-gray-50 p-6 rounded-lg mb-6 text-left">
+                  <h4 className="font-semibold text-dr-blue mb-3">What's Next?</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li>• You'll receive a confirmation email with all the details</li>
+                    <li>• The coach will contact you before the first session</li>
+                    <li>• Check your parent dashboard for updates and schedules</li>
+                    <li>• Bring water bottle and appropriate athletic wear to sessions</li>
+                  </ul>
+                </div>
+                <div className="space-y-3">
+                  <Button onClick={returnToHome} className="w-full bg-dr-blue hover:bg-blue-700">
+                    Return to Home
+                  </Button>
+                  <Button onClick={() => (window.location.href = "/dashboard")} variant="outline" className="w-full">
+                    View Parent Dashboard
+                  </Button>
+                </div>
+              </div>
+            </AnimatedSection>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
