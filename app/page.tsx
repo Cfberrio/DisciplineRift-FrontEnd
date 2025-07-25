@@ -1,7 +1,4 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import ScrollProgress from "@/components/scroll-progress"
 import Header from "@/components/header"
 import PassionInspiredHero from "@/components/passion-inspired-hero"
@@ -12,79 +9,26 @@ import FaqSection from "@/components/faq-section"
 import ContactSection from "@/components/contact-section"
 import RegisterSection from "@/components/register-section"
 import EmailSignupManager from "@/components/email-signup-manager"
-import { Button } from "@/components/ui/button"
 import AnimatedSection from "@/components/animated-section"
-import { CheckCircle, X } from "lucide-react"
+import SuccessMessageHandler from "@/components/success-message-handler"
+import { Button } from "@/components/ui/button"
+
+function SuccessMessageSuspense() {
+  return (
+    <Suspense fallback={null}>
+      <SuccessMessageHandler />
+    </Suspense>
+  )
+}
 
 export default function Home() {
-  const searchParams = useSearchParams()
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
-
-  useEffect(() => {
-    const enrollment = searchParams.get("enrollment")
-    if (enrollment === "success") {
-      setShowSuccessMessage(true)
-    }
-  }, [searchParams])
-
-  const handleCloseSuccessMessage = () => {
-    setShowSuccessMessage(false)
-    // Clean URL by removing query parameters
-    window.history.replaceState({}, document.title, "/")
-  }
   return (
     <div className="min-h-screen">
       <ScrollProgress />
       <Header />
       
-      {/* Success Message Overlay */}
-      {showSuccessMessage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8 relative">
-            <button
-              onClick={handleCloseSuccessMessage}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </button>
-            
-            <div className="text-center">
-              <div className="bg-green-100 rounded-full p-4 w-20 h-20 mx-auto mb-6">
-                <CheckCircle className="h-12 w-12 text-green-600 mx-auto" />
-              </div>
-              
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                🎉 Congratulations!
-              </h2>
-              
-              <p className="text-xl text-gray-700 mb-2">
-                You are now enrolled!
-              </p>
-              
-              <p className="text-gray-600 mb-6">
-                Welcome to Discipline Rift! You'll receive a confirmation email shortly with all the details about your enrollment.
-              </p>
-              
-              <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                <h4 className="font-semibold text-blue-900 mb-2">What's Next?</h4>
-                <ul className="text-sm text-blue-800 text-left space-y-1">
-                  <li>• Check your email for confirmation details</li>
-                  <li>• Your coach will contact you soon</li>
-                  <li>• Access your dashboard for updates</li>
-                  <li>• Get ready for an amazing experience!</li>
-                </ul>
-              </div>
-              
-              <Button 
-                onClick={handleCloseSuccessMessage}
-                className="w-full bg-dr-blue hover:bg-blue-700"
-              >
-                Continue Exploring
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Success Message Handler with Suspense */}
+      <SuccessMessageSuspense />
       <main className="flex flex-col bg-pattern">
         {/* Passion-inspired Hero Section (no id needed for nav) */}
         <PassionInspiredHero />
