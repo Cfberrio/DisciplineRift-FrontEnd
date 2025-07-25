@@ -33,6 +33,7 @@ import {
 } from "lucide-react"
 import AdminLogin from "./admin-login"
 import StudentManagement from "./student-management"
+import EmailTestPanel from "./email-test-panel"
 import { getAdminSession, logoutAdmin, type AdminUser } from "@/lib/admin-auth"
 
 // Mock data for demonstration
@@ -378,13 +379,14 @@ export default function ParentDashboard() {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-6">
+              <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="overview">Resumen</TabsTrigger>
                 <TabsTrigger value="students">Estudiantes</TabsTrigger>
                 <TabsTrigger value="programs">Programas</TabsTrigger>
                 <TabsTrigger value="progress">Progreso</TabsTrigger>
                 <TabsTrigger value="reports">Reportes</TabsTrigger>
                 <TabsTrigger value="medical">Médico</TabsTrigger>
+                <TabsTrigger value="email">Email</TabsTrigger>
               </TabsList>
 
               {/* Overview Tab */}
@@ -849,6 +851,23 @@ export default function ParentDashboard() {
                         </Button>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Email Test Tab */}
+              <TabsContent value="email" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      📧 Sistema de Confirmación de Emails
+                    </CardTitle>
+                    <p className="text-gray-600">
+                      Prueba y configura el sistema de envío automático de emails de confirmación de pago.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EmailTestPanel />
                   </CardContent>
                 </Card>
               </TabsContent>

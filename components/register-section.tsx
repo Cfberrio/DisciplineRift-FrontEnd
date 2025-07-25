@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import AnimatedSection from "@/components/animated-section"
+import SupabaseStatus from "@/components/supabase-status"
 import {
   CheckCircle,
   Search,
@@ -161,44 +162,109 @@ export default function RegisterSection() {
 
   // Check for existing session on component mount
   useEffect(() => {
+    let isMounted = true
+
     async function checkSession() {
       try {
+        if (!isMounted) return
+        
         setIsCheckingSession(true)
         console.log("🔄 Checking for existing session...")
 
+        // Check if Supabase is configured
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          console.warn("⚠️ Supabase not configured, skipping session check")
+          setIsCheckingSession(false)
+          return
+        }
+
+        // Set a timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (isMounted) {
+            console.warn("⚠️ Session check timeout, setting to false")
+            setIsCheckingSession(false)
+          }
+        }, 5000) // 5 second timeout
+
         const {
           data: { session },
+          error: sessionError,
         } = await supabase.auth.getSession()
+
+        // Clear timeout if we get a response
+        clearTimeout(timeoutId)
+
+        if (!isMounted) return
+
+        if (sessionError) {
+          console.error("❌ Session error:", sessionError)
+          setIsCheckingSession(false)
+          return
+        }
 
         if (session?.user) {
           console.log("✅ Found existing session:", session.user.id)
 
-          const { data: parentData, error: parentError } = await supabase
-            .from("parent")
-            .select("*")
-            .eq("parentid", session.user.id)
-            .single()
+          try {
+            // Use a shorter timeout for the database query
+            const controller = new AbortController()
+            const dbTimeoutId = setTimeout(() => controller.abort(), 3000)
 
-          if (!parentError && parentData) {
-            const user: UserType = {
-              id: session.user.id,
-              email: session.user.email || "",
-              firstName: parentData.firstname || "",
-              lastName: parentData.lastname || "",
-              phone: parentData.phone || "",
+            const { data: parentData, error: parentError } = await supabase
+              .from("parent")
+              .select("*")
+              .eq("parentid", session.user.id)
+              .abortSignal(controller.signal)
+              .single()
+
+            clearTimeout(dbTimeoutId)
+
+            if (!isMounted) return
+
+            if (!parentError && parentData) {
+              const user: UserType = {
+                id: session.user.id,
+                email: session.user.email || "",
+                firstName: parentData.firstname || "",
+                lastName: parentData.lastname || "",
+                phone: parentData.phone || "",
+              }
+              setCurrentUser(user)
+              setFormData((prev) => ({
+                ...prev,
+                userId: user.id,
+                parentEmail: user.email,
+                parentFirstName: user.firstName,
+                parentLastName: user.lastName,
+                parentPhone: user.phone,
+              }))
+              console.log("✅ User data loaded from parent record")
+            } else {
+              console.log("⚠️ Parent record not found, using auth metadata")
+              // Parent record doesn't exist, but user is logged in
+              const user: UserType = {
+                id: session.user.id,
+                email: session.user.email || "",
+                firstName: session.user.user_metadata?.firstName || "",
+                lastName: session.user.user_metadata?.lastName || "",
+                phone: session.user.user_metadata?.phone || "",
+              }
+              setCurrentUser(user)
+              setFormData((prev) => ({
+                ...prev,
+                userId: user.id,
+                parentEmail: user.email,
+                parentFirstName: user.firstName,
+                parentLastName: user.lastName,
+                parentPhone: user.phone,
+              }))
+              console.log("✅ User data loaded from auth metadata")
             }
-            setCurrentUser(user)
-            setFormData((prev) => ({
-              ...prev,
-              userId: user.id,
-              parentEmail: user.email,
-              parentFirstName: user.firstName,
-              parentLastName: user.lastName,
-              parentPhone: user.phone,
-            }))
-            console.log("✅ User data loaded from parent record")
-          } else {
-            // Parent record doesn't exist, but user is logged in
+          } catch (dbError) {
+            if (!isMounted) return
+            
+            console.error("❌ Database error, using fallback:", dbError)
+            // Fallback to auth metadata if database query fails
             const user: UserType = {
               id: session.user.id,
               email: session.user.email || "",
@@ -215,48 +281,36 @@ export default function RegisterSection() {
               parentLastName: user.lastName,
               parentPhone: user.phone,
             }))
-            console.log("✅ User data loaded from auth metadata")
+            console.log("✅ User data loaded from auth metadata (fallback)")
           }
         } else {
           console.log("ℹ️ No existing session found")
         }
       } catch (error) {
+        if (!isMounted) return
         console.error("❌ Error checking session:", error)
       } finally {
-        setIsCheckingSession(false)
+        if (isMounted) {
+          setIsCheckingSession(false)
+        }
       }
     }
 
     checkSession()
 
-    // Listen for auth state changes
+    // Cleanup function
+    return () => {
+      isMounted = false
+    }
+
+    // Simplified auth state listener - only handle logout
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       console.log("🔄 Auth state changed:", event, session?.user?.id)
 
-      if (event === "SIGNED_IN" && session?.user) {
-        const { data: parentData } = await supabase.from("parent").select("*").eq("parentid", session.user.id).single()
-
-        const user: UserType = {
-          id: session.user.id,
-          email: session.user.email || "",
-          firstName: parentData?.firstname || session.user.user_metadata?.firstName || "",
-          lastName: parentData?.lastname || session.user.user_metadata?.lastName || "",
-          phone: parentData?.phone || session.user.user_metadata?.phone || "",
-        }
-
-        setCurrentUser(user)
-        setFormData((prev) => ({
-          ...prev,
-          userId: user.id,
-          parentEmail: user.email,
-          parentFirstName: user.firstName,
-          parentLastName: user.lastName,
-          parentPhone: user.phone,
-        }))
-        console.log("✅ Auth state change - user logged in")
-      } else if (event === "SIGNED_OUT") {
+      // Only handle logout to clear state - login is handled manually
+      if (event === "SIGNED_OUT") {
         setCurrentUser(null)
         setFormData((prev) => ({
           ...prev,
@@ -268,6 +322,7 @@ export default function RegisterSection() {
         }))
         console.log("ℹ️ Auth state change - user logged out")
       }
+      // Note: We don't handle SIGNED_IN here to avoid conflicts with manual login flow
     })
 
     return () => subscription.unsubscribe()
@@ -542,16 +597,33 @@ export default function RegisterSection() {
     setAuthError(null)
 
     try {
+      console.log("🔄 Iniciando login para:", authEmail)
+
+      // Add timeout for the login request
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => {
+        controller.abort()
+        console.warn("⚠️ Login request timeout")
+      }, 10000) // 10 second timeout
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: authEmail, password: authPassword }),
+        signal: controller.signal,
       })
 
+      clearTimeout(timeoutId)
+
       const data = await response.json()
+      console.log("📨 Login response:", { success: response.ok, hasUser: !!data.user, hasSession: !!data.session })
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed")
+      }
+
+      if (!data.user) {
+        throw new Error("No user data received from server")
       }
 
       // Create user object from response
@@ -563,12 +635,33 @@ export default function RegisterSection() {
         phone: data.user.phone,
       }
 
-      // Set Supabase session if provided
+      console.log("✅ Usuario autenticado:", user.email)
+
+      // Set Supabase session with timeout
       if (data.session) {
-        await supabase.auth.setSession(data.session)
+        try {
+          console.log("🔄 Estableciendo sesión en Supabase...")
+          const sessionPromise = supabase.auth.setSession(data.session)
+          const sessionTimeoutId = setTimeout(() => {
+            console.warn("⚠️ Session set timeout, continuing anyway")
+          }, 3000)
+
+          await Promise.race([
+            sessionPromise,
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error("Session timeout")), 3000)
+            )
+          ])
+
+          clearTimeout(sessionTimeoutId)
+          console.log("✅ Sesión establecida en Supabase")
+        } catch (sessionError) {
+          console.warn("⚠️ Error setting session, continuing:", sessionError)
+          // Continue even if session setting fails
+        }
       }
 
-      // Update user state and form data
+      // Update user state and form data immediately
       setCurrentUser(user)
       setFormData((prev) => ({
         ...prev,
@@ -584,21 +677,42 @@ export default function RegisterSection() {
       
       // Show success message
       if (data.alreadyLoggedIn) {
-        setMessage(`You are already logged in as ${data.user.email}`)
+        setMessage(`Ya tienes sesión iniciada como ${data.user.email}`)
+      } else {
+        setMessage(`¡Bienvenido, ${user.firstName}!`)
       }
-      
+
+      console.log("🔄 Procediendo al siguiente paso...")
+
       // Go directly to step 4 (Parent Info) after successful login
+      // Use immediate state update instead of setTimeout
+      setIsAuthLoading(false) // Set this first
+      setStep(4)
+      
+      // Scroll to top after a brief delay for better UX
       setTimeout(() => {
-        setStep(4)
-        setTimeout(() => {
-          document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
-        }, 100)
-      }, 200)
+        document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
+      }, 300)
+
+      return // Exit early to prevent the finally block from setting loading to false again
 
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "An unknown error occurred.")
+      console.error("❌ Error en login:", error)
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          setAuthError("El login está tomando mucho tiempo. Por favor, verifica tu conexión e intenta de nuevo.")
+        } else {
+          setAuthError(error.message)
+        }
+      } else {
+        setAuthError("Ocurrió un error inesperado durante el login.")
+      }
     } finally {
-      setIsAuthLoading(false)
+      // Only set loading to false if we haven't already done so
+      if (isAuthLoading) {
+        setIsAuthLoading(false)
+      }
     }
   }
 
@@ -1061,11 +1175,30 @@ export default function RegisterSection() {
                   To complete your registration, you need to log in to your account or create a new one.
                 </p>
 
+                {/* Supabase Status Check */}
+                <SupabaseStatus showOnlyErrors={true} />
+
                 {/* Show session check loading */}
                 {isCheckingSession && (
                   <div className="text-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-dr-blue" />
-                    <p className="text-gray-600">Checking your session...</p>
+                    <p className="text-gray-600 mb-4">Verificando tu sesión...</p>
+                    <div className="space-y-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          console.log("🔄 Usuario saltó manualmente la verificación de sesión")
+                          setIsCheckingSession(false)
+                        }}
+                        className="text-sm mr-2"
+                      >
+                        Saltar & Continuar
+                      </Button>
+                      <p className="text-xs text-gray-500">
+                        Si esto toma mucho tiempo, puedes continuar y iniciar sesión manualmente
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -1078,6 +1211,40 @@ export default function RegisterSection() {
                         <p className="font-semibold text-green-800">Already Logged In</p>
                         <p className="text-green-700">You are already logged in as {currentUser.email}</p>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show login status during authentication */}
+                {isAuthLoading && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Loader2 className="h-5 w-5 text-blue-600 mr-3 animate-spin" />
+                        <div>
+                          <p className="font-semibold text-blue-800">
+                            {authMode === "login" ? "Iniciando Sesión..." : "Creando Cuenta..."}
+                          </p>
+                          <p className="text-blue-700 text-sm">
+                            {authMode === "login" 
+                              ? "Verificando tus credenciales y configurando tu sesión..." 
+                              : "Creando tu cuenta y configurando tu perfil..."
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setIsAuthLoading(false)
+                          setAuthError("Login cancelado por el usuario")
+                          console.log("🔄 Usuario canceló el login")
+                        }}
+                        className="text-blue-700 border-blue-300 hover:bg-blue-100"
+                      >
+                        Cancelar
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -1255,24 +1422,24 @@ export default function RegisterSection() {
                     <Button
                       onClick={authMode === "login" ? handleLogin : handleRegister}
                       disabled={isAuthLoading}
-                      className="flex-1 bg-dr-blue hover:bg-blue-700"
+                      className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                       {isAuthLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {authMode === "login" ? "Logging in..." : "Creating Account..."}
+                          {authMode === "login" ? "Iniciando Sesión..." : "Creando Cuenta..."}
                         </>
                       ) : (
                         <>
                           {authMode === "login" ? (
                             <>
                               <LogIn className="mr-2 h-4 w-4" />
-                              Login & Continue
+                              Iniciar Sesión & Continuar
                             </>
                           ) : (
                             <>
                               <UserPlus className="mr-2 h-4 w-4" />
-                              Create Account
+                              Crear Cuenta
                             </>
                           )}
                         </>

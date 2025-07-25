@@ -113,36 +113,66 @@ export async function POST(request: Request) {
       },
     )
 
-    // Get or create parent record
-    let { data: parentData, error: parentError } = await supabaseAdmin
-      .from("parent")
-      .select("*")
-      .eq("parentid", authData.user.id)
-      .single()
+    // Get or create parent record with timeout
+    let parentData = null
+    try {
+      console.log("🔄 Checking parent record for user:", authData.user.id)
+      
+      // Add timeout for database operations
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => {
+        controller.abort()
+        console.warn("⚠️ Parent record query timeout")
+      }, 3000) // 3 second timeout
 
-    if (parentError && parentError.code === "PGRST116") {
-      // Parent record doesn't exist, create it using upsert
-      console.log("🔄 Creating parent record for user:", authData.user.id)
-
-      const { data: newParentData, error: upsertError } = await supabaseAdmin
+      const { data: existingParent, error: parentError } = await supabaseAdmin
         .from("parent")
-        .upsert({
-          parentid: authData.user.id,
-          firstname: authData.user.user_metadata?.firstName || "",
-          lastname: authData.user.user_metadata?.lastName || "",
-          email: authData.user.email || "",
-          phone: authData.user.user_metadata?.phone || "",
-        })
-        .select()
+        .select("*")
+        .eq("parentid", authData.user.id)
+        .abortSignal(controller.signal)
         .single()
 
-      if (upsertError) {
-        console.error("❌ Failed to create parent record:", upsertError)
-        // Continue with login even if parent record creation fails
+      clearTimeout(timeoutId)
+
+      if (parentError && parentError.code === "PGRST116") {
+        // Parent record doesn't exist, create it using upsert
+        console.log("🔄 Creating parent record for user:", authData.user.id)
+
+        const createTimeoutId = setTimeout(() => {
+          console.warn("⚠️ Parent record creation timeout")
+        }, 5000) // 5 second timeout for creation
+
+        const { data: newParentData, error: upsertError } = await supabaseAdmin
+          .from("parent")
+          .upsert({
+            parentid: authData.user.id,
+            firstname: authData.user.user_metadata?.firstName || "",
+            lastname: authData.user.user_metadata?.lastName || "",
+            email: authData.user.email || "",
+            phone: authData.user.user_metadata?.phone || "",
+          })
+          .select()
+          .single()
+
+        clearTimeout(createTimeoutId)
+
+        if (upsertError) {
+          console.error("❌ Failed to create parent record:", upsertError)
+          // Continue with login even if parent record creation fails
+        } else {
+          parentData = newParentData
+          console.log("✅ Parent record created successfully")
+        }
+      } else if (!parentError) {
+        parentData = existingParent
+        console.log("✅ Parent record found")
       } else {
-        parentData = newParentData
-        console.log("✅ Parent record created successfully")
+        console.error("❌ Parent record query error:", parentError)
+        // Continue with login using metadata
       }
+    } catch (dbError) {
+      console.error("❌ Database operation failed:", dbError)
+      // Continue with login using metadata fallback
     }
 
     return NextResponse.json({

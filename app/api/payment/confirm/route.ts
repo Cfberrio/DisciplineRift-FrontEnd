@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import Stripe from "stripe"
+import { sendPaymentConfirmationEmail, sendPaymentNotificationToCompany } from "@/lib/email-service"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
@@ -8,6 +9,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function GET(request: Request) {
   try {
+    console.log("🚀 === PAYMENT CONFIRMATION GET METHOD STARTED ===")
+    
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, message: "Database service not configured" }, { status: 503 })
     }
@@ -16,11 +19,40 @@ export async function GET(request: Request) {
     const sessionId = searchParams.get("session_id")
     const enrollmentId = searchParams.get("enrollment_id")
 
+    console.log("📋 Payment confirmation parameters:", { 
+      sessionId: sessionId?.substring(0, 20) + "...", 
+      enrollmentId 
+    })
+
     if (!sessionId) {
+      console.error("❌ Missing session_id in payment confirmation")
       return NextResponse.redirect(new URL("/payment/cancel?error=missing_session", request.url))
     }
 
     console.log("🔄 Processing payment confirmation for session:", sessionId)
+
+    // IMMEDIATE EMAIL TEST - Let's see if email system works at all
+    console.log("🧪 === IMMEDIATE EMAIL SYSTEM TEST ===")
+    try {
+      const gmailUser = process.env.GMAIL_USER
+      const gmailPassword = process.env.GMAIL_APP_PASSWORD
+      
+      console.log("🔍 Gmail config check:", {
+        hasUser: !!gmailUser,
+        hasPassword: !!gmailPassword,
+        userValue: gmailUser || "NOT_SET"
+      })
+
+      if (gmailUser && gmailPassword) {
+        console.log("✅ Gmail credentials found - will attempt email sending")
+      } else {
+        console.error("❌ GMAIL CREDENTIALS MISSING!")
+        console.error("- GMAIL_USER:", gmailUser || "NOT SET")
+        console.error("- GMAIL_APP_PASSWORD:", gmailPassword ? "SET" : "NOT SET")
+      }
+    } catch (configError) {
+      console.error("❌ Error checking Gmail config:", configError)
+    }
 
     // Check if this is a development/mock session
     if (sessionId.startsWith("mock_")) {
@@ -49,6 +81,7 @@ export async function GET(request: Request) {
     })
 
     if (session.payment_status !== "paid") {
+      console.log("⚠️ Payment not completed, status:", session.payment_status)
       return NextResponse.redirect(new URL("/payment/cancel?error=payment_not_completed", request.url))
     }
 
@@ -58,6 +91,8 @@ export async function GET(request: Request) {
       console.error("❌ No enrollment ID found")
       return NextResponse.redirect(new URL("/payment/cancel?error=missing_enrollment", request.url))
     }
+
+    console.log("📝 Final enrollment ID for email:", finalEnrollmentId)
 
     // Try to create payment record, but don't fail if schema issues exist
     try {
@@ -107,6 +142,198 @@ export async function GET(request: Request) {
     } else {
       console.log("✅ Enrollment activated successfully")
     }
+
+    // FORCE EMAIL SENDING - WITH DETAILED DEBUGGING
+    console.log("📧 === FORCED EMAIL CONFIRMATION PROCESS ===")
+    
+    try {
+      // Check email configuration first
+      console.log("🔍 Step 1: Checking Gmail configuration...")
+      const gmailUser = process.env.GMAIL_USER
+      const gmailPassword = process.env.GMAIL_APP_PASSWORD
+      
+      if (!gmailUser || !gmailPassword) {
+        console.error("❌ Gmail credentials not configured!")
+        console.error("- GMAIL_USER:", gmailUser ? "✅ Set" : "❌ Missing")
+        console.error("- GMAIL_APP_PASSWORD:", gmailPassword ? "✅ Set" : "❌ Missing")
+        console.error("📧 EMAIL WILL NOT BE SENT - Missing credentials")
+        
+        // IMPORTANT: Let's still try to redirect but log this critical error
+        console.error("🚨 CRITICAL: EMAIL SYSTEM NOT CONFIGURED - USER WILL NOT RECEIVE CONFIRMATION")
+        
+      } else {
+        console.log("✅ Gmail credentials are configured")
+        console.log("- GMAIL_USER:", gmailUser)
+        console.log("- GMAIL_APP_PASSWORD: [HIDDEN]")
+        
+        // Get complete enrollment data for email
+        console.log("🔍 Step 2: Fetching enrollment data for:", finalEnrollmentId)
+        const { data: enrollment, error: enrollmentFetchError } = await supabase
+          .from("enrollment")
+          .select(`
+            *,
+            student:studentid (
+              studentid,
+              firstname,
+              lastname,
+              grade,
+              ecname,
+              ecphone,
+              ecrelationship,
+              parent:parentid (
+                firstname,
+                lastname,
+                email
+              )
+            ),
+            team:teamid (
+              teamid,
+              name,
+              description,
+              price,
+              created_at,
+              updated_at,
+              school:schoolid (
+                name,
+                location
+              ),
+              session (
+                startdate,
+                enddate,
+                starttime,
+                endtime,
+                daysofweek,
+                staff:coachid (
+                  name,
+                  email,
+                  phone
+                )
+              )
+            )
+          `)
+          .eq("enrollmentid", finalEnrollmentId)
+          .single()
+
+        if (enrollmentFetchError) {
+          console.error("❌ Error fetching enrollment data:", enrollmentFetchError)
+          throw new Error(`Failed to fetch enrollment: ${enrollmentFetchError.message}`)
+        }
+
+        console.log("✅ Enrollment data fetched successfully")
+        console.log("📋 Enrollment data structure:", {
+          hasEnrollment: !!enrollment,
+          hasStudent: !!enrollment?.student,
+          hasParent: !!enrollment?.student?.parent,
+          hasTeam: !!enrollment?.team,
+          parentEmail: enrollment?.student?.parent?.email,
+          studentName: enrollment?.student ? `${enrollment.student.firstname} ${enrollment.student.lastname}` : 'N/A',
+          teamName: enrollment?.team?.name || 'N/A'
+        })
+
+        if (enrollment?.student?.parent?.email && enrollment?.team && enrollment?.student) {
+          console.log("🔍 Step 3: Preparing email data...")
+          
+          const studentData = {
+            firstName: enrollment.student.firstname,
+            lastName: enrollment.student.lastname,
+            grade: enrollment.student.grade,
+            emergencyContact: {
+              name: enrollment.student.ecname,
+              phone: enrollment.student.ecphone,
+              relationship: enrollment.student.ecrelationship,
+            }
+          }
+
+          const teamData = {
+            teamid: enrollment.team.teamid,
+            name: enrollment.team.name,
+            description: enrollment.team.description,
+            price: enrollment.team.price,
+            created_at: enrollment.team.created_at,
+            updated_at: enrollment.team.updated_at,
+            school: {
+              name: enrollment.team.school?.name || "Unknown School",
+              location: enrollment.team.school?.location || "Unknown Location",
+            },
+            session: enrollment.team.session || []
+          }
+
+          const emailPaymentData = {
+            amount: (session.amount_total || 0) / 100,
+            date: new Date().toISOString(),
+            sessionId: sessionId
+          }
+
+          const parentData = {
+            firstName: enrollment.student.parent.firstname,
+            lastName: enrollment.student.parent.lastname,
+            email: enrollment.student.parent.email
+          }
+
+          console.log("📧 Step 4: Sending email to:", enrollment.student.parent.email)
+          console.log("📧 Email data prepared:", {
+            student: `${studentData.firstName} ${studentData.lastName}`,
+            team: teamData.name,
+            amount: emailPaymentData.amount,
+            parentEmail: parentData.email
+          })
+
+          console.log("🚀 ATTEMPTING EMAIL SEND NOW...")
+          
+          const emailResult = await sendPaymentConfirmationEmail(
+            enrollment.student.parent.email,
+            studentData,
+            teamData,
+            emailPaymentData,
+            parentData
+          )
+
+          if (emailResult.success) {
+            console.log("✅ Payment confirmation email sent successfully (GET method)")
+            console.log("📧 Message ID:", emailResult.messageId)
+            console.log("🎉 EMAIL SENT SUCCESSFULLY!")
+          } else {
+            console.error("❌ Failed to send payment confirmation email (GET method):", emailResult.error)
+            console.error("🚨 EMAIL SEND FAILED!")
+          }
+
+          // Enviar notificación de pago a la empresa
+          console.log("🏢 Step 5: Sending payment notification to company...")
+          try {
+            const companyEmailResult = await sendPaymentNotificationToCompany(
+              studentData,
+              teamData,
+              emailPaymentData,
+              parentData
+            )
+
+            if (companyEmailResult.success) {
+              console.log("✅ Company notification email sent successfully (GET method)")
+              console.log("📧 Company Message ID:", companyEmailResult.messageId)
+            } else {
+              console.error("❌ Failed to send company notification email (GET method):", companyEmailResult.error)
+            }
+          } catch (companyEmailError) {
+            console.error("❌ Error sending company notification (GET method):", companyEmailError)
+          }
+        } else {
+          console.warn("⚠️ Missing data for sending confirmation email (GET method)")
+          console.warn("📋 Missing data details:", {
+            hasParentEmail: !!enrollment?.student?.parent?.email,
+            hasTeam: !!enrollment?.team,
+            hasStudent: !!enrollment?.student,
+            parentEmail: enrollment?.student?.parent?.email || 'MISSING',
+          })
+          console.error("🚨 CANNOT SEND EMAIL - INCOMPLETE DATA")
+        }
+      }
+    } catch (emailError) {
+      console.error("❌ Error sending payment confirmation email (GET method):", emailError)
+      console.error("🚨 EMAIL SYSTEM CRASHED:", emailError)
+      // Don't fail the redirect because of email issues
+    }
+
+    console.log("🔄 Redirecting to success page...")
 
     // Redirect to main page with success message
     const successUrl = new URL("/", request.url)
@@ -238,18 +465,170 @@ export async function POST(request: Request) {
       // Don't fail the request, just log the error
     }
 
-    // Get enrollment and student details for response
+    // Get complete enrollment, student, parent, team, and school details for email
     const { data: enrollment } = await supabase
       .from("enrollment")
       .select(`
         *,
-        student:studentid (firstname, lastname),
-        team:teamid (name)
+        student:studentid (
+          studentid,
+          firstname,
+          lastname,
+          grade,
+          ecname,
+          ecphone,
+          ecrelationship,
+          parent:parentid (
+            firstname,
+            lastname,
+            email
+          )
+        ),
+        team:teamid (
+          teamid,
+          name,
+          description,
+          price,
+          created_at,
+          updated_at,
+          school:schoolid (
+            name,
+            location
+          ),
+          session (
+            startdate,
+            enddate,
+            starttime,
+            endtime,
+            daysofweek,
+            staff:coachid (
+              name,
+              email,
+              phone
+            )
+          )
+        )
       `)
       .eq("enrollmentid", enrollmentId)
       .single()
 
     console.log("✅ Payment confirmed and recorded successfully")
+
+    // Send confirmation email
+    if (enrollment?.student?.parent?.email && enrollment?.team && enrollment?.student) {
+      try {
+        console.log("📧 === STARTING EMAIL CONFIRMATION PROCESS (POST method) ===")
+        
+        // Check email configuration first
+        console.log("🔍 Step 1: Checking Gmail configuration...")
+        const gmailUser = process.env.GMAIL_USER
+        const gmailPassword = process.env.GMAIL_APP_PASSWORD
+        
+        if (!gmailUser || !gmailPassword) {
+          console.error("❌ Gmail credentials not configured!")
+          console.error("- GMAIL_USER:", gmailUser ? "✅ Set" : "❌ Missing")
+          console.error("- GMAIL_APP_PASSWORD:", gmailPassword ? "✅ Set" : "❌ Missing")
+          console.error("📧 EMAIL WILL NOT BE SENT - Missing credentials")
+        } else {
+          console.log("✅ Gmail credentials are configured")
+          console.log("- GMAIL_USER:", gmailUser)
+          console.log("- GMAIL_APP_PASSWORD: [HIDDEN]")
+        }
+        
+        console.log("📧 Step 2: Preparing email data...")
+        
+        const studentData = {
+          firstName: enrollment.student.firstname,
+          lastName: enrollment.student.lastname,
+          grade: enrollment.student.grade,
+          emergencyContact: {
+            name: enrollment.student.ecname,
+            phone: enrollment.student.ecphone,
+            relationship: enrollment.student.ecrelationship,
+          }
+        }
+
+        const teamData = {
+          teamid: enrollment.team.teamid,
+          name: enrollment.team.name,
+          description: enrollment.team.description,
+          price: enrollment.team.price,
+          created_at: enrollment.team.created_at,
+          updated_at: enrollment.team.updated_at,
+          school: {
+            name: enrollment.team.school?.name || "Unknown School",
+            location: enrollment.team.school?.location || "Unknown Location",
+          },
+          session: enrollment.team.session || []
+        }
+
+        const emailPaymentData = {
+          amount: (session.amount_total || 0) / 100,
+          date: paymentData.date,
+          sessionId: sessionId
+        }
+
+        const parentData = {
+          firstName: enrollment.student.parent.firstname,
+          lastName: enrollment.student.parent.lastname,
+          email: enrollment.student.parent.email
+        }
+
+        console.log("📧 Step 3: Sending email to:", enrollment.student.parent.email)
+        console.log("📧 Email data prepared:", {
+          student: `${studentData.firstName} ${studentData.lastName}`,
+          team: teamData.name,
+          amount: emailPaymentData.amount,
+          parentEmail: parentData.email
+        })
+
+        const emailResult = await sendPaymentConfirmationEmail(
+          enrollment.student.parent.email,
+          studentData,
+          teamData,
+          emailPaymentData,
+          parentData
+        )
+
+        if (emailResult.success) {
+          console.log("✅ Payment confirmation email sent successfully (POST method)")
+          console.log("📧 Message ID:", emailResult.messageId)
+        } else {
+          console.error("❌ Failed to send payment confirmation email (POST method):", emailResult.error)
+        }
+
+        // Enviar notificación de pago a la empresa
+        console.log("🏢 Sending payment notification to company...")
+        try {
+          const companyEmailResult = await sendPaymentNotificationToCompany(
+            studentData,
+            teamData,
+            emailPaymentData,
+            parentData
+          )
+
+          if (companyEmailResult.success) {
+            console.log("✅ Company notification email sent successfully (POST method)")
+            console.log("📧 Company Message ID:", companyEmailResult.messageId)
+          } else {
+            console.error("❌ Failed to send company notification email (POST method):", companyEmailResult.error)
+          }
+        } catch (companyEmailError) {
+          console.error("❌ Error sending company notification (POST method):", companyEmailError)
+        }
+      } catch (emailError) {
+        console.error("❌ Error sending payment confirmation email (POST method):", emailError)
+        // Don't fail the payment confirmation because of email issues
+      }
+    } else {
+      console.warn("⚠️ Missing data for sending confirmation email (POST method)")
+      console.warn("📋 Missing data details:", {
+        hasParentEmail: !!enrollment?.student?.parent?.email,
+        hasTeam: !!enrollment?.team,
+        hasStudent: !!enrollment?.student,
+        parentEmail: enrollment?.student?.parent?.email || 'MISSING',
+      })
+    }
 
     return NextResponse.json({
       success: true,
