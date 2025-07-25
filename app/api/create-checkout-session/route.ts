@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-})
+// Initialize Stripe only if secret key is available
+let stripe: Stripe | null = null
+
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-06-30.basil",
+    })
+  }
+} catch (error) {
+  console.warn("Failed to initialize Stripe:", error)
+}
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     // Check if Stripe is properly configured
-    if (!process.env.STRIPE_SECRET_KEY || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    if (!stripe || !process.env.STRIPE_SECRET_KEY || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
       console.log("⚠️ Stripe not configured, using development mode")
 
       // Return mock session for development

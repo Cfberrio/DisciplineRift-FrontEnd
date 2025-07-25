@@ -3,9 +3,18 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import Stripe from "stripe"
 import { sendPaymentConfirmationEmail, sendPaymentNotificationToCompany } from "@/lib/email-service"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
-})
+// Initialize Stripe only if secret key is available
+let stripe: Stripe | null = null
+
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-06-30.basil",
+    })
+  }
+} catch (error) {
+  console.warn("Failed to initialize Stripe:", error)
+}
 
 export async function GET(request: Request) {
   try {
@@ -63,6 +72,12 @@ export async function GET(request: Request) {
       successUrl.searchParams.set("enrollment", "success")
       successUrl.searchParams.set("mock", "true")
       return NextResponse.redirect(successUrl)
+    }
+
+    // Check if Stripe is configured
+    if (!stripe) {
+      console.error("❌ Stripe not configured")
+      return NextResponse.redirect(new URL("/payment/cancel?error=stripe_not_configured", request.url))
     }
 
     // Retrieve the Stripe session
@@ -375,6 +390,12 @@ export async function POST(request: Request) {
           date: new Date().toISOString(),
         },
       })
+    }
+
+    // Check if Stripe is configured
+    if (!stripe) {
+      console.error("❌ Stripe not configured")
+      return NextResponse.json({ success: false, message: "Stripe not configured" }, { status: 503 })
     }
 
     // Retrieve the Stripe session

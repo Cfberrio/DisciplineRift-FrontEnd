@@ -58,12 +58,19 @@ function createMockClient() {
 // Create Supabase client with validation
 let supabase: any
 
+// Check if we're in build time (when Vercel builds)
+const isBuildTime = process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV
+
 try {
   if (validateSupabaseConfig() && supabaseUrl && supabaseAnonKey) {
     supabase = createClient(supabaseUrl, supabaseAnonKey)
     console.log("✅ Supabase client initialized successfully")
   } else {
-    console.warn("⚠️ Using mock Supabase client - check environment variables")
+    if (isBuildTime) {
+      console.log("⚠️ Build time detected - using mock client")
+    } else {
+      console.warn("⚠️ Using mock Supabase client - check environment variables")
+    }
     supabase = createMockClient()
   }
 } catch (error) {

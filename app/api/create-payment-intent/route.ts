@@ -10,7 +10,7 @@ let stripe: Stripe | null = null
 if (isStripeConfigured) {
   try {
     stripe = new Stripe(stripeSecretKey!, {
-      apiVersion: "2024-06-20",
+      apiVersion: "2025-06-30.basil",
     })
   } catch (error) {
     console.error("Failed to initialize Stripe:", error)

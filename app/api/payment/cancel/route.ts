@@ -2,9 +2,18 @@ import { NextResponse } from "next/server"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-})
+// Initialize Stripe only if secret key is available
+let stripe: Stripe | null = null
+
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-06-30.basil",
+    })
+  }
+} catch (error) {
+  console.warn("Failed to initialize Stripe:", error)
+}
 
 export async function POST(request: Request) {
   try {
@@ -27,6 +36,12 @@ export async function POST(request: Request) {
         success: true,
         message: "Payment cancelled (Development Mode)",
       })
+    }
+
+    // Check if Stripe is configured
+    if (!stripe) {
+      console.error("❌ Stripe not configured")
+      return NextResponse.json({ success: false, message: "Stripe not configured" }, { status: 503 })
     }
 
     // Retrieve the Stripe session
