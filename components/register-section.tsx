@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import AnimatedSection from "@/components/animated-section"
-import SupabaseStatus from "@/components/supabase-status"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import AnimatedSection from "@/components/animated-section";
+import SupabaseStatus from "@/components/supabase-status";
 import {
   CheckCircle,
   Search,
@@ -20,119 +20,116 @@ import {
   UserPlus,
   Loader2,
   CreditCard,
-  KeyRound,
   User,
-} from "lucide-react"
-import Image from "next/image"
-import { supabase } from "@/lib/supabase"
-import Link from "next/link"
+} from "lucide-react";
+import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 // Types for the registration flow
 interface School {
-  id: string
-  name: string
-  location: string
-  logo?: string
-  teams: Team[]
+  id: string;
+  name: string;
+  location: string;
+  logo?: string;
+  teams: Team[];
 }
 
 interface Team {
-  id: string
-  name: string
-  schoolId: string
-  schoolName: string
-  sport: string
-  ageGroup: string
-  skillLevel: string
-  sessions: Session[]
+  id: string;
+  name: string;
+  schoolId: string;
+  schoolName: string;
+  sport: string;
+  ageGroup: string;
+  skillLevel: string;
+  sessions: Session[];
   coach: {
-    name: string
-    email: string
-    phone: string
-  }
-  price: number
-  description: string
+    name: string;
+    email: string;
+    phone: string;
+  };
+  price: number;
+  description: string;
 }
 
 interface Session {
-  id: string
-  dayOfWeek: string
-  time: string
-  duration: string
-  location: string
-  startDate: string
-  endDate: string
-  totalSessions: number
-  trainingType?: string
-  formattedDate?: string
-  coachName?: string
+  id: string;
+  dayOfWeek: string;
+  time: string;
+  duration: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  totalSessions: number;
+  trainingType?: string;
+  formattedDate?: string;
+  coachName?: string;
 }
 
 interface ParentRegistrationData {
-  parentFirstName: string
-  parentLastName: string
-  parentEmail: string
-  parentPhone: string
-  childFirstName: string
-  childLastName: string
-  childBirthdate: string
-  childGrade: string
-  emergencyContactName: string
-  emergencyContactPhone: string
-  emergencyContactRelation: string
-  selectedTeam: Team | null
-  medicalConditions: string
-  specialInstructions: string
-  registrationDate: string
-  status: "pending"
-  paymentStatus: "unpaid"
-  userId: string
+  parentFirstName: string;
+  parentLastName: string;
+  parentEmail: string;
+  parentPhone: string;
+  childFirstName: string;
+  childLastName: string;
+  childBirthdate: string;
+  childGrade: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelation: string;
+  selectedTeam: Team | null;
+  medicalConditions: string;
+  specialInstructions: string;
+  registrationDate: string;
+  status: "pending";
+  paymentStatus: "unpaid";
+  userId: string;
 }
 
 interface UserType {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
 }
 
 export default function RegisterSection() {
-  const [step, setStep] = useState(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submissionError, setSubmissionError] = useState<string | null>(null)
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Search functionality for Step 1
-  const [searchQuery, setSearchQuery] = useState("")
-  const [schools, setSchools] = useState<School[]>([])
-  const [filteredSchools, setFilteredSchools] = useState<School[]>([])
-  const [isLoadingSchools, setIsLoadingSchools] = useState(false)
-  const [searchError, setSearchError] = useState<string | null>(null)
-  const [hasSearched, setHasSearched] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [schools, setSchools] = useState<School[]>([]);
+  const [filteredSchools, setFilteredSchools] = useState<School[]>([]);
+  const [isLoadingSchools, setIsLoadingSchools] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const [allSchoolsData, setAllSchoolsData] = useState<any[]>([])
-  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [allSchoolsData, setAllSchoolsData] = useState<any[]>([]);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // Selected team for Step 2
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
-  const [showAllSessions, setShowAllSessions] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [showAllSessions, setShowAllSessions] = useState(false);
 
   // Authentication state
-  const [authMode, setAuthMode] = useState<"login" | "register">("login")
-  const [authFirstName, setAuthFirstName] = useState("")
-  const [authLastName, setAuthLastName] = useState("")
-  const [authEmail, setAuthEmail] = useState("")
-  const [authPhone, setAuthPhone] = useState("")
-  const [authPassword, setAuthPassword] = useState("")
-  const [authConfirmPassword, setAuthConfirmPassword] = useState("")
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [isAuthLoading, setIsAuthLoading] = useState(false)
-  const [currentUser, setCurrentUser] = useState<UserType | null>(null)
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
+
+  const [authEmail, setAuthEmail] = useState("");
+  const [authOtp, setAuthOtp] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpExpiresIn, setOtpExpiresIn] = useState<string>("");
 
   // Registration data
-  const [registrationResult, setRegistrationResult] = useState<any>(null)
+  const [registrationResult, setRegistrationResult] = useState<any>(null);
 
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
@@ -153,73 +150,76 @@ export default function RegisterSection() {
     status: "pending",
     paymentStatus: "unpaid",
     userId: "",
-  })
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [message, setMessage] = useState<string | null>(null)
-  const [isEmailConfirmationSent, setIsEmailConfirmationSent] = useState(false)
+  const [message, setMessage] = useState<string | null>(null);
+  const [isEmailConfirmationSent, setIsEmailConfirmationSent] = useState(false);
 
   // Check for existing session on component mount
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     async function checkSession() {
       try {
-        if (!isMounted) return
-        
-        setIsCheckingSession(true)
-        console.log("🔄 Checking for existing session...")
+        if (!isMounted) return;
+
+        setIsCheckingSession(true);
+        console.log("🔄 Checking for existing session...");
 
         // Check if Supabase is configured
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          console.warn("⚠️ Supabase not configured, skipping session check")
-          setIsCheckingSession(false)
-          return
+        if (
+          !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+          !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        ) {
+          console.warn("⚠️ Supabase not configured, skipping session check");
+          setIsCheckingSession(false);
+          return;
         }
 
         // Set a timeout to prevent infinite loading
         const timeoutId = setTimeout(() => {
           if (isMounted) {
-            console.warn("⚠️ Session check timeout, setting to false")
-            setIsCheckingSession(false)
+            console.warn("⚠️ Session check timeout, setting to false");
+            setIsCheckingSession(false);
           }
-        }, 5000) // 5 second timeout
+        }, 5000); // 5 second timeout
 
         const {
           data: { session },
           error: sessionError,
-        } = await supabase.auth.getSession()
+        } = await supabase.auth.getSession();
 
         // Clear timeout if we get a response
-        clearTimeout(timeoutId)
+        clearTimeout(timeoutId);
 
-        if (!isMounted) return
+        if (!isMounted) return;
 
         if (sessionError) {
-          console.error("❌ Session error:", sessionError)
-          setIsCheckingSession(false)
-          return
+          console.error("❌ Session error:", sessionError);
+          setIsCheckingSession(false);
+          return;
         }
 
         if (session?.user) {
-          console.log("✅ Found existing session:", session.user.id)
+          console.log("✅ Found existing session:", session.user.id);
 
           try {
             // Use a shorter timeout for the database query
-            const controller = new AbortController()
-            const dbTimeoutId = setTimeout(() => controller.abort(), 3000)
+            const controller = new AbortController();
+            const dbTimeoutId = setTimeout(() => controller.abort(), 3000);
 
             const { data: parentData, error: parentError } = await supabase
               .from("parent")
               .select("*")
               .eq("parentid", session.user.id)
               .abortSignal(controller.signal)
-              .single()
+              .single();
 
-            clearTimeout(dbTimeoutId)
+            clearTimeout(dbTimeoutId);
 
-            if (!isMounted) return
+            if (!isMounted) return;
 
             if (!parentError && parentData) {
               const user: UserType = {
@@ -228,8 +228,8 @@ export default function RegisterSection() {
                 firstName: parentData.firstname || "",
                 lastName: parentData.lastname || "",
                 phone: parentData.phone || "",
-              }
-              setCurrentUser(user)
+              };
+              setCurrentUser(user);
               setFormData((prev) => ({
                 ...prev,
                 userId: user.id,
@@ -237,10 +237,10 @@ export default function RegisterSection() {
                 parentFirstName: user.firstName,
                 parentLastName: user.lastName,
                 parentPhone: user.phone,
-              }))
-              console.log("✅ User data loaded from parent record")
+              }));
+              console.log("✅ User data loaded from parent record");
             } else {
-              console.log("⚠️ Parent record not found, using auth metadata")
+              console.log("⚠️ Parent record not found, using auth metadata");
               // Parent record doesn't exist, but user is logged in
               const user: UserType = {
                 id: session.user.id,
@@ -248,8 +248,8 @@ export default function RegisterSection() {
                 firstName: session.user.user_metadata?.firstName || "",
                 lastName: session.user.user_metadata?.lastName || "",
                 phone: session.user.user_metadata?.phone || "",
-              }
-              setCurrentUser(user)
+              };
+              setCurrentUser(user);
               setFormData((prev) => ({
                 ...prev,
                 userId: user.id,
@@ -257,13 +257,13 @@ export default function RegisterSection() {
                 parentFirstName: user.firstName,
                 parentLastName: user.lastName,
                 parentPhone: user.phone,
-              }))
-              console.log("✅ User data loaded from auth metadata")
+              }));
+              console.log("✅ User data loaded from auth metadata");
             }
           } catch (dbError) {
-            if (!isMounted) return
-            
-            console.error("❌ Database error, using fallback:", dbError)
+            if (!isMounted) return;
+
+            console.error("❌ Database error, using fallback:", dbError);
             // Fallback to auth metadata if database query fails
             const user: UserType = {
               id: session.user.id,
@@ -271,8 +271,8 @@ export default function RegisterSection() {
               firstName: session.user.user_metadata?.firstName || "",
               lastName: session.user.user_metadata?.lastName || "",
               phone: session.user.user_metadata?.phone || "",
-            }
-            setCurrentUser(user)
+            };
+            setCurrentUser(user);
             setFormData((prev) => ({
               ...prev,
               userId: user.id,
@@ -280,38 +280,38 @@ export default function RegisterSection() {
               parentFirstName: user.firstName,
               parentLastName: user.lastName,
               parentPhone: user.phone,
-            }))
-            console.log("✅ User data loaded from auth metadata (fallback)")
+            }));
+            console.log("✅ User data loaded from auth metadata (fallback)");
           }
         } else {
-          console.log("ℹ️ No existing session found")
+          console.log("ℹ️ No existing session found");
         }
       } catch (error) {
-        if (!isMounted) return
-        console.error("❌ Error checking session:", error)
+        if (!isMounted) return;
+        console.error("❌ Error checking session:", error);
       } finally {
         if (isMounted) {
-          setIsCheckingSession(false)
+          setIsCheckingSession(false);
         }
       }
     }
 
-    checkSession()
+    checkSession();
 
     // Cleanup function
     return () => {
-      isMounted = false
-    }
+      isMounted = false;
+    };
 
     // Simplified auth state listener - only handle logout
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
-      console.log("🔄 Auth state changed:", event, session?.user?.id)
+      console.log("🔄 Auth state changed:", event, session?.user?.id);
 
       // Only handle logout to clear state - login is handled manually
       if (event === "SIGNED_OUT") {
-        setCurrentUser(null)
+        setCurrentUser(null);
         setFormData((prev) => ({
           ...prev,
           userId: "",
@@ -319,27 +319,29 @@ export default function RegisterSection() {
           parentFirstName: "",
           parentLastName: "",
           parentPhone: "",
-        }))
-        console.log("ℹ️ Auth state change - user logged out")
+        }));
+        console.log("ℹ️ Auth state change - user logged out");
       }
       // Note: We don't handle SIGNED_IN here to avoid conflicts with manual login flow
-    })
+    });
 
-    return () => subscription.unsubscribe()
-  }, [])
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Transform database data to component format
   const transformSchoolData = (dbSchools: any[]): School[] => {
     if (!Array.isArray(dbSchools)) {
-      console.warn("Invalid schools data received:", dbSchools)
-      return []
+      console.warn("Invalid schools data received:", dbSchools);
+      return [];
     }
 
     return dbSchools.map((school) => ({
       id: school.schoolid || "",
       name: school.name || "Unknown School",
       location: school.location || "Unknown Location",
-      logo: `/placeholder.svg?height=60&width=60&text=${encodeURIComponent(school.name || "School")}`,
+      logo: `/placeholder.svg?height=60&width=60&text=${encodeURIComponent(
+        school.name || "School"
+      )}`,
       teams:
         school.teams?.map((team: any) => ({
           id: team.teamid || "",
@@ -358,7 +360,7 @@ export default function RegisterSection() {
           },
           sessions:
             team.session?.flatMap((session: any) => {
-              const individualSessions = session.individualSessions || []
+              const individualSessions = session.individualSessions || [];
               if (individualSessions.length === 0) {
                 // Create default sessions if none exist
                 return [
@@ -368,15 +370,20 @@ export default function RegisterSection() {
                     time: "3:00 PM - 4:30 PM",
                     duration: "1h 30m",
                     location: school.location || "TBD",
-                    startDate: session.startdate || new Date().toISOString().split("T")[0],
+                    startDate:
+                      session.startdate ||
+                      new Date().toISOString().split("T")[0],
                     endDate:
-                      session.enddate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+                      session.enddate ||
+                      new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                        .toISOString()
+                        .split("T")[0],
                     totalSessions: 12,
                     formattedDate: "Mondays, starting soon",
                     coachName: session.staff?.name || "TBD",
                     trainingType: "General Training",
                   },
-                ]
+                ];
               }
               return individualSessions.map((indSession: any) => ({
                 id: indSession.id || "",
@@ -390,50 +397,52 @@ export default function RegisterSection() {
                 formattedDate: indSession.formattedDate || "",
                 coachName: indSession.coachName || "",
                 trainingType: "General Training",
-              }))
+              }));
             }) || [],
         })) || [],
-    }))
-  }
+    }));
+  };
 
   // Load all data on component mount
   useEffect(() => {
     async function loadAllData() {
-      setIsInitialLoading(true)
-      setSearchError(null)
+      setIsInitialLoading(true);
+      setSearchError(null);
 
       try {
-        console.log("[CLIENT] 🔄 Fetching schools data...")
+        console.log("[CLIENT] 🔄 Fetching schools data...");
         const response = await fetch("/api/schools/all", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-        })
+        });
 
-        console.log("[CLIENT] Response status:", response.status)
+        console.log("[CLIENT] Response status:", response.status);
 
         if (!response.ok) {
-          const errorText = await response.text()
-          console.error("[CLIENT] ❌ Response not OK:", errorText)
-          throw new Error(`HTTP ${response.status}: ${errorText}`)
+          const errorText = await response.text();
+          console.error("[CLIENT] ❌ Response not OK:", errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
-        const data = await response.json()
-        console.log("[CLIENT] ✅ Loaded schools data:", data)
+        const data = await response.json();
+        console.log("[CLIENT] ✅ Loaded schools data:", data);
 
-        const transformedData = transformSchoolData(data.schools || [])
-        console.log("[CLIENT] ✅ Transformed schools data:", transformedData)
+        const transformedData = transformSchoolData(data.schools || []);
+        console.log("[CLIENT] ✅ Transformed schools data:", transformedData);
 
-        setAllSchoolsData(transformedData)
+        setAllSchoolsData(transformedData);
       } catch (error) {
-        console.error("[CLIENT] ❌ Error loading all data:", error)
+        console.error("[CLIENT] ❌ Error loading all data:", error);
         setSearchError(
-          error instanceof Error ? error.message : "An unexpected error occurred while loading schools data.",
-        )
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred while loading schools data."
+        );
 
         // Set mock data as fallback
-        console.log("[CLIENT] 🔄 Using mock data as fallback...")
+        console.log("[CLIENT] 🔄 Using mock data as fallback...");
         const mockData = [
           {
             id: "mock-school-1",
@@ -474,156 +483,204 @@ export default function RegisterSection() {
               },
             ],
           },
-        ]
-        setAllSchoolsData(mockData)
+        ];
+        setAllSchoolsData(mockData);
       } finally {
-        setIsInitialLoading(false)
+        setIsInitialLoading(false);
       }
     }
 
-    loadAllData()
-  }, [])
+    loadAllData();
+  }, []);
 
   // Filter data when search query changes
   useEffect(() => {
     if (!searchQuery || searchQuery.trim() === "") {
-      setFilteredSchools([])
-      setHasSearched(false)
-      return
+      setFilteredSchools([]);
+      setHasSearched(false);
+      return;
     }
 
-    setHasSearched(true)
-    setIsLoadingSchools(true)
+    setHasSearched(true);
+    setIsLoadingSchools(true);
 
     try {
       const filtered = allSchoolsData
         .filter((school) => {
           const schoolMatches =
-            (school.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (school.location || "").toLowerCase().includes(searchQuery.toLowerCase())
+            (school.name || "")
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            (school.location || "")
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase());
 
           const teamMatches = school.teams.some(
             (team: any) =>
-              (team.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (team.description || "").toLowerCase().includes(searchQuery.toLowerCase()),
-          )
+              (team.name || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (team.description || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
+          );
 
-          return schoolMatches || teamMatches
+          return schoolMatches || teamMatches;
         })
         .map((school) => {
           const schoolMatches =
-            (school.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (school.location || "").toLowerCase().includes(searchQuery.toLowerCase())
+            (school.name || "")
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            (school.location || "")
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase());
 
           if (schoolMatches) {
-            return school
+            return school;
           }
 
           return {
             ...school,
             teams: school.teams.filter(
               (team: any) =>
-                (team.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (team.description || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                (team.name || "")
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase()) ||
+                (team.description || "")
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())
             ),
-          }
-        })
+          };
+        });
 
-      setSchools(filtered)
-      setFilteredSchools(filtered)
+      setSchools(filtered);
+      setFilteredSchools(filtered);
     } catch (error) {
-      console.error("Error filtering:", error)
-      setSearchError("Error filtering schools")
+      console.error("Error filtering:", error);
+      setSearchError("Error filtering schools");
     } finally {
-      setIsLoadingSchools(false)
+      setIsLoadingSchools(false);
     }
-  }, [searchQuery, allSchoolsData])
+  }, [searchQuery, allSchoolsData]);
 
   const handleTeamSelect = (team: Team) => {
-    console.log("Selected team:", team)
-    setSelectedTeam(team)
-    setFormData((prev) => ({ ...prev, selectedTeam: team }))
-    setErrors({})
-    setShowAllSessions(false)
-  }
+    console.log("Selected team:", team);
+    setSelectedTeam(team);
+    setFormData((prev) => ({ ...prev, selectedTeam: team }));
+    setErrors({});
+    setShowAllSessions(false);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name]) {
       setErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors[name]
-        return newErrors
-      })
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
-  }
+  };
 
   const handleAuthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    if (name === "authFirstName") setAuthFirstName(value)
-    if (name === "authLastName") setAuthLastName(value)
-    if (name === "authEmail") setAuthEmail(value)
-    if (name === "authPhone") setAuthPhone(value)
-    if (name === "authPassword") setAuthPassword(value)
-    if (name === "authConfirmPassword") setAuthConfirmPassword(value)
-    setAuthError(null)
-  }
+    const { name, value } = e.target;
+    if (name === "authEmail") setAuthEmail(value);
+    if (name === "authOtp") setAuthOtp(value);
+    setAuthError(null);
+  };
 
   const validateAuthForm = (): boolean => {
-    const newAuthErrors: Record<string, string> = {}
+    const newAuthErrors: Record<string, string> = {};
 
-    if (authMode === "register") {
-      if (!authFirstName.trim()) newAuthErrors.firstName = "First name is required"
-      if (!authLastName.trim()) newAuthErrors.lastName = "Last name is required"
-      if (!authPhone.trim()) newAuthErrors.phone = "Phone number is required"
-      else if (!/^\d{10}$/.test(authPhone.replace(/\D/g, ""))) newAuthErrors.phone = "Invalid 10-digit phone number"
-      if (authPassword !== authConfirmPassword) newAuthErrors.confirmPassword = "Passwords do not match"
+    if (!authEmail.trim()) newAuthErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(authEmail))
+      newAuthErrors.email = "Invalid email format";
+
+    setErrors(newAuthErrors);
+    return Object.keys(newAuthErrors).length === 0;
+  };
+
+  const handleSendOTP = async () => {
+    if (!authEmail.trim()) {
+      setAuthError("Email is required");
+      return;
     }
 
-    if (!authEmail.trim()) newAuthErrors.email = "Email is required"
-    else if (!/\S+@\S+\.\S+/.test(authEmail)) newAuthErrors.email = "Invalid email format"
-    if (!authPassword.trim()) newAuthErrors.password = "Password is required"
-    else if (authPassword.length < 6) newAuthErrors.password = "Password must be at least 6 characters"
+    if (!/\S+@\S+\.\S+/.test(authEmail)) {
+      setAuthError("Invalid email format");
+      return;
+    }
 
-    setErrors(newAuthErrors)
-    return Object.keys(newAuthErrors).length === 0
-  }
-
-  const handleLogin = async () => {
-    if (!validateAuthForm()) return
-    setIsAuthLoading(true)
-    setAuthError(null)
+    setIsAuthLoading(true);
+    setAuthError(null);
 
     try {
-      console.log("🔄 Iniciando login para:", authEmail)
+      console.log("🔄 Sending OTP to:", authEmail);
 
-      // Add timeout for the login request
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => {
-        controller.abort()
-        console.warn("⚠️ Login request timeout")
-      }, 10000) // 10 second timeout
-
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/send-login-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: authEmail, password: authPassword }),
-        signal: controller.signal,
-      })
+        body: JSON.stringify({ email: authEmail }),
+      });
 
-      clearTimeout(timeoutId)
-
-      const data = await response.json()
-      console.log("📨 Login response:", { success: response.ok, hasUser: !!data.user, hasSession: !!data.session })
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed")
+        throw new Error(data.message || "Failed to send login code");
+      }
+
+      setOtpSent(true);
+      setOtpExpiresIn(data.expiresIn || "10 minutes");
+      setAuthError(null);
+      setMessage("Login code sent successfully. Please check your email.");
+    } catch (error) {
+      console.error("❌ Error sending OTP:", error);
+      setAuthError(
+        error instanceof Error ? error.message : "Failed to send login code"
+      );
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!authOtp.trim()) {
+      setAuthError("Please enter the login code");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(authOtp)) {
+      setAuthError("Login code must be 6 digits");
+      return;
+    }
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+
+    try {
+      console.log("🔄 Verifying OTP for:", authEmail);
+
+      const response = await fetch("/api/auth/verify-login-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: authEmail, otp: authOtp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid login code");
       }
 
       if (!data.user) {
-        throw new Error("No user data received from server")
+        throw new Error("No user data received from server");
       }
 
       // Create user object from response
@@ -633,36 +690,36 @@ export default function RegisterSection() {
         firstName: data.user.firstName,
         lastName: data.user.lastName,
         phone: data.user.phone,
-      }
+      };
 
-      console.log("✅ Usuario autenticado:", user.email)
+      console.log("✅ Usuario autenticado:", user.email);
 
       // Set Supabase session with timeout
       if (data.session) {
         try {
-          console.log("🔄 Estableciendo sesión en Supabase...")
-          const sessionPromise = supabase.auth.setSession(data.session)
+          console.log("🔄 Estableciendo sesión en Supabase...");
+          const sessionPromise = supabase.auth.setSession(data.session);
           const sessionTimeoutId = setTimeout(() => {
-            console.warn("⚠️ Session set timeout, continuing anyway")
-          }, 3000)
+            console.warn("⚠️ Session set timeout, continuing anyway");
+          }, 3000);
 
           await Promise.race([
             sessionPromise,
-            new Promise((_, reject) => 
+            new Promise((_, reject) =>
               setTimeout(() => reject(new Error("Session timeout")), 3000)
-            )
-          ])
+            ),
+          ]);
 
-          clearTimeout(sessionTimeoutId)
-          console.log("✅ Sesión establecida en Supabase")
+          clearTimeout(sessionTimeoutId);
+          console.log("✅ Sesión establecida en Supabase");
         } catch (sessionError) {
-          console.warn("⚠️ Error setting session, continuing:", sessionError)
+          console.warn("⚠️ Error setting session, continuing:", sessionError);
           // Continue even if session setting fails
         }
       }
 
       // Update user state and form data immediately
-      setCurrentUser(user)
+      setCurrentUser(user);
       setFormData((prev) => ({
         ...prev,
         userId: user.id,
@@ -670,206 +727,268 @@ export default function RegisterSection() {
         parentFirstName: user.firstName,
         parentLastName: user.lastName,
         parentPhone: user.phone,
-      }))
+      }));
 
-      // Clear any auth errors
-      setAuthError(null)
-      
+      // Clear any auth errors and reset OTP state
+      setAuthError(null);
+      setOtpSent(false);
+      setAuthOtp("");
+
       // Show success message
-      if (data.alreadyLoggedIn) {
-        setMessage(`Ya tienes sesión iniciada como ${data.user.email}`)
-      } else {
-        setMessage(`¡Bienvenido, ${user.firstName}!`)
-      }
+      setMessage(`¡Bienvenido, ${user.firstName || user.email}!`);
 
-      console.log("🔄 Procediendo al siguiente paso...")
+      console.log("🔄 Procediendo al siguiente paso...");
 
       // Go directly to step 4 (Parent Info) after successful login
-      // Use immediate state update instead of setTimeout
-      setIsAuthLoading(false) // Set this first
-      setStep(4)
-      
+      setIsAuthLoading(false);
+      setStep(4);
+
       // Scroll to top after a brief delay for better UX
       setTimeout(() => {
-        document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
-      }, 300)
+        document
+          .getElementById("register")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
 
-      return // Exit early to prevent the finally block from setting loading to false again
-
+      return;
     } catch (error) {
-      console.error("❌ Error en login:", error)
-      
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          setAuthError("El login está tomando mucho tiempo. Por favor, verifica tu conexión e intenta de nuevo.")
-        } else {
-          setAuthError(error.message)
-        }
-      } else {
-        setAuthError("Ocurrió un error inesperado durante el login.")
-      }
+      console.error("❌ Error verifying OTP:", error);
+      setAuthError(
+        error instanceof Error ? error.message : "Invalid login code"
+      );
     } finally {
-      // Only set loading to false if we haven't already done so
-      if (isAuthLoading) {
-        setIsAuthLoading(false)
-      }
+      setIsAuthLoading(false);
     }
-  }
+  };
 
   const handleRegister = async () => {
-    if (!validateAuthForm()) return
-    setIsAuthLoading(true)
-    setAuthError(null)
-
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: authFirstName,
-          lastName: authLastName,
-          email: authEmail,
-          phone: authPhone,
-          password: authPassword,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed")
-      }
-
-      setAuthError(null)
-
-      // Check if email confirmation is required
-      if (data.requiresEmailConfirmation) {
-        // Show email confirmation message
-        setMessage(data.message)
-        setIsEmailConfirmationSent(true)
-      } else {
-        // Registration successful without email confirmation - switch to login
-        setMessage("Registration successful! Please log in with your new account.")
-        setAuthMode("login")
-        setIsEmailConfirmationSent(false)
-        
-        // Clear registration fields but keep email and password for easy login
-        setAuthFirstName("")
-        setAuthLastName("")
-        setAuthPhone("")
-        setAuthConfirmPassword("")
-      }
-    } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "An unknown error occurred.")
-    } finally {
-      setIsAuthLoading(false)
-    }
-  }
+    // Registration is now the same as login - just send OTP
+    await handleSendOTP();
+  };
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut()
-      setCurrentUser(null)
-      setMessage(null)
-      setAuthError(null)
-      console.log("✅ User logged out")
+      await supabase.auth.signOut();
+      setCurrentUser(null);
+      setMessage(null);
+      setAuthError(null);
+      console.log("✅ User logged out");
     } catch (error) {
-      console.error("❌ Logout error:", error)
+      console.error("❌ Logout error:", error);
     }
-  }
+  };
 
   const validateStep = (currentStep: number): boolean => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
     if (currentStep === 2 && !selectedTeam) {
-      newErrors.team = "Please select a team to proceed."
-      setErrors(newErrors)
-      return false
+      newErrors.team = "Please select a team to proceed.";
+      setErrors(newErrors);
+      return false;
     }
     if (currentStep === 3 && !currentUser) {
-      newErrors.auth = "Please log in or create an account to continue."
-      setAuthError("Please log in or create an account to continue.")
-      setErrors(newErrors)
-      return false
+      newErrors.auth = "Please log in or create an account to continue.";
+      setAuthError("Please log in or create an account to continue.");
+      setErrors(newErrors);
+      return false;
     }
     if (currentStep === 4) {
-      if (!formData.parentFirstName.trim()) newErrors.parentFirstName = "Parent first name is required"
-      if (!formData.parentLastName.trim()) newErrors.parentLastName = "Parent last name is required"
-      if (!formData.parentEmail.trim()) newErrors.parentEmail = "Parent email is required"
-      else if (!/\S+@\S+\.\S+/.test(formData.parentEmail)) newErrors.parentEmail = "Invalid email format"
-      if (!formData.parentPhone.trim()) newErrors.parentPhone = "Parent phone is required"
+      if (!formData.parentFirstName.trim())
+        newErrors.parentFirstName = "Parent first name is required";
+      if (!formData.parentLastName.trim())
+        newErrors.parentLastName = "Parent last name is required";
+      if (!formData.parentEmail.trim())
+        newErrors.parentEmail = "Parent email is required";
+      else if (!/\S+@\S+\.\S+/.test(formData.parentEmail))
+        newErrors.parentEmail = "Invalid email format";
+      if (!formData.parentPhone.trim())
+        newErrors.parentPhone = "Parent phone is required";
       else if (!/^\d{10}$/.test(formData.parentPhone.replace(/\D/g, "")))
-        newErrors.parentPhone = "Invalid 10-digit phone"
+        newErrors.parentPhone = "Invalid 10-digit phone";
 
-      if (!formData.childFirstName.trim()) newErrors.childFirstName = "Child first name is required"
-      if (!formData.childLastName.trim()) newErrors.childLastName = "Child last name is required"
-      if (!formData.childBirthdate) newErrors.childBirthdate = "Child date of birth is required"
-      if (!formData.childGrade.trim()) newErrors.childGrade = "Child grade is required"
+      if (!formData.childFirstName.trim())
+        newErrors.childFirstName = "Child first name is required";
+      if (!formData.childLastName.trim())
+        newErrors.childLastName = "Child last name is required";
+      if (!formData.childBirthdate)
+        newErrors.childBirthdate = "Child date of birth is required";
+      if (!formData.childGrade.trim())
+        newErrors.childGrade = "Child grade is required";
 
-      if (!formData.emergencyContactName.trim()) newErrors.emergencyContactName = "Emergency contact name is required"
+      if (!formData.emergencyContactName.trim())
+        newErrors.emergencyContactName = "Emergency contact name is required";
       if (!formData.emergencyContactPhone.trim())
-        newErrors.emergencyContactPhone = "Emergency contact phone is required"
-      else if (!/^\d{10}$/.test(formData.emergencyContactPhone.replace(/\D/g, "")))
-        newErrors.emergencyContactPhone = "Invalid 10-digit phone"
+        newErrors.emergencyContactPhone = "Emergency contact phone is required";
+      else if (
+        !/^\d{10}$/.test(formData.emergencyContactPhone.replace(/\D/g, ""))
+      )
+        newErrors.emergencyContactPhone = "Invalid 10-digit phone";
       if (!formData.emergencyContactRelation.trim())
-        newErrors.emergencyContactRelation = "Emergency contact relation is required"
+        newErrors.emergencyContactRelation =
+          "Emergency contact relation is required";
     }
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (validateStep(step)) {
-      setStep((prev) => prev + 1)
+      // Si estamos pasando al paso 4 (información de padre e hijo), verificar/crear registro de padre
+      if (step === 3 && currentUser) {
+        try {
+          console.log(
+            "🔄 Verificando registro de padre para usuario:",
+            currentUser.id
+          );
+
+          // Verificar si existe registro de padre
+          const response = await fetch(
+            `/api/parent-info?userId=${currentUser.id}`
+          );
+
+          if (response.ok) {
+            const parentData = await response.json();
+
+            if (parentData.exists) {
+              // Autocompletar información del padre
+              console.log(
+                "✅ Registro de padre encontrado, autocompletando información"
+              );
+              setFormData((prev) => ({
+                ...prev,
+                parentFirstName: parentData.parent.firstname || "",
+                parentLastName: parentData.parent.lastname || "",
+                parentEmail: parentData.parent.email || "",
+                parentPhone: parentData.parent.phone || "",
+              }));
+            } else {
+              // Crear registro de padre con información del usuario autenticado
+              console.log("🔄 Creando nuevo registro de padre");
+              const createResponse = await fetch("/api/parent-info", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  userId: currentUser.id,
+                  firstName: currentUser.firstName || "",
+                  lastName: currentUser.lastName || "",
+                  email: currentUser.email || "",
+                  phone: currentUser.phone || "",
+                }),
+              });
+
+              if (createResponse.ok) {
+                console.log("✅ Registro de padre creado exitosamente");
+                // Autocompletar con la información del usuario
+                setFormData((prev) => ({
+                  ...prev,
+                  parentFirstName: currentUser.firstName || "",
+                  parentLastName: currentUser.lastName || "",
+                  parentEmail: currentUser.email || "",
+                  parentPhone: currentUser.phone || "",
+                }));
+              } else {
+                console.error("❌ Error creando registro de padre");
+              }
+            }
+          } else {
+            console.error("❌ Error verificando registro de padre");
+          }
+        } catch (error) {
+          console.error(
+            "❌ Error en verificación/creación de registro de padre:",
+            error
+          );
+        }
+      }
+
+      setStep((prev) => prev + 1);
       setTimeout(() => {
-        document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
-      }, 100)
+        document
+          .getElementById("register")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     }
-  }
+  };
 
   const prevStep = () => {
-    setStep((prev) => prev - 1)
+    setStep((prev) => prev - 1);
     setTimeout(() => {
-      document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
-    }, 100)
-  }
+      document
+        .getElementById("register")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateStep(step)) return
+    e.preventDefault();
+    if (!validateStep(step)) return;
 
     try {
-      setIsSubmitting(true)
-      setSubmissionError(null)
-      const submissionData = { ...formData, registrationDate: new Date().toISOString() }
+      setIsSubmitting(true);
+      setSubmissionError(null);
+
+      // Si hay un usuario autenticado, actualizar el registro de padre con la información final
+      if (currentUser) {
+        console.log("🔄 Actualizando registro de padre con información final");
+
+        const updateResponse = await fetch("/api/parent-info", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            firstName: formData.parentFirstName,
+            lastName: formData.parentLastName,
+            email: formData.parentEmail,
+            phone: formData.parentPhone,
+          }),
+        });
+
+        if (!updateResponse.ok) {
+          console.error("❌ Error actualizando registro de padre");
+        } else {
+          console.log("✅ Registro de padre actualizado exitosamente");
+        }
+      }
+
+      const submissionData = {
+        ...formData,
+        registrationDate: new Date().toISOString(),
+      };
+
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionData),
-      })
+      });
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Registration failed.")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed.");
       }
-      const responseData = await response.json()
-      setRegistrationResult(responseData)
-      setStep((prev) => prev + 1)
-      document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" })
+
+      const responseData = await response.json();
+      setRegistrationResult(responseData);
+      setStep((prev) => prev + 1);
+      document
+        .getElementById("register")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (error) {
-      setSubmissionError(error instanceof Error ? error.message : "An unexpected error occurred")
+      setSubmissionError(
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Simplified payment handler that always uses direct redirect
   const handlePayment = async () => {
-    if (!selectedTeam || !registrationResult) return
+    if (!selectedTeam || !registrationResult) return;
 
     try {
-      setIsProcessingPayment(true)
-      setSubmissionError(null)
+      setIsProcessingPayment(true);
+      setSubmissionError(null);
 
-      console.log("🔄 Creating Checkout Session...")
+      console.log("🔄 Creating Checkout Session...");
 
       // Create Checkout Session on the server
       const res = await fetch("/api/create-checkout-session", {
@@ -881,57 +1000,69 @@ export default function RegisterSection() {
           amount: selectedTeam.price,
           description: `${selectedTeam.name} - ${selectedTeam.schoolName}`,
         }),
-      })
+      });
 
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.message || "Unable to start payment")
+        const err = await res.json();
+        throw new Error(err.message || "Unable to start payment");
       }
 
-      const data = await res.json()
-      console.log("✅ Checkout session response:", data)
+      const data = await res.json();
+      console.log("✅ Checkout session response:", data);
 
       // Development fallback
       if (data.isDevelopment) {
-        console.log("🛠 Development mode – skipping real checkout.")
+        console.log("🛠 Development mode – skipping real checkout.");
         setTimeout(() => {
-          setStep(7)
-          document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })
-        }, 1500)
-        return
+          setStep(7);
+          document
+            .getElementById("register")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }, 1500);
+        return;
       }
 
       // Always use direct redirect to Stripe Checkout
       if (data.url) {
-        console.log("🔄 Redirecting to Stripe Checkout:", data.url)
+        console.log("🔄 Redirecting to Stripe Checkout:", data.url);
         // Use window.location.href for immediate redirect
-        window.location.href = data.url
+        window.location.href = data.url;
       } else {
-        throw new Error("No checkout URL provided by server")
+        throw new Error("No checkout URL provided by server");
       }
     } catch (error) {
-      console.error("❌ Payment error:", error)
-      setSubmissionError(error instanceof Error ? error.message : "An unexpected payment error occurred")
-      setIsProcessingPayment(false)
+      console.error("❌ Payment error:", error);
+      setSubmissionError(
+        error instanceof Error
+          ? error.message
+          : "An unexpected payment error occurred"
+      );
+      setIsProcessingPayment(false);
     }
     // Note: Don't set setIsProcessingPayment(false) here if redirect is successful
     // because the page will be redirected away
-  }
+  };
 
   const returnToHome = () => {
-    window.location.href = "/"
-  }
+    window.location.href = "/";
+  };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return ""
-    return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-  }
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
     <section className="py-20 bg-white" id="register">
       <div className="container px-4">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-4xl md:text-5xl wild-youth-text-blue mb-6">REGISTER NOW</h2>
+          <h2 className="text-4xl md:text-5xl wild-youth-text-blue mb-6">
+            REGISTER NOW
+          </h2>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-16">
             Find your school and team to get started with registration.
           </p>
@@ -950,21 +1081,23 @@ export default function RegisterSection() {
                   {s}
                 </div>
                 <span
-                  className={`mt-2 text-sm text-center ${step >= s ? "text-dr-blue font-medium" : "text-gray-500"}`}
+                  className={`mt-2 text-sm text-center ${
+                    step >= s ? "text-dr-blue font-medium" : "text-gray-500"
+                  }`}
                 >
                   {s === 1
                     ? "Search"
                     : s === 2
-                      ? "Select Team"
-                      : s === 3
-                        ? "Account"
-                        : s === 4
-                          ? "Parent Info"
-                          : s === 5
-                            ? "Review"
-                            : s === 6
-                              ? "Payment"
-                              : "Confirmation"}
+                    ? "Select Team"
+                    : s === 3
+                    ? "Account"
+                    : s === 4
+                    ? "Parent Info"
+                    : s === 5
+                    ? "Review"
+                    : s === 6
+                    ? "Payment"
+                    : "Confirmation"}
                 </span>
               </div>
             ))}
@@ -974,7 +1107,9 @@ export default function RegisterSection() {
           {step === 1 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold text-dr-blue mb-6">Find Your School or Team</h3>
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">
+                  Find Your School or Team
+                </h3>
                 <div className="relative mb-6">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
@@ -991,13 +1126,17 @@ export default function RegisterSection() {
                       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
                         <p className="font-semibold">Connection Error</p>
                         <p className="text-sm">{searchError}</p>
-                        <p className="text-sm mt-2">Showing sample data for demonstration purposes.</p>
+                        <p className="text-sm mt-2">
+                          Showing sample data for demonstration purposes.
+                        </p>
                       </div>
                     )}
                     {isInitialLoading && (
                       <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dr-blue mx-auto"></div>
-                        <p className="mt-2 text-gray-600">Loading schools and teams...</p>
+                        <p className="mt-2 text-gray-600">
+                          Loading schools and teams...
+                        </p>
                       </div>
                     )}
                     {isLoadingSchools && (
@@ -1010,24 +1149,34 @@ export default function RegisterSection() {
                       <div className="space-y-6">
                         {filteredSchools.length === 0 ? (
                           <div className="text-center py-8">
-                            <p className="text-gray-600">No schools or teams found matching "{searchQuery}"</p>
+                            <p className="text-gray-600">
+                              No schools or teams found matching "{searchQuery}"
+                            </p>
                             <p className="text-sm text-gray-500 mt-2">
                               Try a different search term or browse all schools
                             </p>
                           </div>
                         ) : (
                           filteredSchools.map((school) => (
-                            <div key={school.id} className="border border-gray-200 rounded-lg p-6">
+                            <div
+                              key={school.id}
+                              className="border border-gray-200 rounded-lg p-6"
+                            >
                               <div className="flex items-center mb-4">
                                 <Image
-                                  src={school.logo || "/placeholder.svg?height=60&width=60&text=School"}
+                                  src={
+                                    school.logo ||
+                                    "/placeholder.svg?height=60&width=60&text=School"
+                                  }
                                   alt={school.name}
                                   width={60}
                                   height={60}
                                   className="rounded-lg mr-4"
                                 />
                                 <div>
-                                  <h4 className="text-xl font-bold text-dr-blue">{school.name}</h4>
+                                  <h4 className="text-xl font-bold text-dr-blue">
+                                    {school.name}
+                                  </h4>
                                   <p className="text-gray-600 flex items-center">
                                     <MapPin className="h-4 w-4 mr-1" />
                                     {school.location}
@@ -1040,26 +1189,38 @@ export default function RegisterSection() {
                                     key={team.id}
                                     className="bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
                                     onClick={() => {
-                                      handleTeamSelect(team)
-                                      nextStep()
+                                      handleTeamSelect(team);
+                                      nextStep();
                                     }}
                                   >
                                     <div className="flex justify-between items-start">
                                       <div className="flex-1">
-                                        <h5 className="font-semibold text-dr-blue">{team.name}</h5>
-                                        <p className="text-sm text-gray-600 mb-2">{team.description}</p>
+                                        <h5 className="font-semibold text-dr-blue">
+                                          {team.name}
+                                        </h5>
+                                        <p className="text-sm text-gray-600 mb-2">
+                                          {team.description}
+                                        </p>
                                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                                           <span className="bg-white px-2 py-1 rounded">
                                             <TagIcon className="inline h-3 w-3 mr-1" />
                                             {team.sport}
                                           </span>
-                                          <span className="bg-white px-2 py-1 rounded">Ages {team.ageGroup}</span>
-                                          <span className="bg-white px-2 py-1 rounded">{team.skillLevel}</span>
+                                          <span className="bg-white px-2 py-1 rounded">
+                                            Ages {team.ageGroup}
+                                          </span>
+                                          <span className="bg-white px-2 py-1 rounded">
+                                            {team.skillLevel}
+                                          </span>
                                         </div>
                                       </div>
                                       <div className="text-right ml-4">
-                                        <div className="text-2xl font-bold text-dr-blue">${team.price}</div>
-                                        <div className="text-sm text-gray-600">per season</div>
+                                        <div className="text-2xl font-bold text-dr-blue">
+                                          ${team.price}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                          per season
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
@@ -1080,41 +1241,61 @@ export default function RegisterSection() {
           {step === 2 && selectedTeam && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold text-dr-blue mb-6">Team Details</h3>
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">
+                  Team Details
+                </h3>
                 <div className="bg-gray-50 p-6 rounded-lg mb-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h4 className="text-xl font-bold text-dr-blue">{selectedTeam.name}</h4>
+                      <h4 className="text-xl font-bold text-dr-blue">
+                        {selectedTeam.name}
+                      </h4>
                       <p className="text-gray-600">{selectedTeam.schoolName}</p>
-                      <p className="text-sm text-gray-600 mt-2">{selectedTeam.description}</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        {selectedTeam.description}
+                      </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-bold text-dr-blue">${selectedTeam.price}</div>
+                      <div className="text-3xl font-bold text-dr-blue">
+                        ${selectedTeam.price}
+                      </div>
                       <div className="text-sm text-gray-600">per season</div>
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-semibold">Sport:</span> {selectedTeam.sport}
+                      <span className="font-semibold">Sport:</span>{" "}
+                      {selectedTeam.sport}
                     </div>
                     <div>
-                      <span className="font-semibold">Age Group:</span> {selectedTeam.ageGroup}
+                      <span className="font-semibold">Age Group:</span>{" "}
+                      {selectedTeam.ageGroup}
                     </div>
                     <div>
-                      <span className="font-semibold">Skill Level:</span> {selectedTeam.skillLevel}
+                      <span className="font-semibold">Skill Level:</span>{" "}
+                      {selectedTeam.skillLevel}
                     </div>
                     <div>
-                      <span className="font-semibold">Coach:</span> {selectedTeam.coach.name}
+                      <span className="font-semibold">Coach:</span>{" "}
+                      {selectedTeam.coach.name}
                     </div>
                   </div>
                 </div>
                 <div className="mb-6">
-                  <h5 className="font-semibold text-dr-blue mb-3">Training Sessions</h5>
+                  <h5 className="font-semibold text-dr-blue mb-3">
+                    Training Sessions
+                  </h5>
                   <div className="space-y-3">
                     {selectedTeam.sessions
-                      .slice(0, showAllSessions ? selectedTeam.sessions.length : 3)
+                      .slice(
+                        0,
+                        showAllSessions ? selectedTeam.sessions.length : 3
+                      )
                       .map((session) => (
-                        <div key={session.id} className="bg-white border border-gray-200 p-4 rounded-lg">
+                        <div
+                          key={session.id}
+                          className="bg-white border border-gray-200 p-4 rounded-lg"
+                        >
                           <div className="flex justify-between items-start">
                             <div>
                               <div className="font-semibold text-dr-blue">
@@ -1122,7 +1303,8 @@ export default function RegisterSection() {
                               </div>
                               <div className="text-sm text-gray-600 mt-1">
                                 <Calendar className="inline h-4 w-4 mr-1" />
-                                {formatDate(session.startDate)} - {formatDate(session.endDate)}
+                                {formatDate(session.startDate)} -{" "}
+                                {formatDate(session.endDate)}
                               </div>
                               <div className="text-sm text-gray-600">
                                 <MapPin className="inline h-4 w-4 mr-1" />
@@ -1148,17 +1330,25 @@ export default function RegisterSection() {
                         </>
                       ) : (
                         <>
-                          Show All {selectedTeam.sessions.length} Sessions <ChevronDown className="ml-1 h-4 w-4" />
+                          Show All {selectedTeam.sessions.length} Sessions{" "}
+                          <ChevronDown className="ml-1 h-4 w-4" />
                         </>
                       )}
                     </button>
                   )}
                 </div>
                 <div className="flex gap-4">
-                  <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                  <Button
+                    onClick={prevStep}
+                    variant="outline"
+                    className="flex-1 bg-transparent"
+                  >
                     Back
                   </Button>
-                  <Button onClick={nextStep} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                  <Button
+                    onClick={nextStep}
+                    className="flex-1 bg-dr-blue hover:bg-blue-700"
+                  >
                     Continue
                   </Button>
                 </div>
@@ -1170,9 +1360,12 @@ export default function RegisterSection() {
           {step === 3 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold text-dr-blue mb-6">Account Required</h3>
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">
+                  Account Required
+                </h3>
                 <p className="text-gray-600 mb-6">
-                  To complete your registration, you need to log in to your account or create a new one.
+                  To complete your registration, you need to log in to your
+                  account or create a new one.
                 </p>
 
                 {/* Supabase Status Check */}
@@ -1182,21 +1375,26 @@ export default function RegisterSection() {
                 {isCheckingSession && (
                   <div className="text-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-dr-blue" />
-                    <p className="text-gray-600 mb-4">Verificando tu sesión...</p>
+                    <p className="text-gray-600 mb-4">
+                      Verificando tu sesión...
+                    </p>
                     <div className="space-y-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => {
-                          console.log("🔄 Usuario saltó manualmente la verificación de sesión")
-                          setIsCheckingSession(false)
+                          console.log(
+                            "🔄 Usuario saltó manualmente la verificación de sesión"
+                          );
+                          setIsCheckingSession(false);
                         }}
                         className="text-sm mr-2"
                       >
                         Saltar & Continuar
                       </Button>
                       <p className="text-xs text-gray-500">
-                        Si esto toma mucho tiempo, puedes continuar y iniciar sesión manualmente
+                        Si esto toma mucho tiempo, puedes continuar y iniciar
+                        sesión manualmente
                       </p>
                     </div>
                   </div>
@@ -1208,8 +1406,12 @@ export default function RegisterSection() {
                     <div className="flex items-center">
                       <User className="h-5 w-5 text-green-600 mr-2" />
                       <div>
-                        <p className="font-semibold text-green-800">Already Logged In</p>
-                        <p className="text-green-700">You are already logged in as {currentUser.email}</p>
+                        <p className="font-semibold text-green-800">
+                          Already Logged In
+                        </p>
+                        <p className="text-green-700">
+                          You are already logged in as {currentUser.email}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1223,13 +1425,11 @@ export default function RegisterSection() {
                         <Loader2 className="h-5 w-5 text-blue-600 mr-3 animate-spin" />
                         <div>
                           <p className="font-semibold text-blue-800">
-                            {authMode === "login" ? "Iniciando Sesión..." : "Creando Cuenta..."}
+                            Iniciando Sesión...
                           </p>
                           <p className="text-blue-700 text-sm">
-                            {authMode === "login" 
-                              ? "Verificando tus credenciales y configurando tu sesión..." 
-                              : "Creando tu cuenta y configurando tu perfil..."
-                            }
+                            Verificando tus credenciales y configurando tu
+                            sesión...
                           </p>
                         </div>
                       </div>
@@ -1237,9 +1437,9 @@ export default function RegisterSection() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setIsAuthLoading(false)
-                          setAuthError("Login cancelado por el usuario")
-                          console.log("🔄 Usuario canceló el login")
+                          setIsAuthLoading(false);
+                          setAuthError("Login cancelado por el usuario");
+                          console.log("🔄 Usuario canceló el login");
                         }}
                         className="text-blue-700 border-blue-300 hover:bg-blue-100"
                       >
@@ -1252,75 +1452,22 @@ export default function RegisterSection() {
                 {/* Show login/register form only if not logged in */}
                 {!isCheckingSession && !currentUser && (
                   <>
-                    {/* Auth Mode Toggle */}
-                    <div className="flex mb-6">
-                      <button
-                        onClick={() => setAuthMode("login")}
-                        className={`flex-1 py-3 px-4 text-center font-medium rounded-l-lg border ${
-                          authMode === "login"
-                            ? "bg-dr-blue text-white border-dr-blue"
-                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                        }`}
-                      >
-                        <LogIn className="inline h-4 w-4 mr-2" />
-                        Login
-                      </button>
-                      <button
-                        onClick={() => setAuthMode("register")}
-                        className={`flex-1 py-3 px-4 text-center font-medium rounded-r-lg border-t border-r border-b ${
-                          authMode === "register"
-                            ? "bg-dr-blue text-white border-dr-blue"
-                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                        }`}
-                      >
-                        <UserPlus className="inline h-4 w-4 mr-2" />
-                        Create Account
-                      </button>
+                    {/* Simple OTP Authentication */}
+                    <div className="text-center mb-6">
+                      <h4 className="text-lg font-semibold text-dr-blue mb-2">
+                        🔐 Secure Login
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        Enter your email to receive a secure login code
+                      </p>
                     </div>
-
-                    {/* Registration Form */}
-                    {authMode === "register" && (
-                      <div className="space-y-4 mb-6">
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                            <Input
-                              name="authFirstName"
-                              value={authFirstName}
-                              onChange={handleAuthChange}
-                              className={errors.firstName ? "border-red-500" : ""}
-                            />
-                            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                            <Input
-                              name="authLastName"
-                              value={authLastName}
-                              onChange={handleAuthChange}
-                              className={errors.lastName ? "border-red-500" : ""}
-                            />
-                            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                          <Input
-                            name="authPhone"
-                            value={authPhone}
-                            onChange={handleAuthChange}
-                            placeholder="(555) 123-4567"
-                            className={errors.phone ? "border-red-500" : ""}
-                          />
-                          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Common Fields */}
                     <div className="space-y-4 mb-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email
+                        </label>
                         <Input
                           name="authEmail"
                           type="email"
@@ -1328,44 +1475,43 @@ export default function RegisterSection() {
                           onChange={handleAuthChange}
                           className={errors.email ? "border-red-500" : ""}
                         />
-                        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                        {errors.email && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.email}
+                          </p>
+                        )}
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <Input
-                          name="authPassword"
-                          type="password"
-                          value={authPassword}
-                          onChange={handleAuthChange}
-                          className={errors.password ? "border-red-500" : ""}
-                        />
-                        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                      </div>
-                      {authMode === "register" && (
+                      {otpSent ? (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Login Code
+                          </label>
                           <Input
-                            name="authConfirmPassword"
-                            type="password"
-                            value={authConfirmPassword}
+                            name="authOtp"
+                            type="text"
+                            placeholder="Enter 6-digit code"
+                            value={authOtp}
                             onChange={handleAuthChange}
-                            className={errors.confirmPassword ? "border-red-500" : ""}
+                            maxLength={6}
+                            className={errors.otp ? "border-red-500" : ""}
                           />
-                          {errors.confirmPassword && (
-                            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                          {errors.otp && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.otp}
+                            </p>
                           )}
+                          <p className="text-sm text-gray-600 mt-1">
+                            Code expires in {otpExpiresIn}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 mb-4">
+                            We'll send a login code to your email
+                          </p>
                         </div>
                       )}
                     </div>
-
-                    {authMode === "login" && (
-                      <div className="text-center mb-6">
-                        <Link href="/auth/forgot-password" className="text-dr-blue hover:text-blue-700 text-sm">
-                          <KeyRound className="inline h-4 w-4 mr-1" />
-                          Forgot your password?
-                        </Link>
-                      </div>
-                    )}
                   </>
                 )}
 
@@ -1391,12 +1537,13 @@ export default function RegisterSection() {
                       <div>
                         <p className="font-semibold">Check Your Email</p>
                         <p className="text-sm mt-1">
-                          We've sent a confirmation link to <strong>{authEmail}</strong>. Please check your email and
-                          click the link to verify your account.
+                          We've sent a confirmation link to{" "}
+                          <strong>{authEmail}</strong>. Please check your email
+                          and click the link to verify your account.
                         </p>
                         <p className="text-sm mt-2">
-                          After confirming your email, you'll be automatically logged in and can continue with
-                          registration.
+                          After confirming your email, you'll be automatically
+                          logged in and can continue with registration.
                         </p>
                       </div>
                     </div>
@@ -1405,46 +1552,68 @@ export default function RegisterSection() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                  <Button
+                    onClick={prevStep}
+                    variant="outline"
+                    className="flex-1 bg-transparent"
+                  >
                     Back
                   </Button>
 
                   {!isCheckingSession && currentUser ? (
                     <div className="flex gap-2 flex-1">
-                      <Button onClick={handleLogout} variant="outline" className="flex-1 bg-transparent">
+                      <Button
+                        onClick={handleLogout}
+                        variant="outline"
+                        className="flex-1 bg-transparent"
+                      >
                         Logout
                       </Button>
-                      <Button onClick={nextStep} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                      <Button
+                        onClick={nextStep}
+                        className="flex-1 bg-dr-blue hover:bg-blue-700"
+                      >
                         Continue
                       </Button>
                     </div>
                   ) : !isCheckingSession && !isEmailConfirmationSent ? (
-                    <Button
-                      onClick={authMode === "login" ? handleLogin : handleRegister}
-                      disabled={isAuthLoading}
-                      className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {isAuthLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {authMode === "login" ? "Iniciando Sesión..." : "Creando Cuenta..."}
-                        </>
-                      ) : (
-                        <>
-                          {authMode === "login" ? (
-                            <>
-                              <LogIn className="mr-2 h-4 w-4" />
-                              Iniciar Sesión & Continuar
-                            </>
-                          ) : (
-                            <>
-                              <UserPlus className="mr-2 h-4 w-4" />
-                              Crear Cuenta
-                            </>
-                          )}
-                        </>
-                      )}
-                    </Button>
+                    otpSent ? (
+                      <Button
+                        onClick={handleVerifyOTP}
+                        disabled={isAuthLoading}
+                        className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isAuthLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Verificando Código...
+                          </>
+                        ) : (
+                          <>
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Verificar Código & Continuar
+                          </>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={handleSendOTP}
+                        disabled={isAuthLoading}
+                        className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isAuthLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Enviando Código...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Enviar Código de Acceso
+                          </>
+                        )}
+                      </Button>
+                    )
                   ) : null}
                 </div>
               </div>
@@ -1455,36 +1624,56 @@ export default function RegisterSection() {
           {step === 4 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold text-dr-blue mb-6">Parent and Child Information</h3>
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">
+                  Parent and Child Information
+                </h3>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Parent Information */}
                   <div>
-                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Parent/Guardian Information</h4>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">
+                      Parent/Guardian Information
+                    </h4>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          First Name
+                        </label>
                         <Input
                           name="parentFirstName"
                           value={formData.parentFirstName}
                           onChange={handleChange}
-                          className={errors.parentFirstName ? "border-red-500" : ""}
+                          className={
+                            errors.parentFirstName ? "border-red-500" : ""
+                          }
                         />
                         {errors.parentFirstName && (
-                          <p className="text-red-500 text-sm mt-1">{errors.parentFirstName}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.parentFirstName}
+                          </p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Last Name
+                        </label>
                         <Input
                           name="parentLastName"
                           value={formData.parentLastName}
                           onChange={handleChange}
-                          className={errors.parentLastName ? "border-red-500" : ""}
+                          className={
+                            errors.parentLastName ? "border-red-500" : ""
+                          }
                         />
-                        {errors.parentLastName && <p className="text-red-500 text-sm mt-1">{errors.parentLastName}</p>}
+                        {errors.parentLastName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.parentLastName}
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email
+                        </label>
                         <Input
                           name="parentEmail"
                           type="email"
@@ -1492,10 +1681,16 @@ export default function RegisterSection() {
                           onChange={handleChange}
                           className={errors.parentEmail ? "border-red-500" : ""}
                         />
-                        {errors.parentEmail && <p className="text-red-500 text-sm mt-1">{errors.parentEmail}</p>}
+                        {errors.parentEmail && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.parentEmail}
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone
+                        </label>
                         <Input
                           name="parentPhone"
                           value={formData.parentPhone}
@@ -1503,105 +1698,164 @@ export default function RegisterSection() {
                           placeholder="(555) 123-4567"
                           className={errors.parentPhone ? "border-red-500" : ""}
                         />
-                        {errors.parentPhone && <p className="text-red-500 text-sm mt-1">{errors.parentPhone}</p>}
+                        {errors.parentPhone && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.parentPhone}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Child Information */}
                   <div>
-                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Child Information</h4>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">
+                      Child Information
+                    </h4>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          First Name
+                        </label>
                         <Input
                           name="childFirstName"
                           value={formData.childFirstName}
                           onChange={handleChange}
-                          className={errors.childFirstName ? "border-red-500" : ""}
+                          className={
+                            errors.childFirstName ? "border-red-500" : ""
+                          }
                         />
-                        {errors.childFirstName && <p className="text-red-500 text-sm mt-1">{errors.childFirstName}</p>}
+                        {errors.childFirstName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.childFirstName}
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Last Name
+                        </label>
                         <Input
                           name="childLastName"
                           value={formData.childLastName}
                           onChange={handleChange}
-                          className={errors.childLastName ? "border-red-500" : ""}
+                          className={
+                            errors.childLastName ? "border-red-500" : ""
+                          }
                         />
-                        {errors.childLastName && <p className="text-red-500 text-sm mt-1">{errors.childLastName}</p>}
+                        {errors.childLastName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.childLastName}
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Date of Birth
+                        </label>
                         <Input
                           name="childBirthdate"
                           type="date"
                           value={formData.childBirthdate}
                           onChange={handleChange}
-                          className={errors.childBirthdate ? "border-red-500" : ""}
+                          className={
+                            errors.childBirthdate ? "border-red-500" : ""
+                          }
                         />
-                        {errors.childBirthdate && <p className="text-red-500 text-sm mt-1">{errors.childBirthdate}</p>}
+                        {errors.childBirthdate && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.childBirthdate}
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Grade</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Grade
+                        </label>
                         <select
                           name="childGrade"
                           value={formData.childGrade}
                           onChange={handleChange}
                           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue ${
-                            errors.childGrade ? "border-red-500" : "border-gray-300"
+                            errors.childGrade
+                              ? "border-red-500"
+                              : "border-gray-300"
                           }`}
                         >
                           <option value="">Select Grade</option>
                           {Array.from({ length: 13 }, (_, i) => (
-                            <option key={i} value={i === 0 ? "K" : i.toString()}>
+                            <option
+                              key={i}
+                              value={i === 0 ? "K" : i.toString()}
+                            >
                               {i === 0 ? "Kindergarten" : `Grade ${i}`}
                             </option>
                           ))}
                         </select>
-                        {errors.childGrade && <p className="text-red-500 text-sm mt-1">{errors.childGrade}</p>}
+                        {errors.childGrade && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.childGrade}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Emergency Contact */}
                   <div>
-                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Emergency Contact</h4>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">
+                      Emergency Contact
+                    </h4>
                     <div className="grid md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Name
+                        </label>
                         <Input
                           name="emergencyContactName"
                           value={formData.emergencyContactName}
                           onChange={handleChange}
-                          className={errors.emergencyContactName ? "border-red-500" : ""}
+                          className={
+                            errors.emergencyContactName ? "border-red-500" : ""
+                          }
                         />
                         {errors.emergencyContactName && (
-                          <p className="text-red-500 text-sm mt-1">{errors.emergencyContactName}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.emergencyContactName}
+                          </p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone
+                        </label>
                         <Input
                           name="emergencyContactPhone"
                           value={formData.emergencyContactPhone}
                           onChange={handleChange}
                           placeholder="(555) 123-4567"
-                          className={errors.emergencyContactPhone ? "border-red-500" : ""}
+                          className={
+                            errors.emergencyContactPhone ? "border-red-500" : ""
+                          }
                         />
                         {errors.emergencyContactPhone && (
-                          <p className="text-red-500 text-sm mt-1">{errors.emergencyContactPhone}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.emergencyContactPhone}
+                          </p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Relationship</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Relationship
+                        </label>
                         <select
                           name="emergencyContactRelation"
                           value={formData.emergencyContactRelation}
                           onChange={handleChange}
                           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue ${
-                            errors.emergencyContactRelation ? "border-red-500" : "border-gray-300"
+                            errors.emergencyContactRelation
+                              ? "border-red-500"
+                              : "border-gray-300"
                           }`}
                         >
                           <option value="">Select Relationship</option>
@@ -1613,7 +1867,9 @@ export default function RegisterSection() {
                           <option value="Other">Other</option>
                         </select>
                         {errors.emergencyContactRelation && (
-                          <p className="text-red-500 text-sm mt-1">{errors.emergencyContactRelation}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.emergencyContactRelation}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -1621,10 +1877,14 @@ export default function RegisterSection() {
 
                   {/* Optional Information */}
                   <div>
-                    <h4 className="text-lg font-semibold text-dr-blue mb-4">Additional Information (Optional)</h4>
+                    <h4 className="text-lg font-semibold text-dr-blue mb-4">
+                      Additional Information (Optional)
+                    </h4>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Medical Conditions</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Medical Conditions
+                        </label>
                         <textarea
                           name="medicalConditions"
                           value={formData.medicalConditions}
@@ -1635,7 +1895,9 @@ export default function RegisterSection() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Special Instructions
+                        </label>
                         <textarea
                           name="specialInstructions"
                           value={formData.specialInstructions}
@@ -1649,10 +1911,19 @@ export default function RegisterSection() {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button type="button" onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                    <Button
+                      type="button"
+                      onClick={prevStep}
+                      variant="outline"
+                      className="flex-1 bg-transparent"
+                    >
                       Back
                     </Button>
-                    <Button type="submit" disabled={isSubmitting} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-1 bg-dr-blue hover:bg-blue-700"
+                    >
                       {isSubmitting ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1679,49 +1950,64 @@ export default function RegisterSection() {
           {step === 5 && selectedTeam && registrationResult && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold text-dr-blue mb-6">Review Your Registration</h3>
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">
+                  Review Your Registration
+                </h3>
                 <div className="space-y-6">
                   {/* Team Information */}
                   <div className="bg-gray-50 p-6 rounded-lg">
-                    <h4 className="font-semibold text-dr-blue mb-3">Selected Team</h4>
+                    <h4 className="font-semibold text-dr-blue mb-3">
+                      Selected Team
+                    </h4>
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium">Team:</span> {selectedTeam.name}
+                        <span className="font-medium">Team:</span>{" "}
+                        {selectedTeam.name}
                       </div>
                       <div>
-                        <span className="font-medium">School:</span> {selectedTeam.schoolName}
+                        <span className="font-medium">School:</span>{" "}
+                        {selectedTeam.schoolName}
                       </div>
                       <div>
-                        <span className="font-medium">Coach:</span> {selectedTeam.coach.name}
+                        <span className="font-medium">Coach:</span>{" "}
+                        {selectedTeam.coach.name}
                       </div>
                       <div>
-                        <span className="font-medium">Price:</span> ${selectedTeam.price}
+                        <span className="font-medium">Price:</span> $
+                        {selectedTeam.price}
                       </div>
                     </div>
                   </div>
 
                   {/* Registration Information */}
                   <div className="bg-gray-50 p-6 rounded-lg">
-                    <h4 className="font-semibold text-dr-blue mb-3">Registration Details</h4>
+                    <h4 className="font-semibold text-dr-blue mb-3">
+                      Registration Details
+                    </h4>
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium">Parent:</span> {formData.parentFirstName}{" "}
-                        {formData.parentLastName}
+                        <span className="font-medium">Parent:</span>{" "}
+                        {formData.parentFirstName} {formData.parentLastName}
                       </div>
                       <div>
-                        <span className="font-medium">Email:</span> {formData.parentEmail}
+                        <span className="font-medium">Email:</span>{" "}
+                        {formData.parentEmail}
                       </div>
                       <div>
-                        <span className="font-medium">Phone:</span> {formData.parentPhone}
+                        <span className="font-medium">Phone:</span>{" "}
+                        {formData.parentPhone}
                       </div>
                       <div>
-                        <span className="font-medium">Child:</span> {formData.childFirstName} {formData.childLastName}
+                        <span className="font-medium">Child:</span>{" "}
+                        {formData.childFirstName} {formData.childLastName}
                       </div>
                       <div>
-                        <span className="font-medium">Grade:</span> {formData.childGrade}
+                        <span className="font-medium">Grade:</span>{" "}
+                        {formData.childGrade}
                       </div>
                       <div>
-                        <span className="font-medium">Emergency Contact:</span> {formData.emergencyContactName} (
+                        <span className="font-medium">Emergency Contact:</span>{" "}
+                        {formData.emergencyContactName} (
                         {formData.emergencyContactRelation})
                       </div>
                     </div>
@@ -1735,10 +2021,17 @@ export default function RegisterSection() {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                    <Button
+                      onClick={prevStep}
+                      variant="outline"
+                      className="flex-1 bg-transparent"
+                    >
                       Back to Edit
                     </Button>
-                    <Button onClick={nextStep} className="flex-1 bg-dr-blue hover:bg-blue-700">
+                    <Button
+                      onClick={nextStep}
+                      className="flex-1 bg-dr-blue hover:bg-blue-700"
+                    >
                       Proceed to Payment
                     </Button>
                   </div>
@@ -1751,9 +2044,13 @@ export default function RegisterSection() {
           {step === 6 && selectedTeam && registrationResult && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-bold text-dr-blue mb-6">Payment</h3>
+                <h3 className="text-2xl font-bold text-dr-blue mb-6">
+                  Payment
+                </h3>
                 <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                  <h4 className="font-semibold text-dr-blue mb-3">Payment Summary</h4>
+                  <h4 className="font-semibold text-dr-blue mb-3">
+                    Payment Summary
+                  </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>
@@ -1768,7 +2065,9 @@ export default function RegisterSection() {
                   </div>
                 </div>
                 <div className="text-center mb-6">
-                  <p className="text-gray-600 mb-4">Click below to proceed to secure payment processing.</p>
+                  <p className="text-gray-600 mb-4">
+                    Click below to proceed to secure payment processing.
+                  </p>
                   <Button
                     onClick={handlePayment}
                     disabled={isProcessingPayment}
@@ -1794,7 +2093,11 @@ export default function RegisterSection() {
                   </div>
                 )}
                 <div className="flex gap-4">
-                  <Button onClick={prevStep} variant="outline" className="flex-1 bg-transparent">
+                  <Button
+                    onClick={prevStep}
+                    variant="outline"
+                    className="flex-1 bg-transparent"
+                  >
                     Back
                   </Button>
                 </div>
@@ -1809,24 +2112,45 @@ export default function RegisterSection() {
                 <div className="bg-green-100 rounded-full p-6 w-24 h-24 mx-auto mb-6">
                   <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
                 </div>
-                <h3 className="text-3xl font-bold text-dr-blue mb-4">Registration Complete!</h3>
+                <h3 className="text-3xl font-bold text-dr-blue mb-4">
+                  Registration Complete!
+                </h3>
                 <p className="text-xl text-gray-700 mb-6">
-                  Welcome to {selectedTeam.name}! Your registration has been successfully processed.
+                  Welcome to {selectedTeam.name}! Your registration has been
+                  successfully processed.
                 </p>
                 <div className="bg-gray-50 p-6 rounded-lg mb-6 text-left">
-                  <h4 className="font-semibold text-dr-blue mb-3">What's Next?</h4>
+                  <h4 className="font-semibold text-dr-blue mb-3">
+                    What's Next?
+                  </h4>
                   <ul className="space-y-2 text-sm text-gray-700">
-                    <li>• You'll receive a confirmation email with all the details</li>
-                    <li>• The coach will contact you before the first session</li>
-                    <li>• Check your parent dashboard for updates and schedules</li>
-                    <li>• Bring water bottle and appropriate athletic wear to sessions</li>
+                    <li>
+                      • You'll receive a confirmation email with all the details
+                    </li>
+                    <li>
+                      • The coach will contact you before the first session
+                    </li>
+                    <li>
+                      • Check your parent dashboard for updates and schedules
+                    </li>
+                    <li>
+                      • Bring water bottle and appropriate athletic wear to
+                      sessions
+                    </li>
                   </ul>
                 </div>
                 <div className="space-y-3">
-                  <Button onClick={returnToHome} className="w-full bg-dr-blue hover:bg-blue-700">
+                  <Button
+                    onClick={returnToHome}
+                    className="w-full bg-dr-blue hover:bg-blue-700"
+                  >
                     Return to Home
                   </Button>
-                  <Button onClick={() => (window.location.href = "/dashboard")} variant="outline" className="w-full">
+                  <Button
+                    onClick={() => (window.location.href = "/dashboard")}
+                    variant="outline"
+                    className="w-full"
+                  >
                     View Parent Dashboard
                   </Button>
                 </div>
@@ -1836,5 +2160,5 @@ export default function RegisterSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
