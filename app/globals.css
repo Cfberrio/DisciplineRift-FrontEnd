@@ -142,6 +142,28 @@ p, span, div, li, td, th, label, input, textarea, select, button {
     font-size: 1rem;
   }
   
+  /* About Us section specific optimizations for iPhone 14 */
+  #about {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  #about .mission-text-large {
+    line-height: 1.6;
+    text-align: justify;
+    font-size: 0.9375rem;
+  }
+  
+  #about h2 {
+    font-size: 1.75rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  
   /* iPhone specific improvements */
   .hero-mobile {
     min-height: 100vh;
@@ -177,6 +199,28 @@ p, span, div, li, td, th, label, input, textarea, select, button {
   h3 { font-size: 1.375rem; line-height: 1.3; }
   h4 { font-size: 1.25rem; line-height: 1.4; }
   p { font-size: 0.9375rem; line-height: 1.5; }
+  
+  /* About Us section specific optimizations for iPhone 14 Pro Max */
+  #about {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  #about .mission-text-large {
+    line-height: 1.6;
+    text-align: justify;
+    font-size: 1rem;
+  }
+  
+  #about h2 {
+    font-size: 2rem;
+    line-height: 1.1;
+    margin-bottom: 1.75rem;
+  }
 }
 
 /* iPhone 15 Pro Max and iPhone 16 Pro Max (431px to 480px) */
@@ -200,6 +244,28 @@ p, span, div, li, td, th, label, input, textarea, select, button {
   .font-ethnocentric {
     line-height: 0.9;
     letter-spacing: -0.02em;
+  }
+  
+  /* About Us section specific optimizations */
+  #about {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  #about .mission-text-large {
+    line-height: 1.6;
+    text-align: justify;
+    font-size: 1.125rem;
+  }
+  
+  #about h2 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin-bottom: 2rem;
   }
 }
 
