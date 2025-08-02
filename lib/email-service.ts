@@ -354,7 +354,7 @@ const createEmailTemplate = (
               `).join('')}
             </div>
           ` : ''}
-
+          
         </div>
         
         <!-- Footer -->

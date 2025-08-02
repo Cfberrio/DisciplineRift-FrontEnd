@@ -2,8 +2,300 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Neue Haas Grotesk Display Pro Font Definitions */
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-Light.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-LightItalic.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-Roman.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-Roman.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-RomanItalic.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-RomanItalic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-Mediu.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-Mediu.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-MediumItalic.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-Bold.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-BoldItalic.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-Black.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Neue Haas Grotesk Display Pro';
+    src: url('/fonts/NeueHaasDisplay-BlackItalic.woff2') format('woff2'),
+        url('/fonts/NeueHaasDisplay-BlackItalic.woff') format('woff');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Ethnocentric Font Definitions */
+@font-face {
+    font-family: 'Ethnocentric';
+    src: url('/fonts/Ethnocentric Rg.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Ethnocentric';
+    src: url('/fonts/Ethnocentric Rg It.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
 body {
-  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Asegurar que todo el texto use Neue Haas Roman por defecto */
+p, span, div, li, td, th, label, input, textarea, select, button {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Mobile-optimized text sizes */
+@media (max-width: 768px) {
+  .mobile-text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+  .mobile-text-base { font-size: 1rem; line-height: 1.5rem; }
+  .mobile-text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+  .mobile-text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+  .mobile-text-2xl { font-size: 1.5rem; line-height: 2rem; }
+  .mobile-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+  .mobile-text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+  .mobile-text-5xl { font-size: 3rem; line-height: 1; }
+  
+  /* Mobile container optimizations */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Mobile section spacing */
+  section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  /* Mobile button optimizations */
+  button, .btn {
+    min-height: 44px; /* iOS recommended touch target */
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Mobile form inputs */
+  input, textarea, select {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 0.75rem;
+  }
+  
+  /* Mobile navigation improvements */
+  .mobile-nav {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  
+  /* Mobile image optimizations */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Mobile overflow prevention */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Mobile-specific hero adjustments */
+  .hero-mobile {
+    min-height: calc(100vh - 80px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  /* Mobile grid improvements */
+  .mobile-grid-fix {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  
+  /* Tablet typography */
+  h1 { font-size: 2.5rem; line-height: 1.1; }
+  h2 { font-size: 2rem; line-height: 1.2; }
+  h3 { font-size: 1.5rem; line-height: 1.3; }
+}
+
+/* Clase específica para el peso Roman */
+.font-neue-haas-roman {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Clase para texto del cuerpo */
+.body-text {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+}
+
+/* Custom classes for Neue Haas Grotesk Display Pro */
+.neue-haas-text-blue {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 900;
+  color: #3b82f6;
+}
+
+.neue-haas-text-white {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.wild-youth-text-blue {
+  font-family: 'Ethnocentric', sans-serif;
+  font-weight: 400;
+  color: #3b82f6;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wild-youth-text-white {
+  font-family: 'Ethnocentric', sans-serif;
+  font-weight: 400;
+  color: #ffffff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ethnocentric-text-blue {
+  font-family: 'Ethnocentric', sans-serif;
+  font-weight: 400;
+  color: #3b82f6;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mission-text-large {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.font-description {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+}
+
+/* Weight utilities */
+.font-neue-haas-light {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 300;
+}
+
+.font-neue-haas-regular {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 400;
+}
+
+.font-neue-haas-medium {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 500;
+}
+
+.font-neue-haas-bold {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 700;
+}
+
+.font-neue-haas-black {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 900;
 }
 
 @layer utilities {
@@ -104,6 +396,9 @@ body {
     color: rgb(var(--foreground-rgb));
     background: rgb(var(--background-rgb));
     overflow-x: hidden;
+    font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+    font-weight: 400;
+    font-style: normal;
   }
 }
 
@@ -332,28 +627,31 @@ section {
 
 /* Typography styles */
 .ethnocentric-text {
-  font-family: var(--font-ethnocentric);
-  letter-spacing: 0.05em;
-  line-height: 0.9;
-  font-weight: 700;
+  font-family: 'Ethnocentric', sans-serif;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
-.ethnocentric-text-blue {
-  font-family: var(--font-ethnocentric);
+.ethnocentric-title-blue {
+  font-family: 'Ethnocentric', sans-serif;
   color: hsl(var(--dr-blue));
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.05em;
-  line-height: 0.9;
-  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
-.ethnocentric-text-white {
-  font-family: var(--font-ethnocentric);
+.ethnocentric-title-white {
+  font-family: 'Ethnocentric', sans-serif;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.05em;
-  line-height: 0.9;
-  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .script-text {
@@ -375,16 +673,18 @@ section {
 
 /* Mission description text styles */
 .mission-text {
-  font-family: var(--font-open-sans);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   line-height: 1.6;
   font-weight: 400;
+  font-style: normal;
   letter-spacing: 0.01em;
 }
 
 .mission-text-large {
-  font-family: var(--font-open-sans);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  font-style: normal;
   letter-spacing: 0.01em;
   font-size: 1.125rem;
 }

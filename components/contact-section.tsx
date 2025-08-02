@@ -42,21 +42,21 @@ export default function ContactSection() {
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
           <h2
-            className="text-4xl md:text-5xl wild-youth-text-blue mb-16"
-            style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.1)" }}
+            className="text-3xl sm:text-4xl md:text-5xl text-blue-600 mb-8 sm:mb-12 md:mb-16 font-bold"
+            style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.8)" }}
           >
             CONTACT US
           </h2>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           {/* Contact Information */}
           <AnimatedSection
             animation="fade-right"
-            className="space-y-8 bg-white/70 backdrop-blur-md p-8 rounded-lg shadow-lg"
+            className="space-y-6 sm:space-y-8 bg-white/70 backdrop-blur-md p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg"
           >
             <div>
-              <h3 className="text-2xl font-bold text-dr-blue mb-6">Get In Touch</h3>
+              <h3 className="text-xl sm:text-2xl ethnocentric-title-blue mb-4 sm:mb-6">Get In Touch</h3>
               <p className="text-gray-800 mb-8">
                 Have questions about our programs or want to learn more about how we can help you improve your game?
                 Reach out to us using any of the methods below, and our team will get back to you as soon as possible.
@@ -102,8 +102,8 @@ export default function ContactSection() {
 
           {/* Contact Form */}
           <AnimatedSection animation="fade-left">
-            <div className="bg-white/90 backdrop-blur-md p-8 rounded-lg shadow-xl">
-              <h3 className="text-2xl font-bold text-dr-blue mb-6">Send Us a Message</h3>
+            <div className="bg-white/90 backdrop-blur-md p-4 sm:p-6 lg:p-8 rounded-lg shadow-xl">
+              <h3 className="text-xl sm:text-2xl ethnocentric-title-blue mb-4 sm:mb-6">Send Us a Message</h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-gray-700 font-medium mb-1">

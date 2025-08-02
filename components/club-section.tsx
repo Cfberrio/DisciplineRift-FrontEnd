@@ -17,7 +17,7 @@ export default function ClubSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-4xl md:text-5xl wild-youth-text-white mb-6 relative">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl wild-youth-text-white mb-4 sm:mb-6 relative">
             <span className="relative z-10">OUR CLUB</span>
             {/* Optional: Brush stroke if it fits the new design */}
             {/* <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div> */}
@@ -27,15 +27,17 @@ export default function ClubSection() {
           </div>
         </AnimatedSection>
 
-        <div className="flex flex-col md:flex-row items-center gap-12">
+        <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8 md:gap-12">
           {/* Content Area - The image of the girl is now part of the background */}
           {/* We can use this space for more text or a call to action related to the club */}
           <AnimatedSection animation="fade-right" className="md:w-1/2">
-            <div className="bg-white/20 backdrop-blur-md p-8 rounded-lg shadow-xl border border-white/30">
-              <h3 className="text-3xl font-bold mb-4 text-white">Join the Discipline Rift Family!</h3>
+            <div className="bg-white/20 backdrop-blur-md p-4 sm:p-6 lg:p-8 rounded-lg shadow-xl border border-white/30">
+              <h3 className="text-2xl sm:text-3xl ethnocentric-title-white mb-3 sm:mb-4">VOLLEYBALL CLUB</h3>
               <p className="text-lg text-white mb-6">
-                Our club is more than just a team; it's a community dedicated to growth, excellence, and fun. We provide
-                a supportive environment where young athletes can thrive.
+              Starting players are developed into high-performance athletes 
+              through advanced coaching, values, and a strong club family to build a lasting 
+              passion for the game.
+
               </p>
               <p className="text-lg text-white mb-8">
                 Whether you're aiming for competitive play or looking to develop your skills in a friendly setting, we
@@ -43,36 +45,30 @@ export default function ClubSection() {
               </p>
               <div className="flex items-center space-x-3 mb-6">
                 <Star className="h-8 w-8 text-white" />
-                <span className="text-xl text-white font-semibold">Become a Champion</span>
+                <span className="text-xl text-white font-semibold">FIND THE RIGHT PROGRAM FOR YOUR CHILD</span>
               </div>
-              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full px-8 shadow-lg transform transition-transform hover:scale-105">
-                <Link href="#register" className="flex items-center">
-                  Explore Club Options <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+          
             </div>
           </AnimatedSection>
 
           <div className="md:w-1/2 text-white">
             <AnimatedSection animation="fade-left" delay={200}>
-              <h3 className="text-3xl font-bold mb-4 text-white">Elite Training & Competition</h3>
+              <h3 className="text-2xl sm:text-3xl ethnocentric-title-white mb-3 sm:mb-4">GIRLS CLUB</h3>
             </AnimatedSection>
 
             <AnimatedSection animation="fade-left" delay={400}>
               <p className="text-lg mb-6">
-                Our club offers year-round training and competitive opportunities for dedicated young players looking to
-                take their game to the next level. With teams for various age groups and skill levels, we provide a
-                pathway for continuous development.
+              Is a fun and challenging program for young athletes
+               who want to improve their skills and play as part of
+                a team. With two practices each week, our players learn
+                 advanced techniques and prepare for local and regional
+                  tournaments—all in a positive and supportive
+                   environment where they can grow, compete, and make new friends.
+
+
               </p>
             </AnimatedSection>
 
-            <AnimatedSection animation="fade-left" delay={600}>
-              <p className="text-lg mb-8">
-                Club members receive professional coaching, participate in regional and national tournaments, and gain
-                exposure to college recruiters. Our comprehensive approach focuses on technical skills, tactical
-                understanding, physical conditioning, and mental preparation.
-              </p>
-            </AnimatedSection>
 
             <StaggeredChildren
               className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
@@ -82,23 +78,19 @@ export default function ClubSection() {
               {[
                 {
                   icon: Trophy,
-                  title: "Travel Teams",
-                  description: "Compete at the highest level in regional and national tournaments",
+                  title: "Advanced skills training",
+                  description: "",
                 },
                 {
                   icon: Users,
-                  title: "Local Teams",
-                  description: "Develop skills while maintaining a balanced schedule",
+                  title: "Two practices each week",
+                  description: "",
                 },
-                {
-                  icon: Target,
-                  title: "College Prep",
-                  description: "Specialized training and recruitment support for college-bound athletes",
-                },
+              
                 {
                   icon: ShieldCheck,
-                  title: "Youth Development",
-                  description: "Foundation building for younger players ages 10-14",
+                  title: "Participation in local and regional tournaments",
+                  description: "",
                 },
               ].map((item, index) => (
                 <div
@@ -117,7 +109,7 @@ export default function ClubSection() {
             <AnimatedSection animation="fade-up" delay={800}>
               <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full px-8 shadow-lg transform transition-transform hover:scale-105">
                 <Link href="#register" className="flex items-center">
-                  Join Our Club <ArrowRight className="ml-2 h-5 w-5" />
+                JOIN US FOR ONE PRACTICE OR TRYOUTS <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
             </AnimatedSection>

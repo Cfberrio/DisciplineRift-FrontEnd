@@ -63,7 +63,7 @@ export default function ExamplePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Program Card 1 */}
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 hover:bg-white/20 transition-all">
-              <h3 className="text-2xl font-bold text-white mb-4">VOLLEYBALL</h3>
+                              <h3 className="text-2xl ethnocentric-title-white mb-4">VOLLEYBALL</h3>
               <p className="text-white/90 mb-6">
                 Introduction and skill development in serving, passing, setting, hitting, blocking, and defensive
                 strategies.
@@ -84,7 +84,7 @@ export default function ExamplePage() {
 
             {/* Program Card 2 */}
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 hover:bg-white/20 transition-all">
-              <h3 className="text-2xl font-bold text-white mb-4">TENNIS</h3>
+                              <h3 className="text-2xl ethnocentric-title-white mb-4">TENNIS</h3>
               <p className="text-white/90 mb-6">
                 Fundamental skills including serving, forehand, backhand, volleying, and court movement.
               </p>
@@ -104,7 +104,7 @@ export default function ExamplePage() {
 
             {/* Program Card 3 */}
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 hover:bg-white/20 transition-all">
-              <h3 className="text-2xl font-bold text-white mb-4">PICKLEBALL</h3>
+                              <h3 className="text-2xl ethnocentric-title-white mb-4">PICKLEBALL</h3>
               <p className="text-white/90 mb-6">
                 Developing foundational pickleball skills: serving, dinking, volleying, strategic shot placement, and
                 footwork.

@@ -30,7 +30,7 @@ export default function BrushstrokeTitle({ children, className, size = "lg", col
     <div className={cn("relative inline-block", className)}>
       <h1
         className={cn(
-          "font-ethnocentric font-black tracking-widest relative z-10 uppercase",
+          "font-ethnocentric tracking-widest relative z-10 uppercase",
           sizeClasses[size],
           colorClasses[color],
           "drop-shadow-lg",

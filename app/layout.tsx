@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { montserrat, inter, pacifico, ethnocentricFont, creepster, openSans } from "./fonts"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import V0SwFix from "@/components/v0-sw-fix"
@@ -19,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${montserrat.variable} ${inter.variable} ${pacifico.variable} ${ethnocentricFont.variable} ${creepster.variable} ${openSans.variable} antialiased`}
+        className="antialiased"
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}

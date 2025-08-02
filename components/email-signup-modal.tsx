@@ -38,7 +38,7 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
         <div className="mx-auto mb-4 bg-yellow-400 p-3 rounded-full w-fit">
           <Mail className="h-8 w-8 text-blue-700" />
         </div>
-        <DialogTitle className="font-wild-youth text-4xl md:text-5xl text-yellow-300 tracking-wide mb-2">
+                        <DialogTitle className="font-ethnocentric text-4xl md:text-5xl text-yellow-300 tracking-wide mb-2">
           STAY CONNECTED!
         </DialogTitle>
         <DialogDescription className="text-blue-100 text-base leading-relaxed">

@@ -33,33 +33,24 @@ export default function PassionInspiredHero() {
       </div>
 
       {/* Content container */}
-      <div className="container relative z-10 px-4 py-20">
-        <div className="flex flex-col items-center justify-center text-center">
+      <div className="container relative z-10 px-4 py-20 h-full">
+        <div className="flex flex-col items-center justify-center text-center h-full">
           {/* Main title with brushstroke effect */}
           <div
             className={`relative transition-all duration-1000 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
-            <h1 className="font-wild-youth text-7xl md:text-9xl text-blue-400 leading-none mb-0">DISCIPLINE</h1>
-            <h1 className="font-wild-youth text-6xl md:text-8xl text-white leading-none mt-[-20px] md:mt-[-30px]">
-              Rift
+            <h1 className="font-ethnocentric text-7xl md:text-9xl text-blue-400 leading-none mb-0"></h1>
+            <h1 className="font-ethnocentric text-6xl md:text-8xl text-white leading-none mt-[-20px] md:mt-[-30px]">
+              
             </h1>
           </div>
 
-          {/* Date and location */}
-          <div
-            className={`mt-8 text-white text-xl md:text-2xl font-bold italic transition-all duration-1000 delay-300 transform ${
-              isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-            }`}
-          >
-            <div>JULY 15-20, 2025</div>
-            <div>LOS ANGELES, CA</div>
-          </div>
 
           {/* CTA Button */}
           <div
-            className={`mt-12 transition-all duration-1000 delay-500 transform ${
+            className={`mt-32 transition-all duration-1000 delay-500 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >

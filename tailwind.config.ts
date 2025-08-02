@@ -92,9 +92,11 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
-        title: ["var(--font-ethnocentric)", "sans-serif"], // page & section titles
-        description: ["var(--font-open-sans)", "sans-serif"], // mission / body descriptions
+        sans: ["'Neue Haas Grotesk Display Pro'", "sans-serif"],
+        title: ["'Neue Haas Grotesk Display Pro'", "sans-serif"], 
+        description: ["'Neue Haas Grotesk Display Pro'", "sans-serif"],
+        'neue-haas': ["'Neue Haas Grotesk Display Pro'", "sans-serif"],
+        'ethnocentric': ["'Ethnocentric'", "sans-serif"],
       },
     },
   },

@@ -120,18 +120,10 @@ export default function FAQSection() {
       id="faq"
       style={{ backgroundImage: "url('/faq-background.png')" }}
     >
-      {/* Overlay to improve text readability against the new background */}
-      <div className="absolute inset-0 bg-black/30 z-0"></div>
+
 
       <div className="container px-4 relative z-10">
-        <AnimatedSection animation="fade-down" className="text-center mb-12">
-          <h2
-            className="text-6xl md:text-7xl font-black text-white mb-8"
-            style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.5)" }}
-          >
-            FAQ'S
-          </h2>
-
+        <AnimatedSection animation="fade-down" className="text-center mb-16 mt-32">
           <div className="max-w-md mx-auto relative">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70" />

@@ -6,28 +6,28 @@ import StaggeredChildren from "@/components/staggered-children"
 export default function ExperienceSection() {
   const experiences = [
     {
-      title: "Professional Coaching",
-      description: "Learn from former collegiate and professional athletes with years of coaching experience",
+      title: "School-Based",
+      description: "Everything needed to play: equipment, coaches, and structure; delivered right to campus.",
       icon: CheckCircle,
     },
     {
-      title: "State-of-the-Art Facilities",
-      description: "Train in modern facilities designed for optimal skill development and performance",
+      title: "Developmental First",
+      description: "Skills and confidence grow step by step, with focus on progress, not pressure.",
       icon: CheckCircle,
     },
     {
-      title: "Personalized Training",
-      description: "Receive individualized attention and custom training plans to meet your specific goals",
+      title: "Values Through Sports",
+      description: "Using sports as a way to learn teamwork, discipline, values, and life lessons that last.",
       icon: CheckCircle,
     },
     {
-      title: "Video Analysis",
-      description: "Improve faster with detailed video breakdown of your technique and gameplay",
+      title: "DR Team: Coaches",
+      description: "Coaches bring energy, intention, and passion, turning practices into lasting experiences.",
       icon: CheckCircle,
     },
     {
-      title: "Mental Performance",
-      description: "Develop the mental toughness and focus needed to excel under pressure",
+      title: "Supportive Environment",
+      description: "A safe, welcoming space where players can grow, take risks, and feel seen.",
       icon: CheckCircle,
     },
     {
@@ -50,17 +50,17 @@ export default function ExperienceSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-4xl md:text-5xl wild-youth-text-blue mb-6 relative">
-            <span className="relative z-10">THE DR EXPERIENCE</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl wild-youth-text-blue mb-4 sm:mb-6 relative">
+            <span className="relative z-10">DR IS FOR STUDENTS</span>
             {/* Optional: keep brush stroke if it fits the new design */}
             {/* <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div> */}
           </h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-16">
+          <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-4 sm:px-0">
             What makes training with Discipline Rift different from anywhere else
           </p>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center">
           <AnimatedSection animation="fade-right" className="order-2 md:order-1">
             <StaggeredChildren className="grid grid-cols-1 gap-6" staggerAmount={150}>
               {experiences.map((item, index) => (
@@ -84,7 +84,7 @@ export default function ExperienceSection() {
           <AnimatedSection animation="fade-left" className="order-1 md:order-2 flex justify-center items-center">
             {/* This div can be used for additional content or removed if the background image is sufficient */}
             <div className="w-full max-w-md p-8 bg-white/30 backdrop-blur-md rounded-lg shadow-xl">
-              <h3 className="text-2xl font-bold text-dr-blue mb-4 text-center">Our Approach</h3>
+              <h3 className="text-2xl ethnocentric-title-blue mb-4 text-center">Our Approach</h3>
               <p className="text-gray-800 text-center">
                 We focus on holistic development, combining cutting-edge training techniques with mentorship to build
                 not just skilled players, but also strong individuals.

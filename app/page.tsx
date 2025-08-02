@@ -43,29 +43,27 @@ export default function Home() {
             <div className="flex justify-end">
               <div className="md:w-1/2 lg:w-2/5">
                 <AnimatedSection animation="fade-left" delay={200}>
-                  <h2 className="text-4xl md:text-5xl ethnocentric-text-blue mb-6">OUR MISSION</h2>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl ethnocentric-text-blue mb-4 sm:mb-6">ABOUT US</h2>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={400}>
                   <p className="mission-text-large text-gray-800 mb-6">
-                    We're dedicated to developing athletic talent and leadership skills in young players across
-                    volleyball, tennis, and pickleball. Our programs combine technical training, competitive play, and
-                    character development to create well-rounded athletes and leaders.
+                  Discipline Rift introduces sports to players in a developmental approach by 
+                  teaching the discipline of a sport and the value of discipline lived in 
+                  a lifestyle involved in sports.
+
                   </p>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={600}>
                   <p className="mission-text-large text-gray-800 mb-8">
-                    Founded by former collegiate and professional players, our organization brings world-class
-                    instruction to athletes of all ages and skill levels, helping to build sustainable programs that
-                    empower students both on and off the court.
+                  By teaching the sport, we create the conditions for something powerful to
+                   happen: the breakthrough. 
+                   The Rift. That moment when a player connects with the 
+                   sport and discovers their love and passion for it. 
+                   Our programs provide all the equipment and coaches needed to support this journey and build a strong, lasting
+                  foundation for a 
+                   lifestyle in sports. 
+
                   </p>
-                </AnimatedSection>
-                <AnimatedSection animation="fade-up" delay={800}>
-                  <Button
-                    variant="outline"
-                    className="border-dr-blue text-dr-blue hover:bg-blue-50 rounded-full px-6 bg-transparent"
-                  >
-                    Our Story
-                  </Button>
                 </AnimatedSection>
               </div>
             </div>
