@@ -86,7 +86,7 @@ export default function ProgramShowcase() {
 
   return (
     <section
-      className="py-0 relative overflow-hidden bg-center"
+      className="py-8 xs:py-12 sm:py-16 md:py-0 relative overflow-hidden bg-center"
       id="programs"
       style={{ 
         backgroundImage: "url('/programs-background.png')", 
@@ -100,20 +100,17 @@ export default function ProgramShowcase() {
       <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400/30 rounded-full filter blur-3xl opacity-20"></div>
       <div className="absolute bottom-10 right-10 w-40 h-40 bg-orange-400/30 rounded-full filter blur-3xl opacity-20"></div>
 
-      <div className="container relative z-10 px-4 pt-40">
+      <div className="container relative z-10 px-4 pt-20 xs:pt-24 sm:pt-28 md:pt-40">
         {/* Update the title section to match the reference */}
-        <AnimatedSection animation="fade-down" className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl wild-youth-text-white mb-3 sm:mb-4 relative">
+        <AnimatedSection animation="fade-down" className="text-center mb-8 xs:mb-10 sm:mb-12">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl wild-youth-text-white mb-3 sm:mb-4 relative px-4 xs:px-0">
             <span className="relative z-10"></span>
             <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div>
           </h2>
-          
-            
-          
         </AnimatedSection>
 
         <div
-          className="relative max-w-6xl mx-auto"
+          className="relative max-w-6xl mx-auto px-2 xs:px-4"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -122,14 +119,14 @@ export default function ProgramShowcase() {
             {/* Left arrow */}
             <button
               onClick={prevSlide}
-              className="absolute left-0 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transform -translate-y-1/2 top-1/2 shadow-lg"
+              className="absolute left-0 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 xs:p-2 transform -translate-y-1/2 top-1/2 shadow-lg"
               aria-label="Previous program"
             >
-              <ChevronLeft size={30} />
+              <ChevronLeft size={24} className="xs:w-6 xs:h-6 md:w-8 md:h-8" />
             </button>
 
             {/* Cards container */}
-            <div className="flex justify-center items-center w-full max-w-3xl mx-auto">
+            <div className="flex justify-center items-center w-full max-w-3xl mx-auto px-4 xs:px-6 sm:px-8">
               {/* Previous card (smaller) */}
               <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 mr-4">
                 <div className="relative rounded-lg overflow-hidden border-2 border-white/50 shadow-xl">
@@ -159,8 +156,8 @@ export default function ProgramShowcase() {
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl wild-youth-text-white text-center mb-2">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 xs:p-4 sm:p-6">
+                      <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl wild-youth-text-white text-center mb-1 xs:mb-2">
                         {programs[currentIndex].title}
                       </h3>
                     </div>
@@ -191,29 +188,29 @@ export default function ProgramShowcase() {
             {/* Right arrow */}
             <button
               onClick={nextSlide}
-              className="absolute right-0 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transform -translate-y-1/2 top-1/2 shadow-lg"
+              className="absolute right-0 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 xs:p-2 transform -translate-y-1/2 top-1/2 shadow-lg"
               aria-label="Next program"
             >
-              <ChevronRight size={30} />
+              <ChevronRight size={24} className="xs:w-6 xs:h-6 md:w-8 md:h-8" />
             </button>
           </div>
 
           {/* Dots indicator */}
-          <div className="flex justify-center mt-6 space-x-2">
+          <div className="flex justify-center mt-4 xs:mt-6 space-x-2">
             {programs.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full ${index === currentIndex ? "bg-yellow-400" : "bg-white/50"}`}
+                className={`w-2 xs:w-3 h-2 xs:h-3 rounded-full ${index === currentIndex ? "bg-yellow-400" : "bg-white/50"}`}
                 aria-label={`Go to program ${index + 1}`}
               />
             ))}
           </div>
 
           {/* Description */}
-          <div className="text-center mt-8 text-white/90">
-                          <h4 className="text-xl sm:text-2xl ethnocentric-title-white mb-3 sm:mb-4">EXCELLENCE IN EVERY ASPECT</h4>
-            <p className="max-w-3xl mx-auto whitespace-pre-line">{programs[currentIndex].description}</p>
+          <div className="text-center mt-6 xs:mt-8 text-white/90 px-4 xs:px-6 sm:px-8">
+            <h4 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4">EXCELLENCE IN EVERY ASPECT</h4>
+            <p className="max-w-3xl mx-auto whitespace-pre-line text-sm xs:text-base sm:text-lg">{programs[currentIndex].description}</p>
           </div>
         </div>
       </div>

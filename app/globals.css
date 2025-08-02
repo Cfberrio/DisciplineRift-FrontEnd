@@ -187,6 +187,22 @@ p, span, div, li, td, th, label, input, textarea, select, button {
     border-radius: 0.5rem;
     font-size: 16px !important;
   }
+  
+  /* Program Showcase section specific optimizations for iPhone 14 */
+  #programs {
+    background-size: 100% auto;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+  }
+  
+  #programs .aspect-\[4\/5\] {
+    aspect-ratio: 4/5;
+  }
+  
+  #programs .wild-youth-text-white {
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
 }
 
 /* iPhone 14 Pro Max and similar (391px to 430px) */
@@ -220,6 +236,22 @@ p, span, div, li, td, th, label, input, textarea, select, button {
     font-size: 2rem;
     line-height: 1.1;
     margin-bottom: 1.75rem;
+  }
+  
+  /* Program Showcase section specific optimizations for iPhone 14 Pro Max */
+  #programs {
+    background-size: 100% auto;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+  }
+  
+  #programs .aspect-\[4\/5\] {
+    aspect-ratio: 4/5;
+  }
+  
+  #programs .wild-youth-text-white {
+    line-height: 1.1;
+    letter-spacing: 0.02em;
   }
 }
 
@@ -266,6 +298,22 @@ p, span, div, li, td, th, label, input, textarea, select, button {
     font-size: 2.5rem;
     line-height: 1.1;
     margin-bottom: 2rem;
+  }
+  
+  /* Program Showcase section specific optimizations */
+  #programs {
+    background-size: 100% auto;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+  }
+  
+  #programs .aspect-\[4\/5\] {
+    aspect-ratio: 4/5;
+  }
+  
+  #programs .wild-youth-text-white {
+    line-height: 1.1;
+    letter-spacing: 0.02em;
   }
 }
 
