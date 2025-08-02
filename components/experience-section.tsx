@@ -50,17 +50,17 @@ export default function ExperienceSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl wild-youth-text-blue mb-4 sm:mb-6 relative">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl wild-youth-text-blue mb-3 xs:mb-4 sm:mb-6 relative px-4 xs:px-0">
             <span className="relative z-10">DR IS FOR STUDENTS</span>
             {/* Optional: keep brush stroke if it fits the new design */}
             {/* <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div> */}
           </h2>
-          <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-4 sm:px-0">
+          <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-6 xs:mb-8 sm:mb-12 md:mb-16 px-4 sm:px-0">
             What makes training with Discipline Rift different from anywhere else
           </p>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xs:gap-6 sm:gap-8 md:gap-12 items-center">
           <AnimatedSection animation="fade-right" className="order-2 md:order-1">
             <StaggeredChildren className="grid grid-cols-1 gap-6" staggerAmount={150}>
               {experiences.map((item, index) => (

@@ -61,13 +61,13 @@ export default function ServicesShowcase() {
     <section className="py-20 bg-gray-50" id="services">
       <div className="container px-4">
         <AnimatedSection animation="fade-down" className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl wild-youth-text-blue mb-4 sm:mb-6">AVAILABLE TEAMS</h2>
-          <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto px-4 sm:px-0">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl wild-youth-text-blue mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">AVAILABLE TEAMS</h2>
+          <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl mx-auto px-4 sm:px-0">
             Join one of our active teams and start your athletic journey
           </p>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-6 lg:gap-8">
           {teams.map((team, index) => (
             <AnimatedSection key={team.teamid} animation="fade-up" delay={index * 100}>
               <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">

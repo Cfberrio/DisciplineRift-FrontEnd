@@ -17,7 +17,7 @@ export default function ClubSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl wild-youth-text-white mb-4 sm:mb-6 relative">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl wild-youth-text-white mb-3 xs:mb-4 sm:mb-6 relative px-4 xs:px-0">
             <span className="relative z-10">OUR CLUB</span>
             {/* Optional: Brush stroke if it fits the new design */}
             {/* <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div> */}
@@ -27,12 +27,12 @@ export default function ClubSection() {
           </div>
         </AnimatedSection>
 
-        <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8 md:gap-12">
+        <div className="flex flex-col md:flex-row items-center gap-4 xs:gap-6 sm:gap-8 md:gap-12">
           {/* Content Area - The image of the girl is now part of the background */}
           {/* We can use this space for more text or a call to action related to the club */}
           <AnimatedSection animation="fade-right" className="md:w-1/2">
-            <div className="bg-white/20 backdrop-blur-md p-4 sm:p-6 lg:p-8 rounded-lg shadow-xl border border-white/30">
-              <h3 className="text-2xl sm:text-3xl ethnocentric-title-white mb-3 sm:mb-4">VOLLEYBALL CLUB</h3>
+            <div className="bg-white/20 backdrop-blur-md p-3 xs:p-4 sm:p-6 lg:p-8 rounded-lg shadow-xl border border-white/30">
+              <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4">VOLLEYBALL CLUB</h3>
               <p className="text-lg text-white mb-6">
               Starting players are developed into high-performance athletes 
               through advanced coaching, values, and a strong club family to build a lasting 
@@ -53,7 +53,7 @@ export default function ClubSection() {
 
           <div className="md:w-1/2 text-white">
             <AnimatedSection animation="fade-left" delay={200}>
-              <h3 className="text-2xl sm:text-3xl ethnocentric-title-white mb-3 sm:mb-4">GIRLS CLUB</h3>
+              <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4">GIRLS CLUB</h3>
             </AnimatedSection>
 
             <AnimatedSection animation="fade-left" delay={400}>

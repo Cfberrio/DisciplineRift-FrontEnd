@@ -123,16 +123,64 @@ p, span, div, li, td, th, label, input, textarea, select, button {
   font-style: normal;
 }
 
-/* Mobile-optimized text sizes */
-@media (max-width: 768px) {
-  .mobile-text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-  .mobile-text-base { font-size: 1rem; line-height: 1.5rem; }
-  .mobile-text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-  .mobile-text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-  .mobile-text-2xl { font-size: 1.5rem; line-height: 2rem; }
-  .mobile-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-  .mobile-text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-  .mobile-text-5xl { font-size: 3rem; line-height: 1; }
+/* iPhone 14 and smaller (up to 390px) */
+@media (max-width: 390px) {
+  .container { padding-left: 0.75rem; padding-right: 0.75rem; }
+  section { padding-top: 2rem; padding-bottom: 2rem; }
+  
+  /* iPhone specific typography */
+  h1 { font-size: 1.75rem; line-height: 1.1; }
+  h2 { font-size: 1.5rem; line-height: 1.2; }
+  h3 { font-size: 1.25rem; line-height: 1.3; }
+  h4 { font-size: 1.125rem; line-height: 1.4; }
+  p { font-size: 0.875rem; line-height: 1.5; }
+  
+  /* iPhone button optimization */
+  button, .btn {
+    min-height: 48px;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+  
+  /* iPhone specific improvements */
+  .hero-mobile {
+    min-height: 100vh;
+    padding: 1rem 0.75rem;
+  }
+  
+  /* iPhone card adjustments */
+  .card, .rounded-lg {
+    border-radius: 0.5rem;
+  }
+  
+  /* iPhone text optimization */
+  .ethnocentric-title-white,
+  .ethnocentric-title-blue {
+    line-height: 1.1;
+    letter-spacing: 0.05em;
+  }
+  
+  /* iPhone form improvements */
+  input, textarea, select {
+    border-radius: 0.5rem;
+    font-size: 16px !important;
+  }
+}
+
+/* iPhone 14 Pro Max and similar (391px to 430px) */
+@media (min-width: 391px) and (max-width: 430px) {
+  .container { padding-left: 1rem; padding-right: 1rem; }
+  section { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  
+  h1 { font-size: 2rem; line-height: 1.1; }
+  h2 { font-size: 1.75rem; line-height: 1.2; }
+  h3 { font-size: 1.375rem; line-height: 1.3; }
+  h4 { font-size: 1.25rem; line-height: 1.4; }
+  p { font-size: 0.9375rem; line-height: 1.5; }
+}
+
+/* General mobile optimization (up to 480px) */
+@media (max-width: 480px) {
   
   /* Mobile container optimizations */
   .container {

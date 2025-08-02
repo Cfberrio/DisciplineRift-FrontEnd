@@ -87,17 +87,17 @@ export default function DynamicHero() {
               {/* Background shape */}
 
               {/* Content */}
-              <div className="relative text-white p-4 sm:p-8 md:p-12 rounded-lg z-10 transform rotate-2">
+              <div className="relative text-white p-2 xs:p-4 sm:p-6 md:p-8 lg:p-12 rounded-lg z-10 transform rotate-1 xs:rotate-2">
                 {/* Title with brush effect */}
                 <div className="flex flex-col items-center justify-center relative">
                   {/* Brush stroke background for title */}
                   <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div>
 
                   {/* Main title */}
-                  <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl wild-youth-text-white mb-0 tracking-tight relative z-10">
+                  <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-6xl lg:text-8xl xl:text-9xl wild-youth-text-white mb-0 tracking-tight relative z-10 leading-none">
                     DISCIPLINE
                   </h1>
-                  <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl wild-youth-text-white -mt-2 sm:-mt-4 md:-mt-6 lg:-mt-8 tracking-tight relative z-10">
+                  <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-5xl lg:text-7xl xl:text-8xl wild-youth-text-white -mt-1 xs:-mt-2 sm:-mt-3 md:-mt-4 lg:-mt-6 xl:-mt-8 tracking-tight relative z-10 leading-none">
                     RIFT
                   </h1>
 
@@ -107,14 +107,14 @@ export default function DynamicHero() {
                 </div>
 
                 {/* Subtitle */}
-                <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 mt-4 sm:mt-6 relative z-10 px-4 sm:px-0">
+                <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl mb-4 xs:mb-6 sm:mb-8 mt-2 xs:mt-4 sm:mt-6 relative z-10 px-2 xs:px-4 sm:px-0 text-center max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg mx-auto">
                   Developing Young Athletes in Volleyball, Tennis, & Pickleball
                 </p>
 
                 {/* CTA Button */}
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black rounded-full px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-bold shadow-lg transform transition-transform hover:scale-105 w-auto min-w-[200px]"
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black rounded-full px-4 xs:px-6 sm:px-8 py-3 xs:py-4 sm:py-6 text-sm xs:text-base sm:text-lg font-bold shadow-lg transform transition-transform hover:scale-105 w-auto min-w-[160px] xs:min-w-[180px] sm:min-w-[200px]"
                 >
                   <Link href="#register" className="flex items-center">
                     REGISTER NOW <ArrowRight className="ml-2 h-5 w-5" />
