@@ -129,7 +129,7 @@ export default function ProgramShowcase() {
             <div className="flex justify-center items-center w-full max-w-3xl mx-auto px-4 xs:px-6 sm:px-8">
               {/* Previous card (smaller) */}
               <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 mr-4">
-                <div className="relative rounded-lg overflow-hidden border-2 border-white/50 shadow-xl">
+                <div className="relative rounded-lg overflow-hidden shadow-xl">
                   <div className="aspect-[4/5] relative">
                     <Image
                       src={programs[prevIndex].image || "/placeholder.svg"}
@@ -146,7 +146,7 @@ export default function ProgramShowcase() {
 
               {/* Current card (larger) */}
               <div className="w-full md:w-2/5 transition-all duration-500 z-10">
-                <div className="relative rounded-lg overflow-hidden border-2 border-white shadow-xl transform rotate-1">
+                <div className="relative rounded-lg overflow-hidden shadow-xl transform rotate-1">
                   <div className="aspect-[4/5] relative">
                     <Image
                       src={programs[currentIndex].image || "/placeholder.svg"}
@@ -169,7 +169,7 @@ export default function ProgramShowcase() {
 
               {/* Next card (smaller) */}
               <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 ml-4">
-                <div className="relative rounded-lg overflow-hidden border-2 border-white/50 shadow-xl">
+                <div className="relative rounded-lg overflow-hidden shadow-xl">
                   <div className="aspect-[4/5] relative">
                     <Image
                       src={programs[nextIndex].image || "/placeholder.svg"}

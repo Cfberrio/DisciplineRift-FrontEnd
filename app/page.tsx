@@ -63,6 +63,14 @@ export default function Home() {
                    lifestyle in sports. 
                   </p>
                 </AnimatedSection>
+                <AnimatedSection animation="fade-left" delay={600}>
+                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl">
+      
+                   Our programs provide all the equipment and coaches needed to support this journey and build a strong, lasting
+                  foundation for a 
+                   lifestyle in sports. 
+                  </p>
+                </AnimatedSection>
               </div>
             </div>
           </div>

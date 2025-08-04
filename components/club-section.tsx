@@ -18,7 +18,7 @@ export default function ClubSection() {
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
           <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl wild-youth-text-white mb-3 xs:mb-4 sm:mb-6 relative px-4 xs:px-0">
-            <span className="relative z-10">OUR CLUB</span>
+            <span className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl wild-youth-text-white xs:mb-4 sm:mb-6 px-4 xs:px-0">OUR CLUB</span>
             {/* Optional: Brush stroke if it fits the new design */}
             {/* <div className="absolute inset-0 bg-brush-stroke bg-no-repeat bg-center bg-contain opacity-20"></div> */}
           </h2>

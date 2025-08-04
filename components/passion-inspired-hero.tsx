@@ -48,7 +48,7 @@ export default function PassionInspiredHero() {
           </div>
           {/* CTA Button */}
           <div
-            className={`mt-8 xs:mt-12 iphone16:mt-16 sm:mt-20 md:mt-28 lg:mt-36 transition-all duration-1000 delay-500 transform ${
+            className={`mt-[32rem] xs:mt-[32rem] iphone16:mt-[32rem] sm:mt-[32rem] md:mt-[32rem] lg:mt-[32rem] transition-all duration-1000 delay-500 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
@@ -64,15 +64,17 @@ export default function PassionInspiredHero() {
 
                     {/* Date and location */}
           <div
-            className={`mt-4 xs:mt-6 iphone16:mt-8 sm:mt-12 md:mt-16 lg:mt-20 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white transition-all duration-1000 delay-700 transform ${
+            className={`mt-24 xs:mt-28 iphone16:mt-32 sm:mt-36 md:mt-40 lg:mt-44 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white transition-all duration-1000 delay-700 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
             <div>
-              <p className = "text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl ethnocentric-text-blue mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">September 2025</p>
-              </div>
-              <p className = "text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl ethnocentric-text-blue mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">Fall Season</p>
+              <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl wild-youth-text-white mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">September 2025</p>
             </div>
+            <div>
+              <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl wild-youth-text-white mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">Fall Season</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
