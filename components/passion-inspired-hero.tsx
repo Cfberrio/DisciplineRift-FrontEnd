@@ -64,7 +64,7 @@ export default function PassionInspiredHero() {
 
                     {/* Date and location */}
           <div
-            className={`mt-24 xs:mt-28 iphone16:mt-32 sm:mt-36 md:mt-40 lg:mt-44 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white transition-all duration-1000 delay-700 transform ${
+            className={`mt-8 xs:mt-10 iphone16:mt-12 sm:mt-14 md:mt-16 lg:mt-18 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white transition-all duration-1000 delay-700 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >

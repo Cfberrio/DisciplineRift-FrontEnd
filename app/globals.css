@@ -1367,6 +1367,60 @@ img {
   display: block;
 }
 
+/* Eliminar sombras de las tarjetas del program showcase */
+#programs .relative.rounded-lg {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#programs .shadow-xl {
+  box-shadow: none !important;
+}
+
+/* Eliminar TODAS las sombras del program showcase */
+#programs * {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+#programs .relative {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#programs .rounded-lg {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#programs .overflow-hidden {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#programs .transform {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#programs .rotate-1 {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Eliminar sombras específicamente de las imágenes */
+#programs img {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+#programs .aspect-\[4\/5\] {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
 h1, h2, h3, p {
   word-wrap: break-word;
   overflow-wrap: break-word;

@@ -31,7 +31,7 @@ export default function ProgramShowcase() {
       image: "/high-school-volleyball-camp.png", // Would be replaced with tennis image
       alt: "Tennis training session",
       description:
-        "Athletes develop proper grip, footwork, and strokes like forehand, backhand, and volleys. Sessions include serving techniques, rally control, and match preparation.",
+        "Players develop footwork and strokes, including forehand, backhand, serves, and volleys. We focus on motor coordination and technique through structured drills and game-based learning.",
       sport: "tennis",
     },
     {
@@ -129,7 +129,7 @@ export default function ProgramShowcase() {
             <div className="flex justify-center items-center w-full max-w-3xl mx-auto px-4 xs:px-6 sm:px-8">
               {/* Previous card (smaller) */}
               <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 mr-4">
-                <div className="relative rounded-lg overflow-hidden shadow-xl">
+                <div className="relative rounded-lg overflow-hidden">
                   <div className="aspect-[4/5] relative">
                     <Image
                       src={programs[prevIndex].image || "/placeholder.svg"}
@@ -146,7 +146,7 @@ export default function ProgramShowcase() {
 
               {/* Current card (larger) */}
               <div className="w-full md:w-2/5 transition-all duration-500 z-10">
-                <div className="relative rounded-lg overflow-hidden shadow-xl transform rotate-1">
+                <div className="relative rounded-lg overflow-hidden transform rotate-1">
                   <div className="aspect-[4/5] relative">
                     <Image
                       src={programs[currentIndex].image || "/placeholder.svg"}
@@ -155,7 +155,6 @@ export default function ProgramShowcase() {
                       className="object-cover"
                       priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 xs:p-4 sm:p-6">
                       <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl wild-youth-text-white text-center mb-1 xs:mb-2">
                         {programs[currentIndex].title}
@@ -169,7 +168,7 @@ export default function ProgramShowcase() {
 
               {/* Next card (smaller) */}
               <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 ml-4">
-                <div className="relative rounded-lg overflow-hidden shadow-xl">
+                <div className="relative rounded-lg overflow-hidden">
                   <div className="aspect-[4/5] relative">
                     <Image
                       src={programs[nextIndex].image || "/placeholder.svg"}

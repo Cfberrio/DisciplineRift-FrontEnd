@@ -120,19 +120,17 @@ export default function FAQSection() {
       id="faq"
       style={{ backgroundImage: "url('/faq-background.png')" }}
     >
-
-
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center mb-16 mt-32">
           <div className="max-w-md mx-auto relative">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/80" />
               <input
                 type="text"
                 placeholder="SEARCH"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/30 backdrop-blur-sm text-white placeholder-white/70 border border-white/50 rounded-full py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-white/70"
+                className="w-full bg-black/50 backdrop-blur-md text-white placeholder-white/60 border border-white/30 rounded-full py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
               />
             </div>
           </div>
