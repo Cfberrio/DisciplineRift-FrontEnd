@@ -1007,3 +1007,228 @@ section {
   z-index: -1;
   opacity: 0.3;
 }
+
+/* ===== RESPONSIVE OVERRIDES ===== */
+
+/* Desktop original - MANTENER INTACTO (1200px+) */
+/* No se modifican estilos existentes */
+
+/* Mac específicos */
+@media screen and (min-width: 1440px) and (max-width: 1440px) {
+  /* MacBook optimizations */
+  .container {
+    max-width: 1400px !important;
+  }
+}
+
+@media screen and (min-width: 1512px) and (max-width: 1728px) {
+  /* MacBook Pro optimizations */
+  .container {
+    max-width: 1500px !important;
+  }
+}
+
+@media screen and (min-width: 2560px) {
+  /* iMac/Studio Display optimizations */
+  .container {
+    max-width: 2000px !important;
+  }
+  
+  h1 { font-size: 4rem !important; }
+  h2 { font-size: 3rem !important; }
+  h3 { font-size: 2.5rem !important; }
+}
+
+/* Tablet */
+@media screen and (max-width: 1199px) and (min-width: 769px) {
+  /* Contenedores */
+  .container {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+  
+  /* Tipografía tablet */
+  h1 { font-size: 2.5rem !important; }
+  h2 { font-size: 2rem !important; }
+  h3 { font-size: 1.5rem !important; }
+  
+  /* Imágenes */
+  img { max-width: 100% !important; height: auto !important; }
+  
+  /* Botones */
+  .btn { 
+    padding: 12px 24px !important; 
+    font-size: 16px !important; 
+    min-height: 44px !important;
+  }
+}
+
+/* Móvil horizontal */
+@media screen and (max-width: 768px) and (min-width: 481px) {
+  /* Contenedores */
+  .container {
+    width: 100% !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+  
+  /* Navegación mobile */
+  .nav-menu { display: none !important; }
+  .mobile-menu { display: block !important; }
+  
+  /* Textos responsivos */
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.75rem !important; }
+  h3 { font-size: 1.25rem !important; }
+  p { font-size: 16px !important; }
+  
+  /* Imágenes */
+  img { max-width: 100% !important; height: auto !important; }
+  
+  /* Botones */
+  .btn { 
+    width: 100% !important; 
+    padding: 12px 20px !important; 
+    font-size: 16px !important; 
+    min-height: 44px !important;
+  }
+  
+  /* Flexbox mobile */
+  .flex-container { flex-direction: column !important; }
+  .flex-item { width: 100% !important; margin-bottom: 20px !important; }
+  
+  /* Grid mobile */
+  .grid { grid-template-columns: 1fr !important; }
+  .grid-cols-2 { grid-template-columns: 1fr !important; }
+  .grid-cols-3 { grid-template-columns: 1fr !important; }
+}
+
+/* Móvil vertical */
+@media screen and (max-width: 480px) {
+  /* Contenedores */
+  .container, .wrapper, .main-content {
+    width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Navegación mobile */
+  .nav-menu { display: none !important; }
+  .mobile-menu { display: block !important; }
+  
+  /* Textos responsivos */
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  h3 { font-size: 1.25rem !important; }
+  h4 { font-size: 1.125rem !important; }
+  p { font-size: 14px !important; }
+  
+  /* Imágenes */
+  img { max-width: 100% !important; height: auto !important; }
+  
+  /* Botones */
+  .btn { 
+    width: 100% !important; 
+    padding: 15px !important; 
+    font-size: 16px !important; 
+    min-height: 44px !important;
+  }
+  
+  /* Flexbox mobile */
+  .flex-container { flex-direction: column !important; }
+  .flex-item { width: 100% !important; margin-bottom: 20px !important; }
+  
+  /* Grid mobile */
+  .grid { grid-template-columns: 1fr !important; }
+  .grid-cols-2 { grid-template-columns: 1fr !important; }
+  .grid-cols-3 { grid-template-columns: 1fr !important; }
+  
+  /* Formularios mobile */
+  input, textarea, select {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 16px !important;
+    min-height: 44px !important;
+  }
+  
+  /* Espaciado mobile */
+  section {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  /* Cards mobile */
+  .card {
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+  }
+  
+  /* Hero sections mobile */
+  .hero-section {
+    min-height: 60vh !important;
+    padding: 2rem 1rem !important;
+  }
+  
+  /* Navigation mobile */
+  .header {
+    padding: 1rem !important;
+  }
+  
+  /* Footer mobile */
+  .footer {
+    padding: 2rem 1rem !important;
+  }
+}
+
+/* iPhone específicos */
+@media screen and (max-width: 390px) {
+  /* iPhone 14 y similares */
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.125rem !important; }
+  
+  .btn { 
+    padding: 12px 16px !important; 
+    font-size: 14px !important; 
+  }
+}
+
+/* iPhone 16 Pro Max específico */
+@media screen and (min-width: 430px) and (max-width: 480px) {
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+  
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.75rem !important; }
+  h3 { font-size: 1.5rem !important; }
+}
+
+/* Prevenir scroll horizontal */
+@media screen and (max-width: 480px) {
+  body {
+    overflow-x: hidden !important;
+  }
+  
+  * {
+    box-sizing: border-box !important;
+  }
+}
+
+/* Touch targets para móvil */
+@media screen and (max-width: 768px) {
+  button, .btn, a {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  input, textarea, select {
+    min-height: 44px !important;
+  }
+}

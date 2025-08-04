@@ -7,7 +7,8 @@ import V0SwFix from "@/components/v0-sw-fix"
 export const metadata: Metadata = {
   title: "Discipline Rift - Youth Sports Development",
   description: "Developing Young Athletes in Volleyball, Tennis, & Pickleball",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  viewport: 'width=device-width, initial-scale=1.0'
 }
 
 export default function RootLayout({
