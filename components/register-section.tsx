@@ -1263,14 +1263,8 @@ export default function RegisterSection() {
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-semibold">Sport:</span>{" "}
-                      {selectedTeam.sport}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Age Group:</span>{" "}
-                      {selectedTeam.ageGroup}
-                    </div>
+                    
+                    
                     <div>
                       <span className="font-semibold">Skill Level:</span>{" "}
                       {selectedTeam.skillLevel}

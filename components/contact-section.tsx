@@ -68,7 +68,7 @@ export default function ContactSection() {
                 <MapPin className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
                 <div>
                   <h4 className="font-bold text-gray-900">Our Location</h4>
-                  <p className="text-gray-700">123 Sports Court, Los Angeles, CA 90001</p>
+                  <p className="text-gray-700">713 W YALE ST ORLANDO, FL, 32804</p>
                 </div>
               </div>
 
@@ -76,7 +76,7 @@ export default function ContactSection() {
                 <Phone className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
                 <div>
                   <h4 className="font-bold text-gray-900">Phone Number</h4>
-                  <p className="text-gray-700">(555) 123-4567</p>
+                  <p className="text-gray-700"> (407) 614-7454</p>
                 </div>
               </div>
 
@@ -93,8 +93,7 @@ export default function ContactSection() {
                 <div>
                   <h4 className="font-bold text-gray-900">Office Hours</h4>
                   <p className="text-gray-700">Monday - Friday: 9:00 AM - 5:00 PM</p>
-                  <p className="text-gray-700">Saturday: 10:00 AM - 2:00 PM</p>
-                  <p className="text-gray-700">Sunday: Closed</p>
+          
                 </div>
               </div>
             </div>
