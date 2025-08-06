@@ -96,3 +96,127 @@
     transform: none !important;
   }
 }
+
+/* ===== ABOUT SECTION - MOBILE OVERRIDES ===== */
+
+/* iPhone y móviles pequeños */
+@media screen and (max-width: 480px) {
+  /* Container about móvil - Mantener imagen con overlay */
+  .about-container-mobile {
+    position: relative !important;
+    padding: 3rem 0 !important;
+    min-height: 80vh !important;
+  }
+  
+  /* Overlay oscuro para mejorar legibilidad */
+  .about-container-mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(30, 64, 175, 0.6)) !important;
+    z-index: 1 !important;
+  }
+  
+  /* Contenido about móvil - Sobre el overlay */
+  .about-content-mobile {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    padding: 2.5rem 1.5rem !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+    margin: 0 auto !important;
+    max-width: 90% !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  
+  /* Título About Us móvil */
+  .about-title-mobile {
+    font-size: 1.8rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5rem !important;
+    color: #1e40af !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+  }
+  
+  /* Texto párrafos móvil */
+  .about-text-mobile {
+    font-size: 0.95rem !important; /* 15.2px */
+    line-height: 1.7 !important;
+    margin-bottom: 1.5rem !important;
+    color: #1f2937 !important;
+    text-align: left !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* iPhone más grandes */
+@media screen and (min-width: 481px) and (max-width: 640px) {
+  /* Container about para iPhone grandes - Mantener imagen */
+  .about-container-mobile {
+    position: relative !important;
+    padding: 4rem 0 !important;
+    min-height: 85vh !important;
+  }
+  
+  /* Overlay para iPhone grandes */
+  .about-container-mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(30, 64, 175, 0.5)) !important;
+    z-index: 1 !important;
+  }
+  
+  /* Contenido about para iPhone grandes */
+  .about-content-mobile {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    padding: 3rem 2rem !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2) !important;
+    margin: 0 auto !important;
+    max-width: 85% !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  .about-title-mobile {
+    font-size: 2.1rem !important;
+    margin-bottom: 1.75rem !important;
+    color: #1e40af !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+  }
+  
+  .about-text-mobile {
+    font-size: 1.05rem !important; /* 16.8px */
+    line-height: 1.7 !important;
+    margin-bottom: 1.75rem !important;
+    color: #1f2937 !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* Tablets - mantener responsive suave */
+@media screen and (min-width: 641px) and (max-width: 768px) {
+  .about-content-mobile {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 80% !important;
+    padding: 2.5rem !important;
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+}
