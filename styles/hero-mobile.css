@@ -1,0 +1,48 @@
+/* ===== MOBILE OVERRIDES PARA HERO SECTION ===== */
+
+/* iPhone y móviles pequeños */
+@media screen and (max-width: 480px) {
+  /* Contenedor principal móvil */
+  .hero-mobile-container {
+    min-height: 100vh !important;
+    padding: 1rem !important;
+  }
+  
+  /* Títulos móvil - solo override tamaños muy grandes */
+  .hero-title-main {
+    font-size: 2rem !important; /* En lugar de text-9xl */
+    line-height: 1.1 !important;
+  }
+  
+  .hero-title-secondary {
+    font-size: 1.5rem !important; /* En lugar de text-8xl */
+    margin-top: -8px !important; /* En lugar de -30px */
+  }
+  
+  /* Botón móvil - reducir espaciado extremo */
+  .hero-button-container {
+    margin-top: 3rem !important; /* En lugar de mt-[32rem] */
+  }
+  
+  /* Texto de fecha móvil */
+  .hero-date-text {
+    font-size: 1rem !important;
+    margin-top: 2rem !important;
+  }
+}
+
+/* iPhone más grandes */
+@media screen and (min-width: 481px) and (max-width: 640px) {
+  .hero-title-main {
+    font-size: 2.5rem !important;
+  }
+  
+  .hero-title-secondary {
+    font-size: 2rem !important;
+    margin-top: -10px !important;
+  }
+  
+  .hero-button-container {
+    margin-top: 4rem !important;
+  }
+}

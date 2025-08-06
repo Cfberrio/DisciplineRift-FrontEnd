@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import "../styles/hero-mobile.css"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -22,7 +23,7 @@ export default function PassionInspiredHero() {
           alt="Dynamic halftone pattern background"
           fill
           priority
-          className="object-cover"
+          className="object-cover object-center w-full h-full"
         />
 
         {/* Subtle overlay to ensure text readability */}
@@ -33,7 +34,7 @@ export default function PassionInspiredHero() {
       </div>
 
       {/* Content container */}
-      <div className="container relative z-10 px-4 py-8 xs:py-12 sm:py-16 md:py-20 h-full">
+      <div className="container relative z-10 px-3 xs:px-4 sm:px-6 md:px-8 py-6 xs:py-8 sm:py-12 md:py-16 lg:py-20 h-full hero-mobile-container">
         <div className="flex flex-col items-center justify-center text-center h-full min-h-screen">
           {/* Main title with brushstroke effect */}
           <div
@@ -41,20 +42,17 @@ export default function PassionInspiredHero() {
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
-            <h1 className="font-ethnocentric text-2xl xs:text-3xl iphone16:text-4xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-9xl text-blue-400 leading-none mb-0"></h1>
-            <h1 className="font-ethnocentric text-xl xs:text-2xl iphone16:text-3xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-8xl text-white leading-none mt-[-8px] xs:mt-[-10px] iphone16:mt-[-12px] sm:mt-[-12px] md:mt-[-20px] lg:mt-[-25px] xl:mt-[-30px]">
-              
-            </h1>
+            
           </div>
           {/* CTA Button */}
           <div
-            className={`mt-[32rem] xs:mt-[32rem] iphone16:mt-[32rem] sm:mt-[32rem] md:mt-[32rem] lg:mt-[32rem] transition-all duration-1000 delay-500 transform ${
+            className={`mt-16 xs:mt-20 sm:mt-24 md:mt-32 lg:mt-40 xl:mt-[32rem] hero-button-container transition-all duration-1000 delay-500 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
             <Button
               size="lg"
-              className="bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-full px-4 xs:px-6 iphone16:px-7 sm:px-8 py-3 xs:py-4 iphone16:py-5 sm:py-6 text-sm xs:text-base iphone16:text-lg sm:text-lg shadow-lg"
+              className="bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-full min-h-[44px] px-6 xs:px-8 sm:px-10 py-3 xs:py-4 sm:py-5 text-sm xs:text-base sm:text-lg shadow-lg"
             >
               <Link href="#register" className="flex items-center">
                 REGISTER NOW <ArrowRight className="ml-2 h-5 w-5" />
@@ -64,15 +62,15 @@ export default function PassionInspiredHero() {
 
                     {/* Date and location */}
           <div
-            className={`mt-8 xs:mt-10 iphone16:mt-12 sm:mt-14 md:mt-16 lg:mt-18 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white transition-all duration-1000 delay-700 transform ${
+            className={`mt-8 xs:mt-10 iphone16:mt-12 sm:mt-14 md:mt-16 lg:mt-18 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white hero-date-text transition-all duration-1000 delay-700 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
             <div>
-              <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl wild-youth-text-white mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">September 2025</p>
+              <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl wild-youth-text-white mb-2 xs:mb-3 sm:mb-4 md:mb-6 px-2 xs:px-3 sm:px-4">September 2025</p>
             </div>
             <div>
-              <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl wild-youth-text-white mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">Fall Season</p>
+              <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl wild-youth-text-white mb-2 xs:mb-3 sm:mb-4 md:mb-6 px-2 xs:px-3 sm:px-4">Fall Season</p>
             </div>
           </div>
         </div>
