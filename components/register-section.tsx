@@ -1202,8 +1202,13 @@ export default function RegisterSection() {
                                           {team.description}
                                         </p>
                                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                                          
-                                          
+                                          <span className="bg-white px-2 py-1 rounded">
+                                            <TagIcon className="inline h-3 w-3 mr-1" />
+                                           
+                                          </span>
+                                          <span className="bg-white px-2 py-1 rounded">
+                                            
+                                          </span>
                                           <span className="bg-white px-2 py-1 rounded">
                                             {team.skillLevel}
                                           </span>
@@ -1575,12 +1580,12 @@ export default function RegisterSection() {
                         {isAuthLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Verificando Código...
+                            Verifying Code...
                           </>
                         ) : (
                           <>
                             <LogIn className="mr-2 h-4 w-4" />
-                            Verificar Código & Continuar
+                             Verify Code & Continue
                           </>
                         )}
                       </Button>
@@ -1593,12 +1598,12 @@ export default function RegisterSection() {
                         {isAuthLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Enviando Código...
+                            Sending Code...
                           </>
                         ) : (
                           <>
                             <Mail className="mr-2 h-4 w-4" />
-                            Enviar Código de Acceso
+                            Send Access Code
                           </>
                         )}
                       </Button>
