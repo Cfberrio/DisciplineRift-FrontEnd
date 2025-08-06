@@ -1202,13 +1202,8 @@ export default function RegisterSection() {
                                           {team.description}
                                         </p>
                                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                                          <span className="bg-white px-2 py-1 rounded">
-                                            <TagIcon className="inline h-3 w-3 mr-1" />
-                                            {team.sport}
-                                          </span>
-                                          <span className="bg-white px-2 py-1 rounded">
-                                            Ages {team.ageGroup}
-                                          </span>
+                                          
+                                          
                                           <span className="bg-white px-2 py-1 rounded">
                                             {team.skillLevel}
                                           </span>
