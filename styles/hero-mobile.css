@@ -2,10 +2,29 @@
 
 /* iPhone y móviles pequeños */
 @media screen and (max-width: 480px) {
+  /* SECCIÓN HERO MÓVIL - Reducir altura */
+  .hero-section-mobile {
+    min-height: 80vh !important; /* Reducir de 100vh a 80vh */
+    height: 80vh !important;
+  }
+  
   /* Contenedor principal móvil */
   .hero-mobile-container {
-    min-height: 100vh !important;
+    min-height: 80vh !important;
+    height: 80vh !important;
     padding: 1rem !important;
+  }
+  
+  /* IMAGEN DE FONDO MÓVIL - Centrado perfecto */
+  .hero-background-image {
+    object-fit: cover !important;
+    object-position: center 40% !important; /* Centrar más hacia arriba */
+    transform: none !important; /* Sin escala, usar tamaño original */
+  }
+  
+  /* Contenedor de imagen móvil */
+  .hero-background-container {
+    height: 80vh !important;
   }
   
   /* Títulos móvil - solo override tamaños muy grandes */
@@ -33,6 +52,28 @@
 
 /* iPhone más grandes */
 @media screen and (min-width: 481px) and (max-width: 640px) {
+  /* Sección para iPhone grandes */
+  .hero-section-mobile {
+    min-height: 85vh !important;
+    height: 85vh !important;
+  }
+  
+  .hero-mobile-container {
+    min-height: 85vh !important;
+    height: 85vh !important;
+  }
+  
+  /* Imagen de fondo para iPhone grandes */
+  .hero-background-image {
+    object-fit: cover !important;
+    object-position: center 45% !important;
+    transform: none !important;
+  }
+  
+  .hero-background-container {
+    height: 85vh !important;
+  }
+  
   .hero-title-main {
     font-size: 2.5rem !important;
   }
@@ -44,5 +85,14 @@
   
   .hero-button-container {
     margin-top: 4rem !important;
+  }
+}
+
+/* Tablets - mantener original */
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  .hero-background-image {
+    object-fit: cover !important;
+    object-position: center center !important;
+    transform: none !important;
   }
 }

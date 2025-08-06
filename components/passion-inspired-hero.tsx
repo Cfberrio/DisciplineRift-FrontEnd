@@ -15,15 +15,15 @@ export default function PassionInspiredHero() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden hero-section-mobile">
       {/* Background image with overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 hero-background-container">
         <Image
           src="/hero-halftone-background.png"
           alt="Dynamic halftone pattern background"
           fill
           priority
-          className="object-cover object-center w-full h-full"
+          className="object-cover object-center w-full h-full hero-background-image"
         />
 
         {/* Subtle overlay to ensure text readability */}
