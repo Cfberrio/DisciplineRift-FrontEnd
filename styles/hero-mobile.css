@@ -400,3 +400,45 @@
     opacity: 0.4 !important; /* Menos opacidad */
   }
 }
+
+/* ===== NAVBAR MOBILE - OPTIMIZACIONES ===== */
+
+/* Mejoras generales para el menú móvil */
+@media screen and (max-width: 767px) {
+  /* Contenedor del menú móvil */
+  .mobile-nav-container {
+    max-height: calc(100vh - 80px) !important; /* Altura máxima basada en viewport */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* Scroll suave en iOS */
+  }
+  
+  /* Items del menú móvil */
+  .mobile-nav-item {
+    touch-action: manipulation !important; /* Optimizar touch */
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1) !important; /* Color de tap en iOS */
+  }
+  
+  /* Botones del menú móvil - tamaño mínimo para touch */
+  .mobile-nav-button {
+    min-height: 48px !important; /* Aumentar área táctil */
+    border-radius: 12px !important;
+    font-size: 0.875rem !important; /* 14px */
+  }
+  
+  /* Grid de botones de usuario */
+  .mobile-user-buttons {
+    gap: 0.5rem !important; /* Espaciado entre botones */
+  }
+  
+  /* Asegurar que el menú no se corte en pantallas pequeñas */
+  .mobile-menu-viewport {
+    max-height: calc(100vh - 100px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Separadores visuales */
+  .mobile-nav-separator {
+    border-color: rgba(156, 163, 175, 0.3) !important; /* Separador más sutil */
+    margin: 0.75rem 0 !important;
+  }
+}
