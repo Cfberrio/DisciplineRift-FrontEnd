@@ -1573,12 +1573,12 @@ export default function RegisterSection() {
                         {isAuthLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Verificando Código...
+                            Verifying Code...
                           </>
                         ) : (
                           <>
                             <LogIn className="mr-2 h-4 w-4" />
-                            Verificar Código & Continuar
+                            Verify Code & Continue
                           </>
                         )}
                       </Button>
@@ -1591,12 +1591,12 @@ export default function RegisterSection() {
                         {isAuthLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Enviando Código...
+                            Sending Code...
                           </>
                         ) : (
                           <>
                             <Mail className="mr-2 h-4 w-4" />
-                            Enviar Código de Acceso
+                            Send Access Code
                           </>
                         )}
                       </Button>

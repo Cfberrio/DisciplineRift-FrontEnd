@@ -1,0 +1,444 @@
+/* ===== MOBILE OVERRIDES PARA HERO SECTION ===== */
+
+/* iPhone y móviles pequeños */
+@media screen and (max-width: 480px) {
+  /* SECCIÓN HERO MÓVIL - Reducir altura */
+  .hero-section-mobile {
+    min-height: 80vh !important; /* Reducir de 100vh a 80vh */
+    height: 80vh !important;
+  }
+  
+  /* Contenedor principal móvil */
+  .hero-mobile-container {
+    min-height: 80vh !important;
+    height: 80vh !important;
+    padding: 1rem !important;
+  }
+  
+  /* IMAGEN DE FONDO MÓVIL - Centrado perfecto */
+  .hero-background-image {
+    object-fit: cover !important;
+    object-position: center 40% !important; /* Centrar más hacia arriba */
+    transform: none !important; /* Sin escala, usar tamaño original */
+  }
+  
+  /* Contenedor de imagen móvil */
+  .hero-background-container {
+    height: 80vh !important;
+  }
+  
+  /* Títulos móvil - solo override tamaños muy grandes */
+  .hero-title-main {
+    font-size: 2rem !important; /* En lugar de text-9xl */
+    line-height: 1.1 !important;
+  }
+  
+  .hero-title-secondary {
+    font-size: 1.5rem !important; /* En lugar de text-8xl */
+    margin-top: -8px !important; /* En lugar de -30px */
+  }
+  
+  /* Botón móvil - reducir espaciado extremo */
+  .hero-button-container {
+    margin-top: 3rem !important; /* En lugar de mt-[32rem] */
+  }
+  
+  /* Texto de fecha móvil */
+  .hero-date-text {
+    font-size: 1rem !important;
+    margin-top: 2rem !important;
+  }
+}
+
+/* iPhone más grandes */
+@media screen and (min-width: 481px) and (max-width: 640px) {
+  /* Sección para iPhone grandes */
+  .hero-section-mobile {
+    min-height: 85vh !important;
+    height: 85vh !important;
+  }
+  
+  .hero-mobile-container {
+    min-height: 85vh !important;
+    height: 85vh !important;
+  }
+  
+  /* Imagen de fondo para iPhone grandes */
+  .hero-background-image {
+    object-fit: cover !important;
+    object-position: center 45% !important;
+    transform: none !important;
+  }
+  
+  .hero-background-container {
+    height: 85vh !important;
+  }
+  
+  .hero-title-main {
+    font-size: 2.5rem !important;
+  }
+  
+  .hero-title-secondary {
+    font-size: 2rem !important;
+    margin-top: -10px !important;
+  }
+  
+  .hero-button-container {
+    margin-top: 4rem !important;
+  }
+}
+
+/* Tablets - mantener original */
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  .hero-background-image {
+    object-fit: cover !important;
+    object-position: center center !important;
+    transform: none !important;
+  }
+}
+
+/* ===== ABOUT SECTION - MOBILE OVERRIDES ===== */
+
+/* iPhone y móviles pequeños */
+@media screen and (max-width: 480px) {
+  /* Container about móvil - Mantener imagen con overlay */
+  .about-container-mobile {
+    position: relative !important;
+    padding: 3rem 0 !important;
+    min-height: 80vh !important;
+  }
+  
+  /* Overlay oscuro para mejorar legibilidad */
+  .about-container-mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(30, 64, 175, 0.6)) !important;
+    z-index: 1 !important;
+  }
+  
+  /* Contenido about móvil - Sobre el overlay */
+  .about-content-mobile {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    padding: 2.5rem 1.5rem !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+    margin: 0 auto !important;
+    max-width: 90% !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  
+  /* Título About Us móvil */
+  .about-title-mobile {
+    font-size: 1.8rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5rem !important;
+    color: #1e40af !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+  }
+  
+  /* Texto párrafos móvil */
+  .about-text-mobile {
+    font-size: 0.95rem !important; /* 15.2px */
+    line-height: 1.7 !important;
+    margin-bottom: 1.5rem !important;
+    color: #1f2937 !important;
+    text-align: left !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* iPhone más grandes */
+@media screen and (min-width: 481px) and (max-width: 640px) {
+  /* Container about para iPhone grandes - Mantener imagen */
+  .about-container-mobile {
+    position: relative !important;
+    padding: 4rem 0 !important;
+    min-height: 85vh !important;
+  }
+  
+  /* Overlay para iPhone grandes */
+  .about-container-mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(30, 64, 175, 0.5)) !important;
+    z-index: 1 !important;
+  }
+  
+  /* Contenido about para iPhone grandes */
+  .about-content-mobile {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    padding: 3rem 2rem !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2) !important;
+    margin: 0 auto !important;
+    max-width: 85% !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  .about-title-mobile {
+    font-size: 2.1rem !important;
+    margin-bottom: 1.75rem !important;
+    color: #1e40af !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+  }
+  
+  .about-text-mobile {
+    font-size: 1.05rem !important; /* 16.8px */
+    line-height: 1.7 !important;
+    margin-bottom: 1.75rem !important;
+    color: #1f2937 !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* Tablets - mantener responsive suave */
+@media screen and (min-width: 641px) and (max-width: 768px) {
+  .about-content-mobile {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 80% !important;
+    padding: 2.5rem !important;
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+}
+
+/* ===== PROGRAM SHOWCASE - MOBILE OVERRIDES ===== */
+
+/* iPhone y móviles pequeños */
+@media screen and (max-width: 480px) {
+  /* Sección principal móvil */
+  .programs-section-mobile {
+    min-height: 90vh !important;
+    padding: 2rem 0 !important;
+    background-position: center -15% !important; /* Ajustar imagen un poco más abajo */
+    background-size: 150% auto !important; /* Aumentar tamaño para mejor cobertura */
+    background-repeat: no-repeat !important;
+  }
+  
+  /* Contenedor de background para móvil */
+  .programs-section-mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-image: inherit !important;
+    background-position: center -80px !important; /* Ajustar imagen un poco más abajo */
+    background-size: 150% auto !important;
+    background-repeat: no-repeat !important;
+    z-index: 0 !important;
+  }
+  
+  /* Container principal móvil - Movido hacia abajo */
+  .programs-container-mobile {
+    padding: 1rem !important;
+    /* El padding-top se maneja desde Tailwind con pt-[60vh] */
+  }
+  
+  /* Título principal móvil - Background title */
+  .programs-title-mobile {
+    font-size: 1.2rem !important; /* Título del background más pequeño */
+    line-height: 1.2 !important;
+    margin-bottom: 0 !important; /* Sin margin porque está positioned */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important; /* Mejor legibilidad */
+  }
+  
+  /* Carrusel container móvil */
+  .programs-carousel-mobile {
+    padding: 0 0.5rem !important; /* Reducir padding lateral */
+  }
+  
+  /* Card principal móvil - reducir tamaño significativamente */
+  .programs-card-main-mobile {
+    width: 65% !important; /* Reducir de 85% a 65% */
+    margin: 0 auto !important;
+    transform: scale(0.8) !important; /* Reducir tamaño general 20% */
+  }
+  
+  /* Cards laterales - ocultar en móvil */
+  .programs-card-side-mobile {
+    display: none !important;
+  }
+  
+  /* Navegación móvil - flechas */
+  .programs-nav-mobile {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Dots indicator móvil - hacer mucho más pequeños */
+  .programs-dots-mobile {
+    margin-top: 0.75rem !important; /* Reducir más el margin-top */
+    gap: 0.375rem !important; /* Menos espacio entre dots */
+    transform: scale(0.6) !important; /* Reducir tamaño general más */
+  }
+  
+  .programs-dot-mobile {
+    width: 6px !important; /* Hacer mucho más pequeños */
+    height: 6px !important;
+  }
+  
+  /* Descripción móvil - reducir tamaño y espaciado */
+  .programs-description-mobile {
+    padding: 0 0.75rem !important; /* Reducir padding lateral */
+    margin-top: 1.25rem !important; /* Reducir de 2rem a 1.25rem */
+    transform: scale(0.9) !important; /* Reducir tamaño general 10% */
+  }
+  
+  .programs-subtitle-mobile {
+    font-size: 0.875rem !important; /* Reducir de 1rem a 0.875rem */
+    line-height: 1.2 !important;
+    margin-bottom: 0.75rem !important; /* Reducir margin */
+  }
+  
+  .programs-text-mobile {
+    font-size: 0.75rem !important; /* Reducir de 14px a 12px */
+    line-height: 1.5 !important;
+    max-width: 280px !important; /* Limitar ancho del texto */
+    margin: 0 auto !important; /* Centrar */
+  }
+}
+
+/* iPhone más grandes */
+@media screen and (min-width: 481px) and (max-width: 640px) {
+  /* Sección para iPhone grandes */
+  .programs-section-mobile {
+    min-height: 95vh !important;
+    padding: 2.5rem 0 !important;
+    background-position: center -20% !important; /* Ajustar imagen un poco más abajo para iPhone grandes */
+    background-size: 150% auto !important;
+    background-repeat: no-repeat !important;
+  }
+  
+  /* Contenedor de background para iPhone grandes */
+  .programs-section-mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-image: inherit !important;
+    background-position: center -100px !important; /* Ajustar imagen un poco más abajo */
+    background-size: 150% auto !important;
+    background-repeat: no-repeat !important;
+    z-index: 0 !important;
+  }
+  
+  .programs-container-mobile {
+    padding: 1.5rem !important;
+    /* El padding-top se maneja desde Tailwind con pt-[65vh] */
+  }
+  
+  .programs-title-mobile {
+    font-size: 1.4rem !important; /* iPhone grandes - título background */
+    margin-bottom: 0 !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+  }
+  
+  .programs-card-main-mobile {
+    width: 70% !important; /* Reducir de 80% a 70% */
+    transform: scale(0.85) !important; /* Reducir tamaño 15% */
+  }
+  
+  .programs-nav-mobile {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0.6rem !important;
+  }
+  
+  .programs-subtitle-mobile {
+    font-size: 1rem !important; /* Reducir de 18px a 16px */
+    margin-bottom: 1rem !important; /* Reducir margin */
+  }
+  
+  .programs-text-mobile {
+    font-size: 0.8rem !important; /* Reducir de 15.2px a 12.8px */
+    line-height: 1.6 !important;
+    max-width: 320px !important; /* Limitar ancho */
+    margin: 0 auto !important;
+  }
+}
+
+/* Tablets - transición suave */
+@media screen and (min-width: 641px) and (max-width: 768px) {
+  .programs-section-mobile {
+    background-position: center 40% !important;
+    background-size: 100% auto !important; /* Mantener original en tablet */
+  }
+  
+  .programs-card-main-mobile {
+    width: 75% !important; /* Tamaño intermedio para tablet */
+    transform: scale(0.9) !important; /* Reducir ligeramente */
+  }
+  
+  /* En tablet mostrar cards laterales pero más pequeñas */
+  .programs-card-side-mobile {
+    display: block !important;
+    transform: scale(0.5) !important; /* Más pequeñas en tablet */
+    opacity: 0.4 !important; /* Menos opacidad */
+  }
+}
+
+/* ===== NAVBAR MOBILE - OPTIMIZACIONES ===== */
+
+/* Mejoras generales para el menú móvil */
+@media screen and (max-width: 767px) {
+  /* Contenedor del menú móvil */
+  .mobile-nav-container {
+    max-height: calc(100vh - 80px) !important; /* Altura máxima basada en viewport */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* Scroll suave en iOS */
+  }
+  
+  /* Items del menú móvil */
+  .mobile-nav-item {
+    touch-action: manipulation !important; /* Optimizar touch */
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1) !important; /* Color de tap en iOS */
+  }
+  
+  /* Botones del menú móvil - tamaño mínimo para touch */
+  .mobile-nav-button {
+    min-height: 48px !important; /* Aumentar área táctil */
+    border-radius: 12px !important;
+    font-size: 0.875rem !important; /* 14px */
+  }
+  
+  /* Grid de botones de usuario */
+  .mobile-user-buttons {
+    gap: 0.5rem !important; /* Espaciado entre botones */
+  }
+  
+  /* Asegurar que el menú no se corte en pantallas pequeñas */
+  .mobile-menu-viewport {
+    max-height: calc(100vh - 100px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Separadores visuales */
+  .mobile-nav-separator {
+    border-color: rgba(156, 163, 175, 0.3) !important; /* Separador más sutil */
+    margin: 0.75rem 0 !important;
+  }
+}

@@ -329,7 +329,7 @@ const createEmailTemplate = (
           <!-- Schedule Information -->
           ${teamData.session && teamData.session.length > 0 ? `
             <div class="section">
-              <h3><span class="section-icon">📅</span>Training Schedule</h3>
+              <h3><span class="section-icon">📅</span>Practice Schedule</h3>
               ${teamData.session.map(session => `
                 <div class="info-grid" style="margin-bottom: 15px;">
                   <div class="info-item">
@@ -362,7 +362,7 @@ const createEmailTemplate = (
           <h4>Discipline Rift</h4>
           <div class="contact-info">
             <p>📧 Support: info@disciplinerift.com</p>
-            <p>📞 Phone: (555) 123-4567</p>
+            <p>📞 Phone: (407) 6147454</p>
             <p>🌐 Web: www.disciplinerift.com</p>
           </div>
           

@@ -42,18 +42,18 @@ export default function SuccessMessageHandler() {
           </div>
           <div>
             <h3 className="text-xl font-semibold text-gray-900">
-              ¡Registro Exitoso!
+              Successful Registration!
             </h3>
             <p className="text-gray-600 mt-1">
-              Tu inscripción ha sido completada correctamente.
+             Your registration has been completed successfully.
             </p>
           </div>
         </div>
         
         <div className="space-y-3 text-sm text-gray-600 mb-6">
-          <p>✅ Pago procesado exitosamente</p>
-          <p>✅ Confirmación enviada por email</p>
-          <p>✅ Acceso al dashboard activado</p>
+          <p>✅ Payment processed successfully</p>
+          <p>✅ Confirmation sent via email</p>
+          
         </div>
         
         <div className="flex space-x-3">
@@ -61,15 +61,9 @@ export default function SuccessMessageHandler() {
             onClick={handleCloseSuccessMessage}
             className="flex-1 bg-blue-600 hover:bg-blue-700"
           >
-            Continuar
+            Continue
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => window.location.href = "/dashboard"}
-            className="flex-1"
-          >
-            Ver Dashboard
-          </Button>
+          
         </div>
       </div>
     </div>
