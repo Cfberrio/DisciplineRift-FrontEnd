@@ -25,6 +25,7 @@ export async function GET(request: Request, { params }: { params: { studentId: s
         lastname,
         dob,
         grade,
+        StudentDismisall,
         ecname,
         ecphone,
         ecrelationship,
@@ -117,6 +118,7 @@ export async function PUT(request: Request, { params }: { params: { studentId: s
       lastName,
       dateOfBirth,
       grade,
+      dismissal,
       emergencyContactName,
       emergencyContactPhone,
       emergencyContactRelation,
@@ -194,6 +196,7 @@ export async function PUT(request: Request, { params }: { params: { studentId: s
     if (lastName) updateData.lastname = lastName
     if (dateOfBirth) updateData.dob = dateOfBirth
     if (grade) updateData.grade = grade.toString()
+    if (dismissal) updateData.StudentDismisall = dismissal
     if (emergencyContactName) updateData.ecname = emergencyContactName
     if (emergencyContactPhone) updateData.ecphone = emergencyContactPhone.replace(/\D/g, "")
     if (emergencyContactRelation) updateData.ecrelationship = emergencyContactRelation

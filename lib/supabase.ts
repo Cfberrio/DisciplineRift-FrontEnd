@@ -145,6 +145,7 @@ export interface Student {
   ecname: string
   ecphone: string
   ecrelationship: string
+  StudentDismisall: string
 }
 
 export interface Parent {

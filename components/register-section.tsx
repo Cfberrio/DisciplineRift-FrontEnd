@@ -76,6 +76,7 @@ interface ParentRegistrationData {
   childLastName: string;
   childBirthdate: string;
   childGrade: string;
+  childDismissal: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
   emergencyContactRelation: string;
@@ -140,6 +141,7 @@ export default function RegisterSection() {
     childLastName: "",
     childBirthdate: "",
     childGrade: "",
+    childDismissal: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
     emergencyContactRelation: "",
@@ -811,8 +813,10 @@ export default function RegisterSection() {
         newErrors.childLastName = "Child last name is required";
       if (!formData.childBirthdate)
         newErrors.childBirthdate = "Child date of birth is required";
-      if (!formData.childGrade.trim())
-        newErrors.childGrade = "Child grade is required";
+          if (!formData.childGrade.trim())
+      newErrors.childGrade = "Child grade is required";
+    if (!formData.childDismissal.trim())
+      newErrors.childDismissal = "Child dismissal is required";
 
       if (!formData.emergencyContactName.trim())
         newErrors.emergencyContactName = "Emergency contact name is required";
@@ -1056,6 +1060,11 @@ export default function RegisterSection() {
     });
   };
 
+  const formatDescription = (description: string) => {
+    if (!description) return "";
+    return description.split('.').filter(part => part.trim() !== '').join('\n');
+  };
+
   return (
     <section className="py-20 bg-white" id="register">
       <div className="container px-4">
@@ -1198,9 +1207,9 @@ export default function RegisterSection() {
                                         <h5 className="font-semibold text-dr-blue">
                                           {team.name}
                                         </h5>
-                                        <p className="text-sm text-gray-600 mb-2">
-                                          {team.description}
-                                        </p>
+                                        <div className="text-sm text-gray-600 mb-2 whitespace-pre-line">
+                                          {formatDescription(team.description)}
+                                        </div>
                                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                                           <span className="bg-white px-2 py-1 rounded">
                                             <TagIcon className="inline h-3 w-3 mr-1" />
@@ -1251,9 +1260,9 @@ export default function RegisterSection() {
                         {selectedTeam.name}
                       </h4>
                       <p className="text-gray-600">{selectedTeam.schoolName}</p>
-                      <p className="text-sm text-gray-600 mt-2">
-                        {selectedTeam.description}
-                      </p>
+                      <div className="text-sm text-gray-600 mt-2 whitespace-pre-line">
+                        {formatDescription(selectedTeam.description)}
+                      </div>
                     </div>
                     <div className="text-right">
                       <div className="text-3xl font-bold text-dr-blue">
@@ -1777,7 +1786,7 @@ export default function RegisterSection() {
                           }`}
                         >
                           <option value="">Select Grade</option>
-                          {Array.from({ length: 13 }, (_, i) => (
+                          {Array.from({ length: 6 }, (_, i) => (
                             <option
                               key={i}
                               value={i === 0 ? "K" : i.toString()}
@@ -1789,6 +1798,31 @@ export default function RegisterSection() {
                         {errors.childGrade && (
                           <p className="text-red-500 text-sm mt-1">
                             {errors.childGrade}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Child's dismissal
+                        </label>
+                        <select
+                          name="childDismissal"
+                          value={formData.childDismissal}
+                          onChange={handleChange}
+                          className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue ${
+                            errors.childDismissal
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          <option value="">Select dismissal type</option>
+                          <option value="After care">After care</option>
+                          <option value="Car Rider">Car Rider</option>
+                          <option value="Walker">Walker</option>
+                        </select>
+                        {errors.childDismissal && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.childDismissal}
                           </p>
                         )}
                       </div>
@@ -1998,6 +2032,10 @@ export default function RegisterSection() {
                       <div>
                         <span className="font-medium">Grade:</span>{" "}
                         {formData.childGrade}
+                      </div>
+                      <div>
+                        <span className="font-medium">Child's dismissal:</span>{" "}
+                        {formData.childDismissal}
                       </div>
                       <div>
                         <span className="font-medium">Emergency Contact:</span>{" "}

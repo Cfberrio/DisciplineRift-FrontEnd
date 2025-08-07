@@ -121,6 +121,7 @@ export async function POST(request: Request) {
         ecname: formData.emergencyContactName,
         ecphone: formData.emergencyContactPhone,
         ecrelationship: formData.emergencyContactRelation,
+        StudentDismisall: formData.childDismissal,
       })
       .select("studentid")
       .single()
