@@ -1,0 +1,10 @@
+[33m196ec77[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m feat: Add child dismissal field and format team descriptions
+[33m39e9fee[m feat: Optimizar navbar para móviles y mejorar ProgramShowcase responsive - navbar desplegable funcional, background reposicionado, elementos móviles ajustados
+[33m1c5e929[m feat: Optimizar ProgramShowcase para móviles - dots más pequeños, imágenes reducidas, background reposicionado
+[33m2e7c85f[m feat: Optimizar About Section para móviles manteniendo imagen de fondo con overlay y tarjeta legible
+[33m7fc69c6[m feat: Optimizar Hero Section para móviles con altura responsive y posicionamiento de imagen mejorado
+[33m96db815[m feat: Optimizar Hero Section para móviles manteniendo diseño desktop
+[33ma65e3d1[m Actualización del frontend
+[33m4d31ab3[m Update register-section.tsx
+[33m7a29a5b[m Actualizar componentes contact-section y register-section
+[33maebb7c8[m Eliminar sombras del program showcase y ajustar posición de texto en hero - Eliminadas todas las sombras y gradientes del program showcase para mostrar solo imágenes puras - Ajustada posición de texto September 2025 y Fall Season más cerca del botón REGISTER NOW - Corregidos errores de linter en faq-section - Mejorada responsividad general
