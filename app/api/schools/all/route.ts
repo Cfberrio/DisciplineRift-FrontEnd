@@ -1,45 +1,49 @@
-import { NextResponse } from "next/server"
-import { isSupabaseConfigured } from "@/lib/supabase"
-import { getAllSchoolsTeamsAndSessions } from "@/lib/supabase-queries"
+import { NextResponse } from "next/server";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import { getAllSchoolsTeamsAndSessions } from "@/lib/supabase-queries";
 
 export async function GET() {
   try {
     // Check if Supabase is properly configured
     if (!isSupabaseConfigured()) {
-      console.error("❌ Supabase not configured for schools API")
+      console.error("❌ Supabase not configured for schools API");
       return NextResponse.json(
         {
           message: "Service temporarily unavailable",
           error: "Database service not configured",
           schools: [],
         },
-        { status: 503 },
-      )
+        { status: 503 }
+      );
     }
 
-    console.log("[SERVER] 🔄 Fetching all schools with teams and sessions...")
+    console.log("[SERVER] 🔄 Fetching schools data with optimized queries...");
 
-    const result = await getAllSchoolsTeamsAndSessions()
+    // Use optimized query function
+    const result = await getAllSchoolsTeamsAndSessions();
 
     if (!result || !result.schools) {
-      console.log("[SERVER] ⚠️ No schools data returned from query")
+      console.log("[SERVER] ⚠️ No schools data returned from query");
       return NextResponse.json({
         schools: [],
         message: "No schools found",
-      })
+      });
     }
 
-    console.log(`[SERVER] ✅ Successfully fetched ${result.schools.length} schools`)
+    console.log(
+      `[SERVER] ✅ Successfully fetched ${result.schools.length} schools`
+    );
 
     return NextResponse.json({
       schools: result.schools,
       count: result.schools.length,
-    })
+    });
   } catch (error) {
-    console.error("[SERVER] ❌ Error fetching schools:", error)
+    console.error("[SERVER] ❌ Error fetching schools:", error);
 
     // Return a more detailed error response
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
 
     return NextResponse.json(
       {
@@ -47,24 +51,32 @@ export async function GET() {
         details: errorMessage,
         schools: [], // Provide empty array as fallback
       },
-      { status: 500 },
-    )
+      { status: 500 }
+    );
   }
 }
 
 // Helper function to generate session instances
 function generateSessionInstances(session: any) {
-  const instances = []
-  const startDate = new Date(session.startdate)
-  const endDate = new Date(session.enddate)
-  const daysOfWeek = session.daysofweek ? session.daysofweek.split(",") : []
+  const instances = [];
+  const startDate = new Date(session.startdate);
+  const endDate = new Date(session.enddate);
+  const daysOfWeek = session.daysofweek ? session.daysofweek.split(",") : [];
 
-  const currentDate = new Date(startDate)
-  let sessionCount = 0
+  const currentDate = new Date(startDate);
+  let sessionCount = 0;
 
   while (currentDate <= endDate && sessionCount < 20) {
-    const dayOfWeek = currentDate.getDay()
-    const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayOfWeek]
+    const dayOfWeek = currentDate.getDay();
+    const dayName = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ][dayOfWeek];
 
     if (daysOfWeek.includes(dayName)) {
       instances.push({
@@ -81,12 +93,12 @@ function generateSessionInstances(session: any) {
           day: "numeric",
         }),
         coachName: session.staff?.name || "TBD",
-      })
-      sessionCount++
+      });
+      sessionCount++;
     }
 
-    currentDate.setDate(currentDate.getDate() + 1)
+    currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  return instances
+  return instances;
 }

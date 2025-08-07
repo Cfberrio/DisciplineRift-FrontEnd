@@ -1116,7 +1116,7 @@ export default function RegisterSection() {
           {step === 1 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                                  <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Find Your School or Team
                 </h3>
                 <div className="relative mb-6">
@@ -1212,13 +1212,6 @@ export default function RegisterSection() {
                                         </div>
                                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                                           <span className="bg-white px-2 py-1 rounded">
-                                            <TagIcon className="inline h-3 w-3 mr-1" />
-                                           
-                                          </span>
-                                          <span className="bg-white px-2 py-1 rounded">
-                                            
-                                          </span>
-                                          <span className="bg-white px-2 py-1 rounded">
                                             {team.skillLevel}
                                           </span>
                                         </div>
@@ -1250,7 +1243,7 @@ export default function RegisterSection() {
           {step === 2 && selectedTeam && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                                  <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Team Details
                 </h3>
                 <div className="bg-gray-50 p-6 rounded-lg mb-6">
@@ -1272,8 +1265,6 @@ export default function RegisterSection() {
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
-                    
-                    
                     <div>
                       <span className="font-semibold">Skill Level:</span>{" "}
                       {selectedTeam.skillLevel}
@@ -1306,8 +1297,10 @@ export default function RegisterSection() {
                               </div>
                               <div className="text-sm text-gray-600 mt-1">
                                 <Calendar className="inline h-4 w-4 mr-1" />
-                                {formatDate(session.startDate)} -{" "}
-                                {formatDate(session.endDate)}
+                                {session.formattedDate ||
+                                  `${formatDate(
+                                    session.startDate
+                                  )} - ${formatDate(session.endDate)}`}
                               </div>
                               <div className="text-sm text-gray-600">
                                 <MapPin className="inline h-4 w-4 mr-1" />
@@ -1363,7 +1356,7 @@ export default function RegisterSection() {
           {step === 3 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                                  <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Account Required
                 </h3>
                 <p className="text-gray-600 mb-6">
@@ -1594,7 +1587,7 @@ export default function RegisterSection() {
                         ) : (
                           <>
                             <LogIn className="mr-2 h-4 w-4" />
-                             Verify Code & Continue
+                            Verify Code & Continue
                           </>
                         )}
                       </Button>
@@ -1627,7 +1620,7 @@ export default function RegisterSection() {
           {step === 4 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                                  <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Parent and Child Information
                 </h3>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -1978,7 +1971,7 @@ export default function RegisterSection() {
           {step === 5 && selectedTeam && registrationResult && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                                  <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Review Your Registration
                 </h3>
                 <div className="space-y-6">
@@ -2076,7 +2069,7 @@ export default function RegisterSection() {
           {step === 6 && selectedTeam && registrationResult && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                                  <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Payment
                 </h3>
                 <div className="bg-gray-50 p-6 rounded-lg mb-6">
@@ -2144,7 +2137,7 @@ export default function RegisterSection() {
                 <div className="bg-green-100 rounded-full p-6 w-24 h-24 mx-auto mb-6">
                   <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
                 </div>
-                                  <h3 className="text-3xl ethnocentric-title-blue mb-4">
+                <h3 className="text-3xl ethnocentric-title-blue mb-4">
                   Registration Complete!
                 </h3>
                 <p className="text-xl text-gray-700 mb-6">
