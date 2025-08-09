@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { Mail, Send, Loader2 } from "lucide-react"
+import { Mail, ArrowRight, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface EmailSignupModalProps {
@@ -33,12 +33,12 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
   }
 
   return (
-    <DialogContent className="sm:max-w-md bg-gradient-to-br from-blue-500 to-blue-700 text-white border-none shadow-2xl rounded-lg overflow-hidden">
-      <DialogHeader className="pt-8 px-8 text-center">
+    <DialogContent className="w-[95vw] max-w-md sm:w-full md:max-w-lg lg:max-w-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white border-none shadow-2xl rounded-lg overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogHeader className="pt-6 sm:pt-8 px-6 sm:px-8 text-center">
         <div className="mx-auto mb-4 bg-yellow-400 p-3 rounded-full w-fit">
           <Mail className="h-8 w-8 text-blue-700" />
         </div>
-                        <DialogTitle className="font-ethnocentric text-4xl md:text-5xl text-yellow-300 tracking-wide mb-2">
+        <DialogTitle className="font-ethnocentric text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-yellow-300 tracking-wide mb-2">
           STAY CONNECTED!
         </DialogTitle>
         <DialogDescription className="text-blue-100 text-base leading-relaxed">
@@ -46,7 +46,7 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           Rift. Don't miss out!
         </DialogDescription>
       </DialogHeader>
-      <form onSubmit={handleSubmit} className="px-8 py-6 space-y-4">
+      <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 sm:py-6 space-y-4">
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-300" />
           <Input
@@ -76,11 +76,11 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           disabled={isSubmitting}
           className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-700 font-bold rounded-md h-12 text-lg transition-all duration-300 transform hover:scale-105 shadow-md"
         >
-          {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Send className="mr-2 h-5 w-5" />}
+          {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ArrowRight className="mr-2 h-5 w-5" />}
           {isSubmitting ? "SUBSCRIBING..." : "SUBSCRIBE"}
         </Button>
       </form>
-      <DialogFooter className="px-8 pb-8 text-center">
+      <DialogFooter className="px-6 sm:px-8 pb-6 sm:pb-8 text-center">
         <p className="text-xs text-blue-200 w-full">We respect your privacy. Unsubscribe at any time.</p>
       </DialogFooter>
       {/* DialogClose is automatically added by shadcn/ui Dialog for the 'X' button */}

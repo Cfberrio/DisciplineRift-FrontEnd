@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Team selection is required" }, { status: 400 })
     }
 
-    // Create admin client to handle parent record creation
+    // Create admin client
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -44,12 +44,12 @@ export async function POST(request: Request) {
       },
     )
 
-    console.log("Checking/creating parent record...")
+    console.log("Checking/updating parent record...")
 
-    // First, ensure parent record exists
+    // First, ensure parent record exists and update it
     const { data: existingParent, error: parentCheckError } = await supabaseAdmin
       .from("parent")
-      .select("parentid")
+      .select("*")
       .eq("parentid", formData.userId)
       .maybeSingle()
 
@@ -57,10 +57,33 @@ export async function POST(request: Request) {
       console.error("Error checking parent:", parentCheckError)
     }
 
-    // If parent doesn't exist, create it
-    if (!existingParent) {
+    // Always update/create parent record with latest information
+    if (existingParent) {
+      console.log("Updating existing parent record...")
+      const { error: updateError } = await supabaseAdmin
+        .from("parent")
+        .update({
+          firstname: formData.parentFirstName,
+          lastname: formData.parentLastName,
+          email: formData.parentEmail,
+          phone: formData.parentPhone,
+        })
+        .eq("parentid", formData.userId)
+
+      if (updateError) {
+        console.error("Parent update error:", updateError)
+        return NextResponse.json(
+          {
+            message: "Failed to update parent record",
+            error: updateError.message,
+          },
+          { status: 500 },
+        )
+      }
+      console.log("Parent updated successfully")
+    } else {
       console.log("Creating parent record...")
-      const { data: parentData, error: parentError } = await supabaseAdmin
+      const { error: parentError } = await supabaseAdmin
         .from("parent")
         .insert({
           parentid: formData.userId,
@@ -69,8 +92,6 @@ export async function POST(request: Request) {
           email: formData.parentEmail,
           phone: formData.parentPhone,
         })
-        .select("parentid")
-        .single()
 
       if (parentError) {
         console.error("Parent creation error:", parentError)
@@ -82,95 +103,188 @@ export async function POST(request: Request) {
           { status: 500 },
         )
       }
-      console.log("Parent created successfully:", parentData.parentid)
-    } else {
-      console.log("Parent already exists:", existingParent.parentid)
+      console.log("Parent created successfully")
     }
 
-    console.log("Checking for existing student...")
+    let studentId: string;
 
-    // Check if student already exists for this parent to prevent duplicates
-    const { data: existingStudent, error: checkError } = await supabaseAdmin
-      .from("student")
-      .select("studentid")
-      .eq("parentid", formData.userId)
-      .eq("firstname", formData.childFirstName)
-      .eq("lastname", formData.childLastName)
+    // Check if this is an existing student (selectedExistingStudent will be sent from frontend)
+    if (formData.selectedExistingStudent?.studentid) {
+      console.log("Using existing student:", formData.selectedExistingStudent.studentid)
+      studentId = formData.selectedExistingStudent.studentid
+
+      // Update student info (in case contact info changed)
+      const { error: updateStudentError } = await supabaseAdmin
+        .from("student")
+        .update({
+          ecname: formData.emergencyContactName,
+          ecphone: formData.emergencyContactPhone,
+          ecrelationship: formData.emergencyContactRelation,
+          studentdismisall: formData.childDismissal,
+        })
+        .eq("studentid", studentId)
+
+      if (updateStudentError) {
+        console.error("Student update error:", updateStudentError)
+        // Don't fail here, just log the error
+      } else {
+        console.log("Student contact info updated successfully")
+      }
+    } else {
+      // Check if we're creating a student with same name (could be updating info)
+      const { data: existingStudent, error: checkError } = await supabaseAdmin
+        .from("student")
+        .select("studentid")
+        .eq("parentid", formData.userId)
+        .eq("firstname", formData.childFirstName)
+        .eq("lastname", formData.childLastName)
+        .maybeSingle()
+
+      if (checkError) {
+        console.error("Error checking existing student:", checkError)
+      }
+
+      if (existingStudent) {
+        console.log("Student with same name exists, updating info...")
+        studentId = existingStudent.studentid
+
+        // Update existing student
+        const { error: updateError } = await supabaseAdmin
+          .from("student")
+          .update({
+            dob: formData.childBirthdate,
+            grade: formData.childGrade,
+            ecname: formData.emergencyContactName,
+            ecphone: formData.emergencyContactPhone,
+            ecrelationship: formData.emergencyContactRelation,
+            studentdismisall: formData.childDismissal,
+          })
+          .eq("studentid", studentId)
+
+        if (updateError) {
+          console.error("Student update error:", updateError)
+          return NextResponse.json(
+            {
+              message: "Failed to update student record",
+              error: updateError.message,
+            },
+            { status: 500 },
+          )
+        }
+        console.log("Student updated successfully")
+      } else {
+        console.log("Creating new student record...")
+
+        // Create new student record
+        const { data: studentData, error: studentError } = await supabaseAdmin
+          .from("student")
+          .insert({
+            parentid: formData.userId,
+            firstname: formData.childFirstName,
+            lastname: formData.childLastName,
+            dob: formData.childBirthdate,
+            grade: formData.childGrade,
+            ecname: formData.emergencyContactName,
+            ecphone: formData.emergencyContactPhone,
+            ecrelationship: formData.emergencyContactRelation,
+            studentdismisall: formData.childDismissal,
+          })
+          .select("studentid")
+          .single()
+
+        if (studentError) {
+          console.error("Student creation error:", studentError)
+          return NextResponse.json(
+            {
+              message: "Failed to create student record",
+              error: studentError.message,
+            },
+            { status: 500 },
+          )
+        }
+
+        studentId = studentData.studentid
+        console.log("Student created successfully:", studentId)
+      }
+    }
+
+    console.log("Checking for existing enrollment...")
+
+    // Check if enrollment already exists for this student and team
+    const { data: existingEnrollment, error: enrollmentCheckError } = await supabaseAdmin
+      .from("enrollment")
+      .select("enrollmentid, isactive")
+      .eq("studentid", studentId)
+      .eq("teamid", formData.selectedTeam.id)
       .maybeSingle()
 
-    if (checkError) {
-      console.error("Error checking existing student:", checkError)
+    if (enrollmentCheckError) {
+      console.error("Error checking existing enrollment:", enrollmentCheckError)
     }
 
-    if (existingStudent) {
-      console.log("Student already exists")
-      return NextResponse.json({ message: "Student already registered" }, { status: 400 })
+    let enrollmentId: string;
+
+    if (existingEnrollment) {
+      console.log("Enrollment already exists:", existingEnrollment.enrollmentid)
+      enrollmentId = existingEnrollment.enrollmentid
+
+      // Check if there's already a completed payment for this enrollment
+      const { data: existingPayment, error: paymentCheckError } = await supabaseAdmin
+        .from("payment")
+        .select("paymentid")
+        .eq("enrollmentid", enrollmentId)
+        .maybeSingle()
+
+      if (paymentCheckError) {
+        console.error("Error checking existing payment:", paymentCheckError)
+      }
+
+      if (existingPayment) {
+        return NextResponse.json(
+          { 
+            message: "Student is already enrolled and paid for this team",
+            enrollmentId: enrollmentId,
+            alreadyPaid: true
+          }, 
+          { status: 400 }
+        )
+      }
+
+      console.log("Enrollment exists but no payment found, allowing retry...")
+    } else {
+      console.log("Creating new enrollment record...")
+
+      // Create new enrollment record
+      const { data: enrollmentData, error: enrollmentError } = await supabaseAdmin
+        .from("enrollment")
+        .insert({
+          studentid: studentId,
+          teamid: formData.selectedTeam.id,
+          isactive: false, // Will be activated after payment
+        })
+        .select("enrollmentid")
+        .single()
+
+      if (enrollmentError) {
+        console.error("Enrollment creation error:", enrollmentError)
+        return NextResponse.json(
+          {
+            message: "Failed to create enrollment record",
+            error: enrollmentError.message,
+          },
+          { status: 500 },
+        )
+      }
+
+      enrollmentId = enrollmentData.enrollmentid
+      console.log("Enrollment created successfully:", enrollmentId)
     }
-
-    console.log("Creating student record...")
-
-    // Create student record with correct column names
-    const { data: studentData, error: studentError } = await supabaseAdmin
-      .from("student")
-      .insert({
-        parentid: formData.userId,
-        firstname: formData.childFirstName,
-        lastname: formData.childLastName,
-        dob: formData.childBirthdate,
-        grade: Number.parseInt(formData.childGrade),
-        ecname: formData.emergencyContactName,
-        ecphone: formData.emergencyContactPhone,
-        ecrelationship: formData.emergencyContactRelation,
-        StudentDismisall: formData.childDismissal,
-      })
-      .select("studentid")
-      .single()
-
-    if (studentError) {
-      console.error("Student creation error:", studentError)
-      return NextResponse.json(
-        {
-          message: "Failed to create student record",
-          error: studentError.message,
-        },
-        { status: 500 },
-      )
-    }
-
-    console.log("Student created successfully:", studentData.studentid)
-
-    console.log("Creating enrollment record...")
-
-    // Create enrollment record
-    const { data: enrollmentData, error: enrollmentError } = await supabaseAdmin
-      .from("enrollment")
-      .insert({
-        studentid: studentData.studentid,
-        teamid: formData.selectedTeam.id,
-        isactive: false, // Will be activated after payment
-      })
-      .select("enrollmentid")
-      .single()
-
-    if (enrollmentError) {
-      console.error("Enrollment creation error:", enrollmentError)
-      // Clean up student record if enrollment fails
-      await supabaseAdmin.from("student").delete().eq("studentid", studentData.studentid)
-      return NextResponse.json(
-        {
-          message: "Failed to create enrollment record",
-          error: enrollmentError.message,
-        },
-        { status: 500 },
-      )
-    }
-
-    console.log("Enrollment created successfully:", enrollmentData.enrollmentid)
 
     return NextResponse.json({
       message: "Registration submitted successfully",
-      studentId: studentData.studentid,
-      enrollmentId: enrollmentData.enrollmentid,
+      studentId: studentId,
+      enrollmentId: enrollmentId,
+      isExistingEnrollment: !!existingEnrollment,
     })
   } catch (error) {
     console.error("Registration error:", error)

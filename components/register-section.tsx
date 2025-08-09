@@ -131,6 +131,9 @@ export default function RegisterSection() {
 
   // Registration data
   const [registrationResult, setRegistrationResult] = useState<any>(null);
+  const [existingStudents, setExistingStudents] = useState<any[]>([]);
+  const [selectedExistingStudent, setSelectedExistingStudent] = useState<any>(null);
+  const [isNewStudent, setIsNewStudent] = useState(true);
 
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
@@ -158,6 +161,26 @@ export default function RegisterSection() {
 
   const [message, setMessage] = useState<string | null>(null);
   const [isEmailConfirmationSent, setIsEmailConfirmationSent] = useState(false);
+
+  // Load existing students for the parent
+  const loadExistingStudents = async (parentId: string) => {
+    try {
+      console.log("🔄 Loading existing students for parent:", parentId);
+      const response = await fetch(`/api/students/by-parent?parentId=${parentId}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ Loaded existing students:", data.students);
+        setExistingStudents(data.students || []);
+      } else {
+        console.error("❌ Error loading students");
+        setExistingStudents([]);
+      }
+    } catch (error) {
+      console.error("❌ Error loading existing students:", error);
+      setExistingStudents([]);
+    }
+  };
 
   // Check for existing session on component mount
   useEffect(() => {
@@ -240,6 +263,8 @@ export default function RegisterSection() {
                 parentLastName: user.lastName,
                 parentPhone: user.phone,
               }));
+              // Load existing students for this parent
+              await loadExistingStudents(user.id);
               console.log("✅ User data loaded from parent record");
             } else {
               console.log("⚠️ Parent record not found, using auth metadata");
@@ -260,6 +285,8 @@ export default function RegisterSection() {
                 parentLastName: user.lastName,
                 parentPhone: user.phone,
               }));
+              // Load existing students for this parent
+              await loadExistingStudents(user.id);
               console.log("✅ User data loaded from auth metadata");
             }
           } catch (dbError) {
@@ -283,6 +310,8 @@ export default function RegisterSection() {
               parentLastName: user.lastName,
               parentPhone: user.phone,
             }));
+            // Load existing students for this parent
+            await loadExistingStudents(user.id);
             console.log("✅ User data loaded from auth metadata (fallback)");
           }
         } else {
@@ -731,6 +760,9 @@ export default function RegisterSection() {
         parentPhone: user.phone,
       }));
 
+      // Load existing students for this parent
+      await loadExistingStudents(user.id);
+
       // Clear any auth errors and reset OTP state
       setAuthError(null);
       setOtpSent(false);
@@ -890,17 +922,20 @@ export default function RegisterSection() {
                   parentPhone: currentUser.phone || "",
                 }));
               } else {
-                console.error("❌ Error creando registro de padre");
+                const errorText = await createResponse.text();
+                console.warn("⚠️ No se pudo crear registro de padre:", errorText);
               }
             }
           } else {
-            console.error("❌ Error verificando registro de padre");
+            const errorText = await response.text();
+            console.warn("⚠️ No se pudo verificar registro de padre:", errorText);
           }
         } catch (error) {
-          console.error(
-            "❌ Error en verificación/creación de registro de padre:",
-            error
+          console.warn(
+            "⚠️ Error en verificación/creación de registro de padre:",
+            error instanceof Error ? error.message : "Error desconocido"
           );
+          // Continuar con el flujo normal incluso si hay error en parent-info
         }
       }
 
@@ -956,6 +991,8 @@ export default function RegisterSection() {
       const submissionData = {
         ...formData,
         registrationDate: new Date().toISOString(),
+        selectedExistingStudent: isNewStudent ? null : selectedExistingStudent,
+        isNewStudent: isNewStudent,
       };
 
       const response = await fetch("/api/register", {
@@ -966,11 +1003,26 @@ export default function RegisterSection() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // If student is already enrolled and paid, show special message
+        if (errorData.alreadyPaid) {
+          setSubmissionError(
+            "This student is already enrolled and has paid for this team. Please check your dashboard or contact support if you need assistance."
+          );
+          return;
+        }
+        
         throw new Error(errorData.message || "Registration failed.");
       }
 
       const responseData = await response.json();
       setRegistrationResult(responseData);
+      
+      // If this is an existing enrollment (payment retry), show special message
+      if (responseData.isExistingEnrollment) {
+        setMessage("Enrollment found! You can now proceed to complete your payment.");
+      }
+      
       setStep((prev) => prev + 1);
       document
         .getElementById("register")
@@ -1623,6 +1675,77 @@ export default function RegisterSection() {
                 <h3 className="text-2xl ethnocentric-title-blue mb-6">
                   Parent and Child Information
                 </h3>
+
+                {/* Existing Students Selection */}
+                {existingStudents.length > 0 && (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="text-lg font-semibold text-dr-blue mb-3">
+                      Students Already Registered
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      You can register an existing child for a new team or add a new child to your account.
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="studentChoice"
+                          checked={isNewStudent}
+                          onChange={() => {
+                            setIsNewStudent(true);
+                            setSelectedExistingStudent(null);
+                            // Clear child form data
+                            setFormData(prev => ({
+                              ...prev,
+                              childFirstName: "",
+                              childLastName: "",
+                              childBirthdate: "",
+                              childGrade: "",
+                              childDismissal: "",
+                              emergencyContactName: "",
+                              emergencyContactPhone: "",
+                              emergencyContactRelation: ""
+                            }));
+                          }}
+                          className="text-dr-blue focus:ring-dr-blue"
+                        />
+                        <span className="text-sm font-medium">Register a new child</span>
+                      </label>
+                      
+                      {existingStudents.map((student) => (
+                        <label key={student.studentid} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="studentChoice"
+                            checked={selectedExistingStudent?.studentid === student.studentid}
+                            onChange={() => {
+                              setIsNewStudent(false);
+                              setSelectedExistingStudent(student);
+                              // Fill form with existing student data
+                              setFormData(prev => ({
+                                ...prev,
+                                childFirstName: student.firstname,
+                                childLastName: student.lastname,
+                                childBirthdate: student.dob,
+                                childGrade: student.grade.toString(),
+                                childDismissal: student.studentdismisall || "",
+                                emergencyContactName: student.ecname,
+                                emergencyContactPhone: student.ecphone,
+                                emergencyContactRelation: student.ecrelationship
+                              }));
+                            }}
+                            className="text-dr-blue focus:ring-dr-blue"
+                          />
+                          <span className="text-sm">
+                            <strong>{student.firstname} {student.lastname}</strong> - Grade {student.grade}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Parent Information */}
                   <div>
@@ -1827,6 +1950,34 @@ export default function RegisterSection() {
                     <h4 className="text-lg font-semibold text-dr-blue mb-4">
                       Emergency Contact
                     </h4>
+                    <div className="mb-4">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.emergencyContactName === `${formData.parentFirstName} ${formData.parentLastName}` && 
+                                   formData.emergencyContactPhone === formData.parentPhone}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                emergencyContactName: `${prev.parentFirstName} ${prev.parentLastName}`,
+                                emergencyContactPhone: prev.parentPhone,
+                                emergencyContactRelation: "Parent"
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                emergencyContactName: "",
+                                emergencyContactPhone: "",
+                                emergencyContactRelation: ""
+                              }));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-dr-blue focus:ring-dr-blue"
+                        />
+                        <span className="text-sm text-gray-700">Same as parent/guardian</span>
+                      </label>
+                    </div>
                     <div className="grid md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2039,9 +2190,16 @@ export default function RegisterSection() {
                   </div>
 
                   {/* Success Message */}
-                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                  <div className={`border px-4 py-3 rounded ${
+                    registrationResult.isExistingEnrollment 
+                      ? "bg-blue-100 border-blue-400 text-blue-700"
+                      : "bg-green-100 border-green-400 text-green-700"
+                  }`}>
                     <CheckCircle className="inline h-4 w-4 mr-2" />
-                    Registration submitted successfully! Your enrollment ID is:{" "}
+                    {registrationResult.isExistingEnrollment 
+                      ? "Enrollment found! You can now complete your payment."
+                      : "Registration submitted successfully!"
+                    } Your enrollment ID is:{" "}
                     <strong>{registrationResult.enrollmentId}</strong>
                   </div>
 
