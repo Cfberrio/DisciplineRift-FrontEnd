@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { supabaseAdmin } from "@/lib/supabase-admin"
 
 export async function POST(request: Request) {
   try {
@@ -9,13 +9,14 @@ export async function POST(request: Request) {
     // Validate required fields
     const requiredFields = [
       "parentFirstName",
-      "parentLastName",
+      "parentLastName", 
       "parentEmail",
       "parentPhone",
       "childFirstName",
       "childLastName",
       "childBirthdate",
       "childGrade",
+      "childDismissal",
       "emergencyContactName",
       "emergencyContactPhone",
       "emergencyContactRelation",
@@ -23,7 +24,8 @@ export async function POST(request: Request) {
     ]
 
     for (const field of requiredFields) {
-      if (!formData[field]) {
+      if (!formData[field] || (typeof formData[field] === 'string' && !formData[field].trim())) {
+        console.error(`❌ Missing required field: ${field}`)
         return NextResponse.json({ message: `${field} is required` }, { status: 400 })
       }
     }
@@ -32,17 +34,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Team selection is required" }, { status: 400 })
     }
 
-    // Create admin client
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      },
-    )
+    // Use admin client from lib
+    console.log("Using Supabase admin client for registration operations...")
 
     console.log("Checking/updating parent record...")
 
@@ -94,11 +87,27 @@ export async function POST(request: Request) {
         })
 
       if (parentError) {
-        console.error("Parent creation error:", parentError)
+        console.error("❌ Parent creation error - FULL DETAILS:", {
+          message: parentError.message,
+          code: parentError.code,
+          details: parentError.details,
+          hint: parentError.hint,
+          statusCode: parentError.statusCode
+        })
+        console.error("❌ Parent data being inserted:", {
+          parentid: formData.userId,
+          firstname: formData.parentFirstName,
+          lastname: formData.parentLastName,
+          email: formData.parentEmail,
+          phone: formData.parentPhone,
+        })
         return NextResponse.json(
           {
             message: "Failed to create parent record",
             error: parentError.message,
+            code: parentError.code,
+            details: parentError.details,
+            hint: parentError.hint
           },
           { status: 500 },
         )
@@ -120,7 +129,7 @@ export async function POST(request: Request) {
           ecname: formData.emergencyContactName,
           ecphone: formData.emergencyContactPhone,
           ecrelationship: formData.emergencyContactRelation,
-          studentdismisall: formData.childDismissal,
+          StudentDismisall: formData.childDismissal,
         })
         .eq("studentid", studentId)
 
@@ -157,7 +166,7 @@ export async function POST(request: Request) {
             ecname: formData.emergencyContactName,
             ecphone: formData.emergencyContactPhone,
             ecrelationship: formData.emergencyContactRelation,
-            studentdismisall: formData.childDismissal,
+            StudentDismisall: formData.childDismissal,
           })
           .eq("studentid", studentId)
 
@@ -187,17 +196,37 @@ export async function POST(request: Request) {
             ecname: formData.emergencyContactName,
             ecphone: formData.emergencyContactPhone,
             ecrelationship: formData.emergencyContactRelation,
-            studentdismisall: formData.childDismissal,
+            StudentDismisall: formData.childDismissal,
           })
           .select("studentid")
           .single()
 
         if (studentError) {
-          console.error("Student creation error:", studentError)
+          console.error("❌ Student creation error - FULL DETAILS:", {
+            message: studentError.message,
+            code: studentError.code,
+            details: studentError.details,
+            hint: studentError.hint,
+            statusCode: studentError.statusCode
+          })
+          console.error("❌ Student data being inserted:", {
+            parentid: formData.userId,
+            firstname: formData.childFirstName,
+            lastname: formData.childLastName,
+            dob: formData.childBirthdate,
+            grade: formData.childGrade,
+            ecname: formData.emergencyContactName,
+            ecphone: formData.emergencyContactPhone,
+            ecrelationship: formData.emergencyContactRelation,
+            StudentDismisall: formData.childDismissal,
+          })
           return NextResponse.json(
             {
               message: "Failed to create student record",
               error: studentError.message,
+              code: studentError.code,
+              details: studentError.details,
+              hint: studentError.hint
             },
             { status: 500 },
           )

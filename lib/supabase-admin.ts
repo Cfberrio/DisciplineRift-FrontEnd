@@ -1,47 +1,71 @@
-// This file is kept for backward compatibility but is no longer used
-// All operations now use the regular client with email confirmation
+import { createClient } from '@supabase/supabase-js'
 
-// Environment variables for admin client (deprecated)
+// Environment variables for admin client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Create mock admin client since we no longer use admin operations
-function createMockAdminClient() {
-  return {
-    auth: {
-      admin: {
-        createUser: async () => ({
-          data: null,
-          error: { message: "Admin client deprecated - use email confirmation" },
-        }),
-        deleteUser: async () => ({ data: null, error: { message: "Admin client deprecated" } }),
-        listUsers: async () => ({ data: { users: [] }, error: null }),
-        generateLink: async () => ({ data: null, error: { message: "Admin client deprecated" } }),
-      },
-    },
-    from: () => ({
-      select: () => ({ data: [], error: null }),
-      insert: () => ({ data: null, error: { message: "Admin client deprecated" } }),
-      update: () => ({ data: null, error: { message: "Admin client deprecated" } }),
-      delete: () => ({ data: null, error: { message: "Admin client deprecated" } }),
-    }),
-  }
+if (!supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable')
 }
 
-// Export mock admin client
-const supabaseAdmin = createMockAdminClient()
+if (!supabaseAnonKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
+}
+
+// Always log the configuration status
+console.log('🔧 Supabase Admin Configuration:')
+console.log('  - URL configured:', !!supabaseUrl)
+console.log('  - SERVICE_ROLE_KEY configured:', !!supabaseServiceKey)
+console.log('  - ANON_KEY configured:', !!supabaseAnonKey)
+
+// Validate keys are not placeholder values
+const isValidServiceKey = supabaseServiceKey && 
+  supabaseServiceKey !== 'your_service_role_key_here' && 
+  supabaseServiceKey.startsWith('eyJ')
+
+const isValidAnonKey = supabaseAnonKey && 
+  supabaseAnonKey !== 'your_anon_key_here' && 
+  supabaseAnonKey.startsWith('eyJ')
+
+console.log('  - SERVICE_ROLE_KEY valid format:', isValidServiceKey)
+console.log('  - ANON_KEY valid format:', isValidAnonKey)
+
+if (!isValidServiceKey && !isValidAnonKey) {
+  console.error('❌ CRITICAL: Neither SERVICE_ROLE_KEY nor ANON_KEY are valid!')
+  console.error('❌ Check your .env.local file - keys should start with "eyJ"')
+}
+
+// Create admin client - prefer service key, fallback to anon key with bypass RLS
+const supabaseAdmin = createClient(
+  supabaseUrl,
+  supabaseServiceKey || supabaseAnonKey,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      headers: supabaseServiceKey ? {} : {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'apikey': supabaseAnonKey
+      }
+    }
+  }
+)
 
 export { supabaseAdmin }
 
-// Helper function to check if admin client is properly configured (always false now)
+// Helper function to check if admin client is properly configured
 export function isSupabaseAdminConfigured(): boolean {
-  return false
+  return !!(supabaseUrl && (supabaseServiceKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY))
 }
 
-// Validation function for admin client access (always returns invalid)
+// Validation function for admin client access
 export function validateAdminClientAccess() {
+  const isValid = isSupabaseAdminConfigured()
   return {
-    isValid: false,
-    error: "Admin client is deprecated. Use email confirmation flow instead.",
+    isValid,
+    error: isValid ? null : "Supabase admin client is not properly configured.",
   }
 }
