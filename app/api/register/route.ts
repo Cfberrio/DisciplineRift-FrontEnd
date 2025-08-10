@@ -4,7 +4,12 @@ import { supabaseAdmin } from "@/lib/supabase-admin"
 export async function POST(request: Request) {
   try {
     const formData = await request.json()
-    console.log("Registration request received:", formData)
+    // Only log in development for security
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Registration request received:", formData)
+    } else {
+      console.log("Registration request received for user:", formData.userId)
+    }
 
     // Validate required fields
     const requiredFields = [

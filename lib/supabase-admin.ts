@@ -5,6 +5,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+// Production-safe environment variable validation
 if (!supabaseUrl) {
   throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable')
 }
@@ -13,11 +14,13 @@ if (!supabaseAnonKey) {
   throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
 }
 
-// Always log the configuration status
-console.log('🔧 Supabase Admin Configuration:')
-console.log('  - URL configured:', !!supabaseUrl)
-console.log('  - SERVICE_ROLE_KEY configured:', !!supabaseServiceKey)
-console.log('  - ANON_KEY configured:', !!supabaseAnonKey)
+// Production logging - only log configuration status, not sensitive details
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔧 Supabase Admin Configuration:')
+  console.log('  - URL configured:', !!supabaseUrl)
+  console.log('  - SERVICE_ROLE_KEY configured:', !!supabaseServiceKey)
+  console.log('  - ANON_KEY configured:', !!supabaseAnonKey)
+}
 
 // Validate keys are not placeholder values
 const isValidServiceKey = supabaseServiceKey && 
@@ -28,15 +31,20 @@ const isValidAnonKey = supabaseAnonKey &&
   supabaseAnonKey !== 'your_anon_key_here' && 
   supabaseAnonKey.startsWith('eyJ')
 
-console.log('  - SERVICE_ROLE_KEY valid format:', isValidServiceKey)
-console.log('  - ANON_KEY valid format:', isValidAnonKey)
-
-if (!isValidServiceKey && !isValidAnonKey) {
-  console.error('❌ CRITICAL: Neither SERVICE_ROLE_KEY nor ANON_KEY are valid!')
-  console.error('❌ Check your .env.local file - keys should start with "eyJ"')
+// Only log validation in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('  - SERVICE_ROLE_KEY valid format:', isValidServiceKey)
+  console.log('  - ANON_KEY valid format:', isValidAnonKey)
 }
 
-// Create admin client - prefer service key, fallback to anon key with bypass RLS
+// Critical error handling for production
+if (!isValidServiceKey && !isValidAnonKey) {
+  const error = 'CRITICAL: Neither SERVICE_ROLE_KEY nor ANON_KEY are valid! Check environment variables.'
+  console.error('❌', error)
+  throw new Error(error)
+}
+
+// Create admin client with production-safe configuration
 const supabaseAdmin = createClient(
   supabaseUrl,
   supabaseServiceKey || supabaseAnonKey,
@@ -45,12 +53,15 @@ const supabaseAdmin = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-    global: {
-      headers: supabaseServiceKey ? {} : {
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'apikey': supabaseAnonKey
+    // Simplified configuration for production reliability
+    ...(supabaseServiceKey ? {} : {
+      global: {
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey
+        }
       }
-    }
+    })
   }
 )
 
