@@ -1686,14 +1686,16 @@ export default function RegisterSection() {
                       You can register an existing child for a new team or add a new child to your account.
                     </p>
                     
-                    <div className="space-y-3">
-                      <div className="p-3 bg-white rounded-lg border border-blue-200">
-                        <label className="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="studentChoice"
-                            checked={isNewStudent}
-                            onChange={() => {
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Select Student Option
+                        </label>
+                        <select
+                          value={selectedExistingStudent ? selectedExistingStudent.studentid : 'new'}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === 'new') {
                               setIsNewStudent(true);
                               setSelectedExistingStudent(null);
                               // Clear child form data
@@ -1708,24 +1710,9 @@ export default function RegisterSection() {
                                 emergencyContactPhone: "",
                                 emergencyContactRelation: ""
                               }));
-                            }}
-                            className="mt-1 text-dr-blue focus:ring-dr-blue flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm sm:text-base font-medium text-gray-900 block">Register a new child</span>
-                            <span className="text-xs sm:text-sm text-gray-500 block mt-1">Add a completely new student to your account</span>
-                          </div>
-                        </label>
-                      </div>
-                      
-                      {existingStudents.map((student) => (
-                        <div key={student.studentid} className="p-3 bg-white rounded-lg border border-blue-200">
-                          <label className="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
-                            <input
-                              type="radio"
-                              name="studentChoice"
-                              checked={selectedExistingStudent?.studentid === student.studentid}
-                              onChange={() => {
+                            } else {
+                              const student = existingStudents.find(s => s.studentid === value);
+                              if (student) {
                                 setIsNewStudent(false);
                                 setSelectedExistingStudent(student);
                                 // Fill form with existing student data
@@ -1740,24 +1727,36 @@ export default function RegisterSection() {
                                   emergencyContactPhone: student.ecphone,
                                   emergencyContactRelation: student.ecrelationship
                                 }));
-                              }}
-                              className="mt-1 text-dr-blue focus:ring-dr-blue flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm sm:text-base font-medium text-gray-900 block">
-                                {student.firstname} {student.lastname}
-                              </span>
-                              <div className="text-xs text-gray-500 space-y-1 mt-1">
-                                <div>Grade {student.grade}</div>
-                                <div>DOB: {new Date(student.dob).toLocaleDateString()}</div>
-                                {student.ecname && (
-                                  <div>Emergency Contact: {student.ecname}</div>
-                                )}
-                              </div>
+                              }
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue bg-white"
+                        >
+                          <option value="new">Register a new child</option>
+                          {existingStudents.map((student) => (
+                            <option key={student.studentid} value={student.studentid}>
+                              {student.firstname} {student.lastname} - Grade {student.grade} (DOB: {new Date(student.dob).toLocaleDateString()})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      {selectedExistingStudent && (
+                        <div className="p-3 bg-white rounded-lg border border-blue-200">
+                          <div className="text-sm text-gray-700">
+                            <div className="font-medium text-gray-900 mb-2">
+                              Selected: {selectedExistingStudent.firstname} {selectedExistingStudent.lastname}
                             </div>
-                          </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
+                              <div>Grade: {selectedExistingStudent.grade}</div>
+                              <div>DOB: {new Date(selectedExistingStudent.dob).toLocaleDateString()}</div>
+                              {selectedExistingStudent.ecname && (
+                                <div className="sm:col-span-2">Emergency Contact: {selectedExistingStudent.ecname}</div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 )}
@@ -1966,36 +1965,37 @@ export default function RegisterSection() {
                     <h4 className="text-lg font-semibold text-dr-blue mb-4">
                       Emergency Contact
                     </h4>
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
-                      <label className="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.emergencyContactName === `${formData.parentFirstName} ${formData.parentLastName}` && 
-                                   formData.emergencyContactPhone === formData.parentPhone}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormData(prev => ({
-                                ...prev,
-                                emergencyContactName: `${prev.parentFirstName} ${prev.parentLastName}`,
-                                emergencyContactPhone: prev.parentPhone,
-                                emergencyContactRelation: "Parent"
-                              }));
-                            } else {
-                              setFormData(prev => ({
-                                ...prev,
-                                emergencyContactName: "",
-                                emergencyContactPhone: "",
-                                emergencyContactRelation: ""
-                              }));
-                            }
-                          }}
-                          className="mt-1 rounded border-gray-300 text-dr-blue focus:ring-dr-blue flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm sm:text-base font-medium text-gray-700 block">Same as parent/guardian</span>
-                          <span className="text-xs sm:text-sm text-gray-500 block mt-1">Use parent information for emergency contact</span>
-                        </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Emergency Contact Source
                       </label>
+                      <select
+                        value={
+                          formData.emergencyContactName === `${formData.parentFirstName} ${formData.parentLastName}` && 
+                          formData.emergencyContactPhone === formData.parentPhone ? 'parent' : 'different'
+                        }
+                        onChange={(e) => {
+                          if (e.target.value === 'parent') {
+                            setFormData(prev => ({
+                              ...prev,
+                              emergencyContactName: `${prev.parentFirstName} ${prev.parentLastName}`,
+                              emergencyContactPhone: prev.parentPhone,
+                              emergencyContactRelation: "Parent"
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              emergencyContactName: "",
+                              emergencyContactPhone: "",
+                              emergencyContactRelation: ""
+                            }));
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue bg-white"
+                      >
+                        <option value="parent">Same as parent/guardian</option>
+                        <option value="different">Different emergency contact</option>
+                      </select>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
