@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { MapPin, User, Mail, Calendar, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import AnimatedSection from "@/components/animated-section"
 
@@ -15,19 +15,66 @@ export default function ContactSection() {
     message: "",
   })
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
+  const [submitError, setSubmitError] = useState("")
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+    // Clear any previous messages when user starts typing
+    if (submitMessage) setSubmitMessage("")
+    if (submitError) setSubmitError("")
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Form submission logic would go here
-    console.log("Form submitted:", formData)
-    // Reset form
-    setFormData({ name: "", email: "", subject: "", message: "" })
-    // Show success message
-    alert("Thank you for your message! We'll get back to you soon.")
+    
+    if (isSubmitting) return
+    
+    setIsSubmitting(true)
+    setSubmitMessage("")
+    setSubmitError("")
+
+    try {
+      console.log("Submitting contact form:", formData)
+      
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send message")
+      }
+
+      console.log("Contact form submitted successfully")
+      
+      // Reset form on success
+      setFormData({ name: "", email: "", subject: "", message: "" })
+      setSubmitMessage(data.message || "Thank you for your message! We'll get back to you soon.")
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSubmitMessage(""), 5000)
+
+    } catch (error) {
+      console.error("Contact form submission error:", error)
+      setSubmitError(
+        error instanceof Error 
+          ? error.message 
+          : "An error occurred while sending your message. Please try again."
+      )
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => setSubmitError(""), 5000)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -73,7 +120,7 @@ export default function ContactSection() {
               </div>
 
               <div className="flex items-start">
-                <Phone className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
+                <User className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
                 <div>
                   <h4 className="font-bold text-gray-900">Phone Number</h4>
                   <p className="text-gray-700"> (407) 614-7454</p>
@@ -89,7 +136,7 @@ export default function ContactSection() {
               </div>
 
               <div className="flex items-start">
-                <Clock className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
+                <Calendar className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
                 <div>
                   <h4 className="font-bold text-gray-900">Office Hours</h4>
                   <p className="text-gray-700">Monday - Friday: 9:00 AM - 5:00 PM</p>
@@ -149,7 +196,6 @@ export default function ContactSection() {
                     <option value="General Inquiry">General Inquiry</option>
                     <option value="Program Information">Program Information</option>
                     <option value="Registration">Registration</option>
-                    <option value="Coaching Opportunities">Coaching Opportunities</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -169,11 +215,34 @@ export default function ContactSection() {
                   ></textarea>
                 </div>
 
+                {/* Success/Error Messages */}
+                {submitMessage && (
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span>{submitMessage}</span>
+                  </div>
+                )}
+                
+                {submitError && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center">
+                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 <Button
                   type="submit"
-                  className="w-full bg-dr-blue hover:bg-blue-500 text-white rounded-lg py-3 shadow-md"
+                  disabled={isSubmitting}
+                  className="w-full bg-dr-blue hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 shadow-md transition-all duration-200"
                 >
-                  Send Message
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending Message...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
                 </Button>
               </form>
             </div>
