@@ -1688,7 +1688,7 @@ export default function RegisterSection() {
                     
                     <div className="space-y-3">
                       <div className="p-3 bg-white rounded-lg border border-blue-200">
-                        <label className="flex items-start space-x-3 cursor-pointer">
+                        <label className="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
                           <input
                             type="radio"
                             name="studentChoice"
@@ -1709,18 +1709,18 @@ export default function RegisterSection() {
                                 emergencyContactRelation: ""
                               }));
                             }}
-                            className="mt-1 text-dr-blue focus:ring-dr-blue flex-shrink-0"
+                            className="mt-1 text-dr-blue focus:ring-dr-blue flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5"
                           />
                           <div className="flex-1 min-w-0">
-                            <span className="text-sm font-medium text-gray-900 block">Register a new child</span>
-                            <span className="text-xs text-gray-500 block mt-1">Add a completely new student to your account</span>
+                            <span className="text-sm sm:text-base font-medium text-gray-900 block">Register a new child</span>
+                            <span className="text-xs sm:text-sm text-gray-500 block mt-1">Add a completely new student to your account</span>
                           </div>
                         </label>
                       </div>
                       
                       {existingStudents.map((student) => (
                         <div key={student.studentid} className="p-3 bg-white rounded-lg border border-blue-200">
-                          <label className="flex items-start space-x-3 cursor-pointer">
+                          <label className="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
                             <input
                               type="radio"
                               name="studentChoice"
@@ -1741,10 +1741,10 @@ export default function RegisterSection() {
                                   emergencyContactRelation: student.ecrelationship
                                 }));
                               }}
-                              className="mt-1 text-dr-blue focus:ring-dr-blue flex-shrink-0"
+                              className="mt-1 text-dr-blue focus:ring-dr-blue flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5"
                             />
                             <div className="flex-1 min-w-0">
-                              <span className="text-sm font-medium text-gray-900 block">
+                              <span className="text-sm sm:text-base font-medium text-gray-900 block">
                                 {student.firstname} {student.lastname}
                               </span>
                               <div className="text-xs text-gray-500 space-y-1 mt-1">
@@ -1967,7 +1967,7 @@ export default function RegisterSection() {
                       Emergency Contact
                     </h4>
                     <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
-                      <label className="flex items-start space-x-3 cursor-pointer">
+                      <label className="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={formData.emergencyContactName === `${formData.parentFirstName} ${formData.parentLastName}` && 
@@ -1989,11 +1989,11 @@ export default function RegisterSection() {
                               }));
                             }
                           }}
-                          className="mt-1 rounded border-gray-300 text-dr-blue focus:ring-dr-blue flex-shrink-0"
+                          className="mt-1 rounded border-gray-300 text-dr-blue focus:ring-dr-blue flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5"
                         />
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-gray-700 block">Same as parent/guardian</span>
-                          <span className="text-xs text-gray-500 block mt-1">Use parent information for emergency contact</span>
+                          <span className="text-sm sm:text-base font-medium text-gray-700 block">Same as parent/guardian</span>
+                          <span className="text-xs sm:text-sm text-gray-500 block mt-1">Use parent information for emergency contact</span>
                         </div>
                       </label>
                     </div>
