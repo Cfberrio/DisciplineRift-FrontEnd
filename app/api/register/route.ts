@@ -262,11 +262,12 @@ export async function POST(request: Request) {
       console.log("Enrollment already exists:", existingEnrollment.enrollmentid)
       enrollmentId = existingEnrollment.enrollmentid
 
-      // Check if there's already a completed payment for this enrollment
+      // Check if there's already a completed payment for this specific enrollment (student + team combination)
       const { data: existingPayment, error: paymentCheckError } = await supabaseAdmin
         .from("payment")
-        .select("paymentid")
+        .select("paymentid, status")
         .eq("enrollmentid", enrollmentId)
+        .eq("status", "paid")
         .maybeSingle()
 
       if (paymentCheckError) {
@@ -274,9 +275,10 @@ export async function POST(request: Request) {
       }
 
       if (existingPayment) {
+        console.log("Payment already exists for this specific team enrollment")
         return NextResponse.json(
           { 
-            message: "Student is already enrolled and paid for this team",
+            message: "Student is already enrolled and paid for this specific team. Please select a different team or check your dashboard.",
             enrollmentId: enrollmentId,
             alreadyPaid: true
           }, 

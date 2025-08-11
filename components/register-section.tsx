@@ -1004,10 +1004,10 @@ export default function RegisterSection() {
       if (!response.ok) {
         const errorData = await response.json();
         
-        // If student is already enrolled and paid, show special message
+        // If student is already enrolled and paid for this specific team, show special message
         if (errorData.alreadyPaid) {
           setSubmissionError(
-            "This student is already enrolled and has paid for this team. Please check your dashboard or contact support if you need assistance."
+            "This student is already enrolled and has paid for this specific team. You can register the same student for different teams, but not twice for the same team. Please check your dashboard or contact support if you need assistance."
           );
           return;
         }
