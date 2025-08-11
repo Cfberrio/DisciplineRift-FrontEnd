@@ -4,17 +4,19 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Mail, ArrowRight, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface EmailSignupModalProps {
-  onSubscribe: (email: string) => Promise<void>
+  onSubscribe: (email: string, sportInterest?: string) => Promise<void>
   isSubmitting: boolean
 }
 
 export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSignupModalProps) {
   const [email, setEmail] = useState("")
+  const [sportInterest, setSportInterest] = useState("")
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,7 +31,7 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
       return
     }
     setError("")
-    await onSubscribe(email)
+    await onSubscribe(email, sportInterest)
   }
 
   return (
@@ -38,12 +40,12 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
         <div className="mx-auto mb-4 bg-yellow-400 p-3 rounded-full w-fit">
           <Mail className="h-8 w-8 text-blue-700" />
         </div>
-        <DialogTitle className="font-ethnocentric text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-yellow-300 tracking-wide mb-2">
-          STAY CONNECTED!
+        <DialogTitle className="font-ethnocentric text-xl sm:text-2xl md:text-3xl lg:text-4xl text-yellow-300 tracking-wide mb-2 leading-tight">
+          What If Sports Could Unlock Your Child's Potential?
         </DialogTitle>
-        <DialogDescription className="text-blue-100 text-base leading-relaxed">
-          Join our mailing list for the latest news on programs, upcoming events, and exclusive offers from Discipline
-          Rift. Don't miss out!
+        <DialogDescription className="text-blue-100 text-sm sm:text-base leading-relaxed mb-2">
+          Discover how volleyball, tennis, or pickleball can help your child build confidence, discipline, and teamwork—all while having fun.
+          <br /><strong>Sign up to get season updates, expert tips, and priority registration.</strong>
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 sm:py-6 space-y-4">
@@ -66,6 +68,21 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
             aria-describedby="email-error"
           />
         </div>
+        
+        {/* Sport Interest Dropdown */}
+        <div className="space-y-2">
+          <Select value={sportInterest} onValueChange={setSportInterest}>
+            <SelectTrigger className="w-full h-12 text-base rounded-md border-2 bg-blue-600/50 text-white border-blue-400 focus:border-yellow-400 focus:ring-yellow-400">
+              <SelectValue placeholder="Child's sport interest" className="text-blue-300" />
+            </SelectTrigger>
+            <SelectContent className="bg-blue-600 border-blue-400">
+              <SelectItem value="volleyball" className="text-white hover:bg-blue-500">Volleyball</SelectItem>
+              <SelectItem value="pickleball" className="text-white hover:bg-blue-500">Pickleball</SelectItem>
+              <SelectItem value="tennis" className="text-white hover:bg-blue-500">Tennis</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {error && (
           <p id="email-error" className="text-sm text-red-300 bg-red-900/50 px-3 py-2 rounded-md">
             {error}
@@ -77,11 +94,19 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-700 font-bold rounded-md h-12 text-lg transition-all duration-300 transform hover:scale-105 shadow-md"
         >
           {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ArrowRight className="mr-2 h-5 w-5" />}
-          {isSubmitting ? "SUBSCRIBING..." : "SUBSCRIBE"}
+          {isSubmitting ? "GETTING GUIDE..." : "Get My Parent Guide"}
         </Button>
       </form>
-      <DialogFooter className="px-6 sm:px-8 pb-6 sm:pb-8 text-center">
-        <p className="text-xs text-blue-200 w-full">We respect your privacy. Unsubscribe at any time.</p>
+      <DialogFooter className="px-6 sm:px-8 pb-6 sm:pb-8 text-center space-y-3">
+        <div className="w-full">
+          <p className="text-sm font-semibold text-yellow-300 mb-1">
+            How to Stay Connected to Your Child's Sports Journey
+          </p>
+          <p className="text-xs text-blue-200">
+            5 simple ways to spark excitement and build a love for sports at home.
+          </p>
+        </div>
+        
       </DialogFooter>
       {/* DialogClose is automatically added by shadcn/ui Dialog for the 'X' button */}
     </DialogContent>

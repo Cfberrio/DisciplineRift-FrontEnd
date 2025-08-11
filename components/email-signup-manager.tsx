@@ -24,18 +24,46 @@ export default function EmailSignupManager() {
     }
   }, [])
 
-  const handleSubscribe = async (email: string) => {
+  const handleSubscribe = async (email: string, sportInterest?: string) => {
     setIsSubmitting(true)
-    console.log("Subscribing email:", email) // Replace with actual API call
+    console.log("Subscribing email:", email, "Sport interest:", sportInterest)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      // Call the API to send the Parent Guide email
+      const response = await fetch("/api/send-parent-guide", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          sportInterest,
+        }),
+      })
 
-    // On successful subscription:
-    localStorage.setItem(LOCAL_STORAGE_KEY, "true")
-    setIsModalOpen(false)
-    setIsSubmitting(false)
-    // Optionally, show a success toast/message here
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        console.log("✅ Parent Guide email sent successfully")
+        // On successful subscription:
+        localStorage.setItem(LOCAL_STORAGE_KEY, "true")
+        setIsModalOpen(false)
+        // Optionally, show a success toast/message here
+      } else {
+        console.error("❌ Failed to send Parent Guide email:", result.message)
+        // Handle error - could show an error message to the user
+        // For now, we'll still close the modal to avoid blocking the user
+        localStorage.setItem(LOCAL_STORAGE_KEY, "true")
+        setIsModalOpen(false)
+      }
+    } catch (error) {
+      console.error("❌ Error sending Parent Guide email:", error)
+      // Handle error - still close modal to avoid blocking the user
+      localStorage.setItem(LOCAL_STORAGE_KEY, "true")
+      setIsModalOpen(false)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleOpenChange = (open: boolean) => {

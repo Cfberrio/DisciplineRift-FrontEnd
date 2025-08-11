@@ -703,4 +703,144 @@ export async function sendPaymentNotificationToCompany(
     console.error('❌ Error sending company notification email:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
+}
+
+// Template HTML para el popup de registro de padres
+const createParentGuideEmailTemplate = (email: string, sportInterest?: string) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>We're Saving a Spot for Your Child — Don't Miss Out!</title>
+    </head>
+    <body style="margin:0;padding:0;background-color:#f4f6f8;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:680px;margin:32px auto 40px;background:#ffffff;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,0.08);overflow:hidden;">
+        <tr>
+          <td style="padding:22px 26px 8px;background:linear-gradient(90deg,#0ea5a8,#06b6d4);color:#fff;">
+            <!-- Header -->
+            <table role="presentation" width="100%">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <h1 style="margin:0;font-size:20px;line-height:1.1;font-weight:700;">We're Saving a Spot for Your Child — Don't Miss Out!</h1>
+                </td>
+                <td style="text-align:right;vertical-align:middle;">
+                  <!-- Optional small logo placeholder -->
+                  
+            
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:22px 30px 18px;color:#0f172a;">
+            <!-- Greeting -->
+            <p style="margin:0 0 12px;font-size:15px;color:#0f172a;">Hi,</p>
+
+            <!-- Body -->
+            <p style="margin:0 0 12px;font-size:15px;color:#334155;">
+              It looks like you haven't completed the registration yet — and spots are filling quickly. We'd love to see your child out on the court with us this season!
+            </p>
+
+            <p style="margin:0 0 12px;font-size:15px;color:#334155;">
+              Don't forget to take action and register your child for an exciting season filled with growth, fun, and skill-building.
+            </p>
+
+            <p style="margin:0 0 16px;font-size:15px;color:#334155;">
+              Whether it's <strong>volleyball</strong>, <strong>tennis</strong>, or <strong>pickleball</strong>, your child will learn from our trained coaches in a supportive, energetic environment that helps them develop a lifelong passion for the sport.
+            </p>
+
+            ${sportInterest ? `
+              <p style="margin:0 0 16px;font-size:15px;color:#334155;background:#f0f9ff;padding:12px;border-radius:6px;border-left:4px solid #0ea5a8;">
+                <strong>Great choice on ${sportInterest}!</strong> This sport is perfect for building confidence, teamwork, and athletic skills.
+              </p>
+            ` : ''}
+
+            <!-- Feature list -->
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:8px 0 18px;">
+              <tr>
+                <td style="font-size:15px;color:#0f172a;">
+                  <ul style="margin:0;padding-left:18px;color:#0f172a;">
+                    <li style="margin-bottom:6px;">✅ Secure their spot today</li>
+                    <li style="margin-bottom:0;">🧑‍🏫 Trained, caring coaches</li>
+                  </ul>
+                </td>
+              </tr>
+            </table>
+
+            <!-- CTA button -->
+            <p style="text-align:center;margin:14px 0 18px;">
+              <a href="https://www.disciplinerift.com/#register" target="_blank" rel="noopener" style="display:inline-block;padding:12px 20px;border-radius:8px;background:#0ea5a8;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 6px 14px rgba(14,165,168,0.18);">
+                👉 Secure My Child's Spot
+              </a>
+            </p>
+
+            <p style="margin:0 0 18px;font-size:14px;color:#475569;">
+              We can't wait to help your child thrive this season!
+            </p>
+
+            <!-- Signature -->
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:8px;">
+              <tr>
+                <td style="vertical-align:top;padding-top:8px;">
+                  <p style="margin:0;font-weight:700;color:#0b5b6b;">With excitement,</p>
+                  <p style="margin:6px 0 0;color:#334155;font-weight:600;">The Discipline Rift Team</p>
+                </td>
+                <td style="vertical-align:top;padding-top:8px;text-align:right;">
+                  <p style="margin:0;font-size:13px;color:#475569;">📧 <a href="mailto:info@disciplinerift.com" style="color:#0b5b6b;text-decoration:none;">info@disciplinerift.com</a></p>
+                  <p style="margin:6px 0 0;font-size:13px;color:#475569;">📞 (407) 614-7454</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#f8fafc;padding:14px 26px 20px;border-top:1px solid rgba(15,23,42,0.04);font-size:13px;color:#64748b;">
+            <p style="margin:0;">If you already registered, thank you! If not — click the button above to complete your registration and guarantee your child's spot.</p>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `
+}
+
+// Función para enviar el email del Parent Guide desde el popup
+export async function sendParentGuideEmail(email: string, sportInterest?: string) {
+  try {
+    // Verificar que las credenciales de Gmail estén configuradas
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      throw new Error('Gmail credentials not configured')
+    }
+
+    const transporter = createTransporter()
+
+    // Generar el HTML del correo
+    const htmlContent = createParentGuideEmailTemplate(email, sportInterest)
+
+    // Configurar el correo
+    const mailOptions = {
+      from: {
+        name: 'Discipline Rift',
+        address: process.env.GMAIL_USER!,
+      },
+      to: email,
+      subject: "We're Saving a Spot for Your Child — Don't Miss Out!",
+      html: htmlContent,
+    }
+
+    // Enviar el correo
+    const result = await transporter.sendMail(mailOptions)
+    
+    console.log('✅ Parent Guide email sent successfully:', result.messageId)
+    return { success: true, messageId: result.messageId }
+    
+  } catch (error) {
+    console.error('❌ Error sending Parent Guide email:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
 } 
