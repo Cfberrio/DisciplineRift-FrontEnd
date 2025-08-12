@@ -50,7 +50,7 @@ export default function ExperienceSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ethnocentric-text-blue mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0">DR IS FOR STUDENTS</h2>
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ethnocentric-title-blue mb-7 xs:mb-4 sm:mb-6 px-4 xs:px-0">DR IS FOR STUDENTS</h2>
         </AnimatedSection>
 
         <AnimatedSection animation="fade-down" className="text-center" delay={200}>

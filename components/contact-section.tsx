@@ -89,7 +89,7 @@ export default function ContactSection() {
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
           <h2
-            className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-blue-600 mb-6 xs:mb-8 sm:mb-12 md:mb-16 font-bold px-4 xs:px-0"
+            className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-blue-600 mb-4 xs:mb-8 sm:mb-12 md:mb-16 font-bold px-4 xs:px-0"
             style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.8)" }}
           >
             CONTACT US

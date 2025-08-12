@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, LogIn, User } from "lucide-react"
+import { ChevronDown, ChevronUp, LogIn, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -34,6 +34,7 @@ export default function Header() {
     { name: "CLUB", href: "#club" },
     { name: "FAQ", href: "#faq" },
     { name: "CONTACT US", href: "#contact" },
+    { name: "JOIN TEAM", href: "#join-team" },
   ]
 
   const handleNavClick = (href: string) => {
@@ -70,7 +71,7 @@ export default function Header() {
               isScrolled ? "text-dr-blue" : "text-white",
             )}
           >
-            DISCIPLINE RIFT
+            DISCIPLINE RIft
           </Link>
 
           {/* Desktop Navigation */}
@@ -136,7 +137,7 @@ export default function Header() {
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMenuOpen ? <ChevronUp className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
           </button>
         </div>
       </div>

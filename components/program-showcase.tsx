@@ -209,7 +209,9 @@ export default function ProgramShowcase() {
 
           {/* Description */}
           <div className="text-center mt-6 xs:mt-8 text-white/90 px-4 xs:px-6 sm:px-8 programs-description-mobile">
-            <h4 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4 programs-subtitle-mobile">EXCELLENCE IN EVERY ASPECT</h4>
+                          <h4 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4 programs-subtitle-mobile">
+                {programs[currentIndex].sport.toUpperCase()}
+              </h4>
             <p className="max-w-3xl mx-auto whitespace-pre-line text-sm xs:text-base sm:text-lg programs-text-mobile">{programs[currentIndex].description}</p>
           </div>
         </div>

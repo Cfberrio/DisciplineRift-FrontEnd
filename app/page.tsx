@@ -7,6 +7,7 @@ import ProgramShowcase from "@/components/program-showcase"
 import ClubSection from "@/components/club-section"
 import FaqSection from "@/components/faq-section"
 import ContactSection from "@/components/contact-section"
+import JoinTeamSection from "@/components/join-team-section"
 import RegisterSection from "@/components/register-section"
 import EmailSignupManager from "@/components/email-signup-manager"
 import AnimatedSection from "@/components/animated-section"
@@ -43,7 +44,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:justify-end">
               <div className="w-full md:w-1/2 lg:w-2/5 about-content-mobile">
                 <AnimatedSection animation="fade-left" delay={200}>
-                  <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ethnocentric-text-blue mb-3 xs:mb-4 sm:mb-6 px-4 xs:px-0 about-title-mobile">ABOUT US</h2>
+                  <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ethnocentric-title-blue mb-4 px-4 xs:px-0 about-title-mobile">ABOUT US</h2>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={400}>
                   <p className="mission-text-large text-gray-800 mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile">
@@ -97,6 +98,11 @@ export default function Home() {
         {/* Contact Section - ContactSection component has id="contact" internally */}
         <div id="contact">
           <ContactSection />
+        </div>
+
+        {/* Join Team Section - JoinTeamSection component has id="join-team" internally */}
+        <div id="join-team">
+          <JoinTeamSection />
         </div>
 
         {/* Registration Section - RegisterSection component has id="register" internally */}

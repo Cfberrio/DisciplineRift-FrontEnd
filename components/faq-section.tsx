@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, ChevronDown, ChevronUp } from "lucide-react"
 import AnimatedSection from "@/components/animated-section"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,18 @@ interface FAQItem {
 export default function FAQSection() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const faqItems: FAQItem[] = [
     {
@@ -116,13 +128,17 @@ export default function FAQSection() {
 
   return (
     <section
-      className="py-20 relative overflow-hidden bg-cover bg-center"
+      className="py-20 relative overflow-hidden bg-no-repeat bg-center"
       id="faq"
-      style={{ backgroundImage: "url('/faq-background.png')" }}
+      style={{ 
+        backgroundImage: "url('/faq-background.png')",
+        backgroundSize: isMobile ? "200% auto" : "150% auto",
+        backgroundPosition: "center top"
+      }}
     >
       <div className="container px-4 relative z-10">
-        <AnimatedSection animation="fade-down" className="text-center mb-16 mt-32">
-          <div className="max-w-md mx-auto relative">
+        <AnimatedSection animation="fade-down" className="text-center mb-16 mt-32 md:mt-32 lg:mt-32">
+          <div className="max-w-md mx-auto relative mt-16 md:mt-0">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/80" />
               <input

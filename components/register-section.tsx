@@ -1121,7 +1121,7 @@ export default function RegisterSection() {
     <section className="py-20 bg-white" id="register">
       <div className="container px-4">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-4xl md:text-5xl wild-youth-text-blue mb-6">
+          <h2 className="text-4xl md:text-5xl ethnocentric-title-blue mb-4">
             REGISTER NOW
           </h2>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-16">
@@ -1172,7 +1172,7 @@ export default function RegisterSection() {
                   Find Your School or Team
                 </h3>
                 <div className="relative mb-6">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  
                   <input
                     type="text"
                     placeholder="Search for your school or team..."

@@ -52,7 +52,7 @@ export default function PassionInspiredHero() {
           >
             <Button
               size="lg"
-              className="bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-full min-h-[44px] px-6 xs:px-8 sm:px-10 py-3 xs:py-4 sm:py-5 text-sm xs:text-base sm:text-lg shadow-lg"
+              className="bg-white hover:bg-blue-50 ethnocentric-title-blue font-bold rounded-full min-h-[44px] px-6 xs:px-8 sm:px-10 py-3 xs:py-4 sm:py-5 text-sm xs:text-base sm:text-lg shadow-lg mb-4"
             >
               <Link href="#register" className="flex items-center">
                 REGISTER NOW <ArrowRight className="ml-2 h-5 w-5" />
