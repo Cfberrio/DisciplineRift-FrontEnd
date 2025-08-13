@@ -711,99 +711,68 @@ const createParentGuideEmailTemplate = (email: string, sportInterest?: string) =
     <!DOCTYPE html>
     <html lang="en">
     <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>We're Saving a Spot for Your Child — Don't Miss Out!</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Stay Connected to Your Child's Sports Journey</title>
     </head>
-    <body style="margin:0;padding:0;background-color:#f4f6f8;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:680px;margin:32px auto 40px;background:#ffffff;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,0.08);overflow:hidden;">
-        <tr>
-          <td style="padding:22px 26px 8px;background:linear-gradient(90deg,#0ea5a8,#06b6d4);color:#fff;">
-            <!-- Header -->
-            <table role="presentation" width="100%">
-              <tr>
-                <td style="vertical-align:middle;">
-                  <h1 style="margin:0;font-size:20px;line-height:1.1;font-weight:700;">We're Saving a Spot for Your Child — Don't Miss Out!</h1>
-                </td>
-                <td style="text-align:right;vertical-align:middle;">
-                  <!-- Optional small logo placeholder -->
-                  
-            
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px;">
+      
+      <p>Hi Parent,</p>
+      
+      <p>
+        Sports can be one of the most rewarding experiences for your child — not just for physical health, 
+        but for building confidence, discipline, and teamwork. Even if you can't be at practice, you can still 
+        play a big role in keeping the spark alive at home.
+      </p>
 
-        <tr>
-          <td style="padding:22px 30px 18px;color:#0f172a;">
-            <!-- Greeting -->
-            <p style="margin:0 0 12px;font-size:15px;color:#0f172a;">Hi,</p>
+      <p>Here are <strong>5 simple ways</strong> to stay connected to your child's sports journey this season:</p>
 
-            <!-- Body -->
-            <p style="margin:0 0 12px;font-size:15px;color:#334155;">
-              It looks like you haven't completed the registration yet — and spots are filling quickly. We'd love to see your child out on the court with us this season!
-            </p>
+      <ol>
+        <li>
+          <strong>Start Every Week with Curiosity</strong><br>
+          Ask open-ended questions after practice:
+          <blockquote style="margin: 10px 0; padding-left: 15px; border-left: 3px solid #ccc;">
+            "What was the most fun thing you did today?"<br>
+            "Can you show me something new you learned?"
+          </blockquote>
+          This shows interest without pressure and keeps conversations flowing.
+        </li>
 
-            <p style="margin:0 0 12px;font-size:15px;color:#334155;">
-              Don't forget to take action and register your child for an exciting season filled with growth, fun, and skill-building.
-            </p>
+        <li>
+          <strong>Create a Home Sports Ritual</strong><br>
+          Set aside 10 minutes a couple of times a week to "play" their sport together — soft toss volleyball in the living room, 
+          mini pickleball rallies, or shadow tennis swings. The goal is bonding, not coaching.
+        </li>
 
-            <p style="margin:0 0 16px;font-size:15px;color:#334155;">
-              Whether it's <strong>volleyball</strong>, <strong>tennis</strong>, or <strong>pickleball</strong>, your child will learn from our trained coaches in a supportive, energetic environment that helps them develop a lifelong passion for the sport.
-            </p>
+        <li>
+          <strong>Celebrate Small Wins</strong><br>
+          If they share a moment of progress ("I served over the net!"), mark it on a calendar or a "sports milestones" board. 
+          Progress becomes something you both look forward to.
+        </li>
 
-            ${sportInterest ? `
-              <p style="margin:0 0 16px;font-size:15px;color:#334155;background:#f0f9ff;padding:12px;border-radius:6px;border-left:4px solid #0ea5a8;">
-                <strong>Great choice on ${sportInterest}!</strong> This sport is perfect for building confidence, teamwork, and athletic skills.
-              </p>
-            ` : ''}
+        <li>
+          <strong>Let Them Teach You</strong><br>
+          Invite your child to "coach" you. Kids love taking the lead, and explaining skills helps them internalize what they've learned.
+        </li>
 
-            <!-- Feature list -->
-            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:8px 0 18px;">
-              <tr>
-                <td style="font-size:15px;color:#0f172a;">
-                  <ul style="margin:0;padding-left:18px;color:#0f172a;">
-                    <li style="margin-bottom:6px;">✅ Secure their spot today</li>
-                    <li style="margin-bottom:0;">🧑‍🏫 Trained, caring coaches</li>
-                  </ul>
-                </td>
-              </tr>
-            </table>
+        <li>
+          <strong>Share the Story of Sports</strong><br>
+          Watch short highlight clips together and talk about effort, teamwork, and joy — the values that last long after the game ends.
+        </li>
+      </ol>
 
-            <!-- CTA button -->
-            <p style="text-align:center;margin:14px 0 18px;">
-              <a href="https://www.disciplinerift.com/#register" target="_blank" rel="noopener" style="display:inline-block;padding:12px 20px;border-radius:8px;background:#0ea5a8;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 6px 14px rgba(14,165,168,0.18);">
-                👉 Secure My Child's Spot
-              </a>
-            </p>
+      <p>
+        Small moments like these create lasting memories and keep your child excited to learn, grow, and play.
+      </p>
 
-            <p style="margin:0 0 18px;font-size:14px;color:#475569;">
-              We can't wait to help your child thrive this season!
-            </p>
+      <p>With love,<br>
+      <strong>The Discipline Rift Team</strong></p>
 
-            <!-- Signature -->
-            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:8px;">
-              <tr>
-                <td style="vertical-align:top;padding-top:8px;">
-                  <p style="margin:0;font-weight:700;color:#0b5b6b;">With excitement,</p>
-                  <p style="margin:6px 0 0;color:#334155;font-weight:600;">The Discipline Rift Team</p>
-                </td>
-                <td style="vertical-align:top;padding-top:8px;text-align:right;">
-                  <p style="margin:0;font-size:13px;color:#475569;">📧 <a href="mailto:info@disciplinerift.com" style="color:#0b5b6b;text-decoration:none;">info@disciplinerift.com</a></p>
-                  <p style="margin:6px 0 0;font-size:13px;color:#475569;">📞 (407) 614-7454</p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+      <p>
+        📧 <a href="mailto:info@disciplinerift.com">info@disciplinerift.com</a><br>
+        📞 <a href="tel:+14076147454">(407) 614-7454</a>
+      </p>
 
-        <tr>
-          <td style="background:#f8fafc;padding:14px 26px 20px;border-top:1px solid rgba(15,23,42,0.04);font-size:13px;color:#64748b;">
-            <p style="margin:0;">If you already registered, thank you! If not — click the button above to complete your registration and guarantee your child's spot.</p>
-          </td>
-        </tr>
-      </table>
     </body>
     </html>
   `
@@ -829,7 +798,7 @@ export async function sendParentGuideEmail(email: string, sportInterest?: string
         address: process.env.GMAIL_USER!,
       },
       to: email,
-      subject: "We're Saving a Spot for Your Child — Don't Miss Out!",
+      subject: "Stay Connected to Your Child's Sports Journey",
       html: htmlContent,
     }
 
