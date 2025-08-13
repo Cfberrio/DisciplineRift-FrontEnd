@@ -191,3 +191,11 @@ export interface Payment {
   amount: number;
   enrollmentid: string;
 }
+
+export interface Newsletter {
+  id: string;
+  email: string;
+  sport: string | null;
+  created_at: string;
+  updated_at: string;
+}
