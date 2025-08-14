@@ -331,25 +331,27 @@ const createEmailTemplate = (
             <div class="section">
               <h3><span class="section-icon">📅</span>Practice Schedule</h3>
               ${teamData.session.map(session => `
-                <div class="info-grid" style="margin-bottom: 15px;">
-                  <div class="info-item">
-                    <div class="info-label">Dates</div>
-                    <div class="info-value">${formatDate(session.startdate)} - ${formatDate(session.enddate)}</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="info-label">Time</div>
-                    <div class="info-value">${session.starttime} - ${session.endtime}</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="info-label">Days</div>
-                    <div class="info-value">${session.daysofweek}</div>
-                  </div>
-                  ${session.staff ? `
+                <div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <div class="info-label">Day & Time</div>
+                      <div class="info-value" style="font-weight: 600; color: #1e40af;">${session.daysofweek} - ${session.starttime} - ${session.endtime}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Schedule Period</div>
+                      <div class="info-value">${formatDate(session.startdate)} - ${formatDate(session.enddate)}</div>
+                    </div>
                     <div class="info-item">
                       <div class="info-label">Coach</div>
-                      <div class="info-value">${session.staff.name}</div>
+                      <div class="info-value">${session.staff ? session.staff.name : 'TBD'}</div>
                     </div>
-                  ` : ''}
+                    ${session.staff ? `
+                      <div class="info-item">
+                        <div class="info-label">Coach</div>
+                        <div class="info-value">${session.staff.name}</div>
+                      </div>
+                    ` : ''}
+                  </div>
                 </div>
               `).join('')}
             </div>
