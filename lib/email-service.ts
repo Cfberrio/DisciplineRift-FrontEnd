@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import { buildPracticeOccurrences, formatTimeES, type PracticeOccurrence } from './schedule/buildPracticeOccurrences'
 
 // Configurar el transportador de Gmail
 const createTransporter = () => {
@@ -30,6 +31,7 @@ interface TeamData {
   price: number
   created_at: string
   updated_at: string
+  timezone?: string
   school: {
     name: string
     location: string
@@ -45,6 +47,9 @@ interface TeamData {
       email: string
       phone: string
     }
+  }>
+  practiceOccurrences?: Array<PracticeOccurrence & {
+    timeFormatted: string
   }>
 }
 
@@ -326,34 +331,35 @@ const createEmailTemplate = (
             ` : ''}
           </div>
           
-          <!-- Schedule Information -->
-          ${teamData.session && teamData.session.length > 0 ? `
+          <!-- Practice Schedule - Individual Sessions -->
+          ${teamData.practiceOccurrences && teamData.practiceOccurrences.length > 0 ? `
             <div class="section">
               <h3><span class="section-icon">📅</span>Practice Schedule</h3>
-              ${teamData.session.map(session => `
-                <div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
-                  <div class="info-grid">
-                    <div class="info-item">
-                      <div class="info-label">Day & Time</div>
-                      <div class="info-value" style="font-weight: 600; color: #1e40af;">${session.daysofweek} - ${session.starttime} - ${session.endtime}</div>
-                    </div>
-                    <div class="info-item">
-                      <div class="info-label">Schedule Period</div>
-                      <div class="info-value">${formatDate(session.startdate)} - ${formatDate(session.enddate)}</div>
-                    </div>
-                    <div class="info-item">
-                      <div class="info-label">Coach</div>
-                      <div class="info-value">${session.staff ? session.staff.name : 'TBD'}</div>
-                    </div>
-                    ${session.staff ? `
-                      <div class="info-item">
-                        <div class="info-label">Coach</div>
-                        <div class="info-value">${session.staff.name}</div>
+              <div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  ${teamData.practiceOccurrences?.map((occurrence, index) => `
+                    <li style="padding: 12px 0; border-bottom: ${index < (teamData.practiceOccurrences?.length || 0) - 1 ? '1px solid #f3f4f6' : 'none'}; display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 2px;">
+                          ${occurrence.formattedDateES}
+                        </div>
+                        <div style="color: #6b7280; font-size: 13px;">
+                          ${occurrence.timeFormatted}
+                        </div>
                       </div>
-                    ` : ''}
-                  </div>
+                      <div style="text-align: right; color: #9ca3af; font-size: 12px;">
+                        ${occurrence.location}
+                      </div>
+                    </li>
+                  `).join('')}
+                </ul>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f3f4f6; font-size: 12px; color: #6b7280; text-align: center;">
+                  <strong>Coach:</strong> ${teamData.practiceOccurrences[0]?.coachName || 'TBD'} | 
+                  <strong>Location:</strong> ${teamData.practiceOccurrences[0]?.location || 'TBD'}
+                  <br>
+                  <span style="opacity: 0.8;">Schedule shown in Miami timezone (EST/EDT)</span>
                 </div>
-              `).join('')}
+              </div>
             </div>
           ` : ''}
           
@@ -396,8 +402,49 @@ export async function sendPaymentConfirmationEmail(
 
     const transporter = createTransporter()
 
+    // Calculate individual practice occurrences
+    let enhancedTeamData = { ...teamData };
+    
+    if (teamData.session && teamData.session.length > 0) {
+      const session = teamData.session[0]; // Assuming single session per team
+      
+      // Parse days of week
+      let daysOfWeek: string[] = [];
+      try {
+        if (typeof session.daysofweek === "string") {
+          const rawValue = session.daysofweek.trim();
+          if (rawValue.includes(",")) {
+            daysOfWeek = rawValue.split(",").map((day: string) => day.trim());
+          } else {
+            daysOfWeek = [rawValue];
+          }
+        }
+      } catch (error) {
+        console.warn("Error parsing days of week:", error);
+        daysOfWeek = ["Monday", "Wednesday", "Friday"];
+      }
+
+      // Calculate practice occurrences
+      const practiceOccurrences = buildPracticeOccurrences({
+        startDate: session.startdate,
+        endDate: session.enddate,
+        daysOfWeek,
+        startTime: session.starttime,
+        endTime: session.endtime,
+        location: teamData.school.location,
+        coachName: session.staff?.name || 'TBD',
+        timezone: teamData.timezone || 'America/New_York'
+      });
+
+      // Format times in Spanish and add to team data
+      enhancedTeamData.practiceOccurrences = practiceOccurrences.map(occurrence => ({
+        ...occurrence,
+        timeFormatted: formatTimeES(occurrence.time)
+      }));
+    }
+
     // Generar el HTML del correo
-    const htmlContent = createEmailTemplate(studentData, teamData, paymentData, parentData)
+    const htmlContent = createEmailTemplate(studentData, enhancedTeamData, paymentData, parentData)
 
     // Configurar el correo
     const mailOptions = {
@@ -778,6 +825,186 @@ const createParentGuideEmailTemplate = (email: string, sportInterest?: string) =
     </body>
     </html>
   `
+}
+
+// Template HTML para recordatorios de sesión
+const createSessionReminderTemplate = (
+  studentName: string,
+  teamName: string,
+  schoolName: string,
+  sessionDate: string,
+  sessionTime: string,
+  schoolLocation: string,
+  reminderType: string
+) => {
+  const reminderMessages = {
+    '30d': {
+      title: '🗓️ Recordatorio: Tu sesión de entrenamiento es en 30 días',
+      message: 'Tu sesión de entrenamiento se acerca. Asegúrate de tener todo listo.',
+      urgency: 'info'
+    },
+    '7d': {
+      title: '⏰ Recordatorio: Tu sesión de entrenamiento es en 7 días',
+      message: 'Tu sesión de entrenamiento es la próxima semana. Prepara tu equipo deportivo.',
+      urgency: 'warning'
+    },
+    '1d': {
+      title: '🚨 Recordatorio: Tu sesión de entrenamiento es MAÑANA',
+      message: 'Tu sesión de entrenamiento es mañana. ¡No olvides asistir!',
+      urgency: 'urgent'
+    }
+  };
+
+  const reminder = reminderMessages[reminderType as keyof typeof reminderMessages] || reminderMessages['1d'];
+  const urgencyColors = {
+    info: '#3b82f6',
+    warning: '#f59e0b',
+    urgent: '#ef4444'
+  };
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${reminder.title}</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px;">
+      
+      <div style="background: linear-gradient(135deg, ${urgencyColors[reminder.urgency as keyof typeof urgencyColors]} 0%, #1e40af 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+        <h1 style="margin: 0; font-size: 24px;">${reminder.title}</h1>
+        <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">${reminder.message}</p>
+      </div>
+
+      <div style="background-color: #f8fafc; padding: 25px; border-radius: 8px; border-left: 4px solid ${urgencyColors[reminder.urgency as keyof typeof urgencyColors]}; margin-bottom: 25px;">
+        <h2 style="color: #1e40af; margin-top: 0; font-size: 20px;">📋 Detalles de la Sesión</h2>
+        
+        <div style="background-color: white; padding: 20px; border-radius: 6px; margin: 15px 0;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 120px;">Estudiante:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${studentName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Equipo:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${teamName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Escuela:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${schoolName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Fecha:</td>
+              <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">${new Date(sessionDate).toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Hora:</td>
+              <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">${sessionTime}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Ubicación:</td>
+              <td style="padding: 8px 0; color: #1f2937;">${schoolLocation}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 25px;">
+        <h3 style="color: #059669; margin-top: 0; font-size: 18px;">✅ Qué traer a la sesión:</h3>
+        <ul style="margin: 10px 0; padding-left: 20px; color: #374151;">
+          <li>Ropa deportiva cómoda</li>
+          <li>Zapatos deportivos apropiados</li>
+          <li>Botella de agua</li>
+          <li>Toalla pequeña</li>
+          <li>Actitud positiva y ganas de aprender</li>
+        </ul>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <p style="color: #6b7280; font-size: 14px;">
+          Si tienes alguna pregunta o necesitas reprogramar, contáctanos:<br>
+          📧 <a href="mailto:info@disciplinerift.com" style="color: #3b82f6;">info@disciplinerift.com</a><br>
+          📞 <a href="tel:+14076147454" style="color: #3b82f6;">(407) 614-7454</a>
+        </p>
+      </div>
+
+      <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; border-radius: 8px; text-align: center; margin-top: 30px;">
+        <p style="margin: 0; font-size: 12px;">
+          Este es un recordatorio automático de Discipline Rift<br>
+          Enviado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}
+        </p>
+      </div>
+
+    </body>
+    </html>
+  `;
+};
+
+// Función para enviar recordatorio de sesión
+export async function sendSessionReminderEmail(data: {
+  parentEmail: string;
+  studentName: string;
+  teamName: string;
+  schoolName: string;
+  sessionDate: string;
+  sessionTime: string;
+  schoolLocation: string;
+  reminderType: string;
+}) {
+  try {
+    // Verificar que las credenciales de Gmail estén configuradas
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      throw new Error('Gmail credentials not configured');
+    }
+
+    const transporter = createTransporter();
+
+    // Generar el HTML del correo
+    const htmlContent = createSessionReminderTemplate(
+      data.studentName,
+      data.teamName,
+      data.schoolName,
+      data.sessionDate,
+      data.sessionTime,
+      data.schoolLocation,
+      data.reminderType
+    );
+
+    const reminderTypeNames = {
+      '30d': '30 días',
+      '7d': '7 días', 
+      '1d': '1 día'
+    };
+
+    const reminderName = reminderTypeNames[data.reminderType as keyof typeof reminderTypeNames] || 'próximamente';
+
+    // Configurar el correo
+    const mailOptions = {
+      from: {
+        name: 'Discipline Rift',
+        address: process.env.GMAIL_USER!,
+      },
+      to: data.parentEmail,
+      subject: `🏐 Recordatorio: Sesión de ${data.studentName} en ${reminderName}`,
+      html: htmlContent,
+    };
+
+    // Enviar el correo
+    const result = await transporter.sendMail(mailOptions);
+    
+    console.log('✅ Session reminder email sent successfully:', result.messageId);
+    return { success: true, messageId: result.messageId };
+    
+  } catch (error) {
+    console.error('❌ Error sending session reminder email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
 }
 
 // Función para enviar el email del Parent Guide desde el popup

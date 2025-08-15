@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { Team, School } from "./supabase";
+import { buildPracticeOccurrences } from "./schedule/buildPracticeOccurrences";
 
 export async function getSchools() {
   try {
@@ -287,16 +288,16 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
               parsedDaysOfWeek = ["Monday", "Wednesday", "Friday"];
             }
 
-            // Calculate individual sessions
-            const individualSessions = calculateIndividualSessions(
-              session.startdate,
-              session.enddate,
-              parsedDaysOfWeek,
-              session.starttime,
-              session.endtime,
-              school.location,
-              coachInfo?.name || "TBD"
-            );
+            // Calculate individual sessions using shared utility
+            const individualSessions = buildPracticeOccurrences({
+              startDate: session.startdate,
+              endDate: session.enddate,
+              daysOfWeek: parsedDaysOfWeek,
+              startTime: session.starttime,
+              endTime: session.endtime,
+              location: school.location,
+              coachName: coachInfo?.name || "TBD"
+            });
 
             return {
               ...session,
@@ -383,136 +384,10 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
   }
 }
 
-function calculateIndividualSessions(
-  startDate: string,
-  endDate: string,
-  daysOfWeek: string[],
-  startTime: string,
-  endTime: string,
-  location: string,
-  coachName: string
-): Array<{
-  id: string;
-  date: Date;
-  dayOfWeek: string;
-  time: string;
-  duration: string;
-  location: string;
-  coachName: string;
-  formattedDate: string;
-}> {
-  try {
-    if (
-      !startDate ||
-      !endDate ||
-      !Array.isArray(daysOfWeek) ||
-      daysOfWeek.length === 0
-    ) {
-      return [];
-    }
+// Individual sessions calculation is now handled by buildPracticeOccurrences
+// from lib/schedule/buildPracticeOccurrences.ts
 
-    // Pre-calculate time string and duration once
-    const timeString = `${startTime || "3:00 PM"} - ${endTime || "4:30 PM"}`;
-    const durationString = calculateDuration(startTime, endTime);
-    const locationString = location || "TBD";
-    const coachNameString = coachName || "TBD";
-
-    const dayMap: { [key: string]: number } = {
-      Sunday: 0,
-      Monday: 1,
-      Tuesday: 2,
-      Wednesday: 3,
-      Thursday: 4,
-      Friday: 5,
-      Saturday: 6,
-    };
-
-    const targetDays = daysOfWeek
-      .map((day) => dayMap[day.trim()])
-      .filter((day) => day !== undefined);
-
-    if (targetDays.length === 0) {
-      return [];
-    }
-
-    const start = new Date(startDate + "T00:00:00");
-    const end = new Date(endDate + "T23:59:59"); // Include the entire end date
-    const sessions: Array<{
-      id: string;
-      date: Date;
-      dayOfWeek: string;
-      time: string;
-      duration: string;
-      location: string;
-      coachName: string;
-      formattedDate: string;
-    }> = [];
-
-    const currentDate = new Date(start);
-    let sessionCounter = 0;
-    const maxSessions = Math.min(
-      50,
-      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 7))
-    ); // Limit to 50 sessions or reasonable amount
-
-    while (currentDate <= end && sessionCounter < maxSessions) {
-      const dayOfWeek = currentDate.getDay();
-
-      if (targetDays.includes(dayOfWeek)) {
-        const dayName =
-          Object.keys(dayMap).find((key) => dayMap[key] === dayOfWeek) ||
-          "Unknown";
-
-        sessions.push({
-          id: `session-${sessionCounter++}-${
-            currentDate.toISOString().split("T")[0]
-          }`,
-          date: new Date(currentDate),
-          dayOfWeek: dayName,
-          time: timeString,
-          duration: durationString,
-          location: locationString,
-          coachName: coachNameString,
-          formattedDate: currentDate.toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          }),
-        });
-      }
-
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    return sessions;
-  } catch (error) {
-    console.error(
-      "[SESSIONS] ❌ Error calculating individual sessions:",
-      error
-    );
-    return [];
-  }
-}
-
-function calculateDuration(startTime: string, endTime: string): string {
-  try {
-    if (!startTime || !endTime) return "1h 30m";
-
-    const start = new Date(`2000-01-01 ${startTime}`);
-    const end = new Date(`2000-01-01 ${endTime}`);
-    const diffMs = end.getTime() - start.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (diffHours > 0) {
-      return `${diffHours}h ${diffMinutes > 0 ? diffMinutes + "m" : ""}`.trim();
-    }
-    return `${diffMinutes}m`;
-  } catch {
-    return "1h 30m";
-  }
-}
+// Duration calculation is now handled by buildPracticeOccurrences
 
 export async function filterSchoolsAndTeams(
   allSchools: Array<School & { teams: Team[] }>,
