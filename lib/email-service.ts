@@ -425,12 +425,20 @@ export async function sendPaymentConfirmationEmail(
       }
 
       // Calculate practice occurrences
+      // Ensure times are in HH:MM format (remove seconds if present)
+      const cleanStartTime = session.starttime?.includes(':') 
+        ? session.starttime.substring(0, 5) 
+        : session.starttime;
+      const cleanEndTime = session.endtime?.includes(':') 
+        ? session.endtime.substring(0, 5) 
+        : session.endtime;
+
       const practiceOccurrences = buildPracticeOccurrences({
         startDate: session.startdate,
         endDate: session.enddate,
         daysOfWeek,
-        startTime: session.starttime,
-        endTime: session.endtime,
+        startTime: cleanStartTime,
+        endTime: cleanEndTime,
         location: teamData.school.location,
         coachName: session.staff?.name || 'TBD',
         timezone: teamData.timezone || 'America/New_York'

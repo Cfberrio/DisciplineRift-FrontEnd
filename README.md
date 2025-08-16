@@ -60,6 +60,13 @@ SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 # Stripe Configuration
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=tu_stripe_publishable_key
 STRIPE_SECRET_KEY=tu_stripe_secret_key
+
+# Gmail SMTP Configuration (para emails automáticos)
+GMAIL_USER=tu-email@gmail.com
+GMAIL_APP_PASSWORD=tu_gmail_app_password
+
+# Jobs y Schedulers (opcional)
+ENABLE_SCHEDULERS=1              # Habilitar jobs automáticos en desarrollo
 ```
 
 ### 4. Ejecutar en desarrollo
@@ -105,19 +112,87 @@ Para acceder al panel de administración:
 ├── components/            # Componentes React
 │   ├── ui/               # Componentes de UI base
 │   └── ...               # Componentes específicos
+├── jobs/                  # Jobs programados y tareas automáticas
 ├── lib/                   # Utilidades y configuraciones
 ├── hooks/                 # Custom React Hooks
+├── scripts/               # Scripts CLI para mantenimiento
 └── public/               # Archivos estáticos
 ```
 
 ## 🔧 Scripts Disponibles
 
 ```bash
+# Desarrollo y producción
 npm run dev      # Servidor de desarrollo
 npm run build    # Build de producción
 npm run start    # Servidor de producción
 npm run lint     # Linter
+
+# Jobs y recordatorios automáticos
+npm run season-reminders           # Ejecutar recordatorios de temporada
+npm run season-reminders:dry-run   # Modo prueba (no envía emails)
+npm run season-reminders:test      # Ejecutar con fecha de prueba
 ```
+
+## 🤖 Jobs Automáticos y Recordatorios
+
+### Recordatorios de Temporada
+
+El sistema incluye un job automático que envía recordatorios por email a los padres cuando la temporada de su equipo está a punto de comenzar.
+
+#### Características:
+- **Programación**: Se ejecuta diariamente a las 20:30 (hora de Miami/Nueva York)
+- **Criterio**: Envía emails cuando la temporada comienza exactamente en 30 días
+- **Deduplicación**: Un email por padre por sesión (aunque tenga múltiples hijos en el mismo equipo)
+- **Contenido**: Incluye horario completo de la temporada con fechas y horas específicas
+
+#### Configuración Requerida:
+```env
+# Supabase para acceso a datos
+NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
+
+# Gmail para envío de emails
+GMAIL_USER=tu-email@gmail.com
+GMAIL_APP_PASSWORD=tu_gmail_app_password
+```
+
+#### Ejecución Manual:
+```bash
+# Ejecutar con fecha actual
+npm run season-reminders
+
+# Modo prueba (recomendado para testing)
+npm run season-reminders:dry-run
+
+# Ejecutar con fecha específica para testing
+TEST_DATE=2024-01-15 npm run season-reminders
+```
+
+#### Configuración de Gmail:
+
+1. **Habilitar 2FA** en tu cuenta de Google
+2. **Generar App Password**:
+   - Ve a [Google Account Security](https://myaccount.google.com/security)
+   - Selecciona "App passwords"
+   - Selecciona "Mail" como aplicación
+   - Copia la contraseña de 16 caracteres
+3. **Configurar variables**:
+   - `GMAIL_USER`: Tu dirección de Gmail
+   - `GMAIL_APP_PASSWORD`: La contraseña de aplicación generada
+
+#### Activación del Scheduler:
+
+- **Producción**: Se activa automáticamente
+- **Desarrollo**: Requiere `ENABLE_SCHEDULERS=1` en `.env.local`
+
+#### Logs y Monitoreo:
+
+El job proporciona logs detallados:
+- Sesiones encontradas y procesadas
+- Enrollments y padres identificados
+- Emails enviados exitosamente
+- Errores y problemas encontrados
 
 ## 🎨 Diseño y UI
 

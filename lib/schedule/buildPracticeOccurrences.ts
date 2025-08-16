@@ -104,36 +104,87 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
       return [];
     }
 
-    const start = new Date(startDate + "T00:00:00");
-    const end = new Date(endDate + "T23:59:59");
+    // Parse dates using explicit timezone handling to avoid date shifting
+    // Split the date string and create Date objects more explicitly
+    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+    
+    // Create dates in local time to avoid timezone conversion issues
+    const start = new Date(startYear, startMonth - 1, startDay); // month is 0-indexed
+    const end = new Date(endYear, endMonth - 1, endDay);
     const exceptionsSet = new Set(exceptions);
     
+    // NEW LOGIC: Find the first occurrence that matches the desired days
+    // If startDate doesn't match the target day, look backward first
+    const actualStartDate = new Date(start);
+    const currentDayOfWeek = actualStartDate.getDay();
+    
+    // Check if the start date matches any of the target days
+    const isStartDateValid = targetDays.includes(currentDayOfWeek);
+    
+    if (!isStartDateValid) {
+      // Look backward up to 7 days to find a matching day
+      let foundValidStart = false;
+      for (let i = 1; i <= 7; i++) {
+        const testDate = new Date(start);
+        testDate.setDate(testDate.getDate() - i);
+        
+        if (targetDays.includes(testDate.getDay())) {
+          actualStartDate.setDate(actualStartDate.getDate() - i);
+          foundValidStart = true;
+          console.log(`[PRACTICE_OCCURRENCES] 🔄 Adjusted start date from ${startDate} to ${actualStartDate.getFullYear()}-${String(actualStartDate.getMonth() + 1).padStart(2, '0')}-${String(actualStartDate.getDate()).padStart(2, '0')} to match ${daysOfWeek.join(', ')}`);
+          break;
+        }
+      }
+      
+      // If no valid day found backward, look forward (original behavior)
+      if (!foundValidStart) {
+        for (let i = 1; i <= 7; i++) {
+          const testDate = new Date(start);
+          testDate.setDate(testDate.getDate() + i);
+          
+          if (targetDays.includes(testDate.getDay())) {
+            actualStartDate.setDate(actualStartDate.getDate() + i);
+            console.log(`[PRACTICE_OCCURRENCES] ⏭️ Adjusted start date forward from ${startDate} to ${actualStartDate.getFullYear()}-${String(actualStartDate.getMonth() + 1).padStart(2, '0')}-${String(actualStartDate.getDate()).padStart(2, '0')} to match ${daysOfWeek.join(', ')}`);
+            break;
+          }
+        }
+      }
+    }
+    
     const sessions: PracticeOccurrence[] = [];
-    const currentDate = new Date(start);
+    const currentDate = new Date(actualStartDate);
     let sessionCounter = 0;
-    const maxSessions = Math.min(
-      50,
-      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 7))
-    );
+    
+    // Calculate max sessions more accurately
+    // Get total days in range and calculate potential sessions
+    const totalDays = Math.ceil((end.getTime() - actualStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 to include end date
+    const potentialSessions = Math.ceil(totalDays / 7) * targetDays.length + 2; // Add buffer for edge cases
+    const maxSessions = Math.min(50, potentialSessions);
 
     while (currentDate <= end && sessionCounter < maxSessions) {
       const dayOfWeek = currentDate.getDay();
-      const currentDateISO = currentDate.toISOString().split("T")[0];
+      // Create ISO date string manually to ensure consistency
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const currentDateISO = `${year}-${month}-${day}`;
 
       if (targetDays.includes(dayOfWeek) && !exceptionsSet.has(currentDateISO)) {
         const dayName =
           Object.keys(dayMap).find((key) => dayMap[key] === dayOfWeek) ||
           "Unknown";
 
-        // Format for English (Team Details UI)
+        // Format for English (Team Details UI) - Force timezone to avoid shifting
         const formattedDate = currentDate.toLocaleDateString("en-US", {
           weekday: "long",
           month: "short",
           day: "numeric",
           year: "numeric",
+          timeZone: timezone
         });
 
-        // Format for English (Email) - Miami timezone
+        // Format for English (Email) - Miami timezone with consistent date
         const formattedDateES = currentDate.toLocaleDateString("en-US", {
           weekday: "long",
           day: "2-digit",

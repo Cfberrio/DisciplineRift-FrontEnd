@@ -67,3 +67,4 @@ $$;
 -- Dar permisos a la función
 GRANT EXECUTE ON FUNCTION get_sessions_for_reminders() TO anon;
 GRANT EXECUTE ON FUNCTION get_sessions_for_reminders() TO authenticated;
+

@@ -30,3 +30,4 @@ ALTER TABLE session_reminders ENABLE ROW LEVEL SECURITY;
 -- Política para permitir operaciones del service role
 CREATE POLICY "Allow service role full access" ON session_reminders
   FOR ALL USING (auth.role() = 'service_role');
+
