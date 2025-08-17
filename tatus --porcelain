@@ -1,0 +1,3419 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex e9e2f95..9e091ae 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -60,13 +60,6 @@[m [mSUPABASE_SERVICE_ROLE_KEY=tu_service_role_key[m
+ # Stripe Configuration[m
+ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=tu_stripe_publishable_key[m
+ STRIPE_SECRET_KEY=tu_stripe_secret_key[m
+[31m-[m
+[31m-# Gmail SMTP Configuration (para emails automáticos)[m
+[31m-GMAIL_USER=tu-email@gmail.com[m
+[31m-GMAIL_APP_PASSWORD=tu_gmail_app_password[m
+[31m-[m
+[31m-# Jobs y Schedulers (opcional)[m
+[31m-ENABLE_SCHEDULERS=1              # Habilitar jobs automáticos en desarrollo[m
+ ```[m
+ [m
+ ### 4. Ejecutar en desarrollo[m
+[36m@@ -112,88 +105,20 @@[m [mPara acceder al panel de administración:[m
+ ├── components/            # Componentes React[m
+ │   ├── ui/               # Componentes de UI base[m
+ │   └── ...               # Componentes específicos[m
+[31m-├── jobs/                  # Jobs programados y tareas automáticas[m
+ ├── lib/                   # Utilidades y configuraciones[m
+ ├── hooks/                 # Custom React Hooks[m
+[31m-├── scripts/               # Scripts CLI para mantenimiento[m
+ └── public/               # Archivos estáticos[m
+ ```[m
+ [m
+ ## 🔧 Scripts Disponibles[m
+ [m
+ ```bash[m
+[31m-# Desarrollo y producción[m
+ npm run dev      # Servidor de desarrollo[m
+ npm run build    # Build de producción[m
+ npm run start    # Servidor de producción[m
+ npm run lint     # Linter[m
+[31m-[m
+[31m-# Jobs y recordatorios automáticos[m
+[31m-npm run season-reminders           # Ejecutar recordatorios de temporada[m
+[31m-npm run season-reminders:dry-run   # Modo prueba (no envía emails)[m
+[31m-npm run season-reminders:test      # Ejecutar con fecha de prueba[m
+[31m-```[m
+[31m-[m
+[31m-## 🤖 Jobs Automáticos y Recordatorios[m
+[31m-[m
+[31m-### Recordatorios de Temporada[m
+[31m-[m
+[31m-El sistema incluye un job automático que envía recordatorios por email a los padres cuando la temporada de su equipo está a punto de comenzar.[m
+[31m-[m
+[31m-#### Características:[m
+[31m-- **Programación**: Se ejecuta diariamente a las 20:30 (hora de Miami/Nueva York)[m
+[31m-- **Criterio**: Envía emails cuando la temporada comienza exactamente en 30 días[m
+[31m-- **Deduplicación**: Un email por padre por sesión (aunque tenga múltiples hijos en el mismo equipo)[m
+[31m-- **Contenido**: Incluye horario completo de la temporada con fechas y horas específicas[m
+[31m-[m
+[31m-#### Configuración Requerida:[m
+[31m-```env[m
+[31m-# Supabase para acceso a datos[m
+[31m-NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url[m
+[31m-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key[m
+[31m-[m
+[31m-# Gmail para envío de emails[m
+[31m-GMAIL_USER=tu-email@gmail.com[m
+[31m-GMAIL_APP_PASSWORD=tu_gmail_app_password[m
+[31m-```[m
+[31m-[m
+[31m-#### Ejecución Manual:[m
+[31m-```bash[m
+[31m-# Ejecutar con fecha actual[m
+[31m-npm run season-reminders[m
+[31m-[m
+[31m-# Modo prueba (recomendado para testing)[m
+[31m-npm run season-reminders:dry-run[m
+[31m-[m
+[31m-# Ejecutar con fecha específica para testing[m
+[31m-TEST_DATE=2024-01-15 npm run season-reminders[m
+ ```[m
+ [m
+[31m-#### Configuración de Gmail:[m
+[31m-[m
+[31m-1. **Habilitar 2FA** en tu cuenta de Google[m
+[31m-2. **Generar App Password**:[m
+[31m-   - Ve a [Google Account Security](https://myaccount.google.com/security)[m
+[31m-   - Selecciona "App passwords"[m
+[31m-   - Selecciona "Mail" como aplicación[m
+[31m-   - Copia la contraseña de 16 caracteres[m
+[31m-3. **Configurar variables**:[m
+[31m-   - `GMAIL_USER`: Tu dirección de Gmail[m
+[31m-   - `GMAIL_APP_PASSWORD`: La contraseña de aplicación generada[m
+[31m-[m
+[31m-#### Activación del Scheduler:[m
+[31m-[m
+[31m-- **Producción**: Se activa automáticamente[m
+[31m-- **Desarrollo**: Requiere `ENABLE_SCHEDULERS=1` en `.env.local`[m
+[31m-[m
+[31m-#### Logs y Monitoreo:[m
+[31m-[m
+[31m-El job proporciona logs detallados:[m
+[31m-- Sesiones encontradas y procesadas[m
+[31m-- Enrollments y padres identificados[m
+[31m-- Emails enviados exitosamente[m
+[31m-- Errores y problemas encontrados[m
+[31m-[m
+ ## 🎨 Diseño y UI[m
+ [m
+ - **Design System**: Implementación consistente con Tailwind CSS[m
+[1mdiff --git a/app/api/sessions/send-reminder/route.ts b/app/api/sessions/send-reminder/route.ts[m
+[1mindex 8690173..24104a2 100644[m
+[1m--- a/app/api/sessions/send-reminder/route.ts[m
+[1m+++ b/app/api/sessions/send-reminder/route.ts[m
+[36m@@ -99,4 +99,3 @@[m [mexport async function POST(request: Request) {[m
+     );[m
+   }[m
+ }[m
+[31m-[m
+[1mdiff --git a/app/api/sessions/upcoming/route.ts b/app/api/sessions/upcoming/route.ts[m
+[1mindex 5f4ade1..d3735e6 100644[m
+[1m--- a/app/api/sessions/upcoming/route.ts[m
+[1m+++ b/app/api/sessions/upcoming/route.ts[m
+[36m@@ -156,4 +156,3 @@[m [mexport async function GET(request: Request) {[m
+     );[m
+   }[m
+ }[m
+[31m-[m
+[1mdiff --git a/force-push.bat b/force-push.bat[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8375d22[m
+[1m--- /dev/null[m
+[1m+++ b/force-push.bat[m
+[36m@@ -0,0 +1,47 @@[m
+[32m+[m[32m@echo off[m
+[32m+[m[32mecho ========================================[m
+[32m+[m[32mecho FORZANDO PUSH AL REPOSITORIO GITHUB[m
+[32m+[m[32mecho ========================================[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 1. Verificando estado actual...[m
+[32m+[m[32mgit status[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 2. Añadiendo todos los archivos...[m
+[32m+[m[32mgit add .[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 3. Verificando si hay cambios para commitear...[m
+[32m+[m[32mgit status --porcelain[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 4. Commiteando cambios (si los hay)...[m
+[32m+[m[32mgit commit -m "feat: Implement season reminders system and fix date issues - Add automated daily job for season reminders (20:30 NY time) - Implement season reminders with HTML email templates - Add retry mechanism for failed email sends - Fix buildPracticeOccurrences backward date search - Fix missing last session in practice schedules - Add comprehensive CLI scripts for testing and management - Update email service to handle time format cleaning - Add scheduler system with cron jobs"[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 5. Verificando ramas...[m
+[32m+[m[32mgit branch -a[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 6. Intentando push a fresh-start...[m
+[32m+[m[32mgit push origin fresh-start[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 7. Si falla, creando upstream...[m
+[32m+[m[32mgit push -u origin fresh-start[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 8. Verificando estado final...[m
+[32m+[m[32mgit status[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 9. Mostrando ultimo commit...[m
+[32m+[m[32mgit log --oneline -1[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho ========================================[m
+[32m+[m[32mecho PROCESO COMPLETADO[m
+[32m+[m[32mecho ========================================[m
+[32m+[m
+[32m+[m[32mpause[m
+[1mdiff --git a/h origin fresh-start b/h origin fresh-start[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5f1c822[m
+[1m--- /dev/null[m
+[1m+++ b/h origin fresh-start[m	
+[36m@@ -0,0 +1,6 @@[m
+[32m+[m[32m* [32mfresh-start[m[m
+[32m+[m[32m  main[m[m
+[32m+[m[32m  [31mremotes/disciplinerift/main[m[m
+[32m+[m[32m  [31mremotes/origin/HEAD[m -> origin/main[m
+[32m+[m[32m  [31mremotes/origin/fresh-start[m[m
+[32m+[m[32m  [31mremotes/origin/main[m[m
+[1mdiff --git a/jobs/README.md b/jobs/README.md[m
+[1mdeleted file mode 100644[m
+[1mindex 56e0d90..0000000[m
+[1m--- a/jobs/README.md[m
+[1m+++ /dev/null[m
+[36m@@ -1,135 +0,0 @@[m
+[31m-# Jobs Automáticos - Discipline Rift[m
+[31m-[m
+[31m-Este directorio contiene los jobs automáticos y tareas programadas del sistema.[m
+[31m-[m
+[31m-## 📋 Jobs Disponibles[m
+[31m-[m
+[31m-### 🏐 Season Reminders (`sendSeasonReminders.ts`)[m
+[31m-[m
+[31m-**Descripción**: Envía recordatorios por email a los padres cuando la temporada de su equipo comienza en exactamente 30 días.[m
+[31m-[m
+[31m-**Programación**: Diariamente a las 20:30 America/New_York[m
+[31m-[m
+[31m-**Funcionalidades**:[m
+[31m-- ✅ Busca sesiones que inicien exactamente en 30 días[m
+[31m-- ✅ Identifica enrollments activos para cada sesión[m
+[31m-- ✅ Resuelve información de estudiantes y padres[m
+[31m-- ✅ Deduplicación automática (un email por padre por sesión)[m
+[31m-- ✅ Construye horario completo de temporada con fechas y horas[m
+[31m-- ✅ Envío de emails con template HTML responsive[m
+[31m-- ✅ Logs detallados y manejo de errores[m
+[31m-- ✅ Soporte para múltiples formatos de días de la semana[m
+[31m-[m
+[31m-**Criterios de Negocio**:[m
+[31m-1. Solo sesiones con `startdate` = hoy + 30 días[m
+[31m-2. Solo enrollments con `isactive = true`[m
+[31m-3. Un email por combinación de (padre, sesión)[m
+[31m-4. Subject: `{teamname} Season Starts in One Month! Discipline Rift`[m
+[31m-5. Fallback a `Team {teamid}` si no hay nombre de equipo[m
+[31m-[m
+[31m-**Funciones Exportadas**:[m
+[31m-- `runSeasonReminders(opts?: { now?: Date })`: Función principal del job[m
+[31m-- `checkSeasonRemindersConfig()`: Verificación de configuración[m
+[31m-[m
+[31m-## 🔧 Configuración[m
+[31m-[m
+[31m-### Variables de Entorno Requeridas:[m
+[31m-```env[m
+[31m-# Supabase (RLS deshabilitado - solo clave anónima)[m
+[31m-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url[m
+[31m-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key[m
+[31m-[m
+[31m-# Gmail[m
+[31m-GMAIL_USER=your-email@gmail.com[m
+[31m-GMAIL_APP_PASSWORD=your_app_password[m
+[31m-```[m
+[31m-[m
+[31m-### Variables Opcionales:[m
+[31m-```env[m
+[31m-ENABLE_SCHEDULERS=1          # Habilitar en desarrollo[m
+[31m-DRY_RUN=1                    # Modo prueba (futuro)[m
+[31m-TEST_DATE=2024-01-15         # Fecha específica para testing[m
+[31m-```[m
+[31m-[m
+[31m-## 🚀 Ejecución[m
+[31m-[m
+[31m-### Manual (CLI):[m
+[31m-```bash[m
+[31m-# Ejecutar normalmente[m
+[31m-npm run season-reminders[m
+[31m-[m
+[31m-# Con fecha específica para testing[m
+[31m-npm run season-reminders:test[m
+[31m-[m
+[31m-# Modo prueba (próximamente)[m
+[31m-npm run season-reminders:dry-run[m
+[31m-```[m
+[31m-[m
+[31m-### Automática (Scheduler):[m
+[31m-El scheduler se inicia automáticamente en:[m
+[31m-- ✅ **Producción**: Siempre activo[m
+[31m-- ⚠️ **Desarrollo**: Requiere `ENABLE_SCHEDULERS=1`[m
+[31m-[m
+[31m-## 📊 Monitoreo y Logs[m
+[31m-[m
+[31m-El job proporciona logs estructurados:[m
+[31m-[m
+[31m-```[m
+[31m-🚀 === INICIANDO JOB DE RECORDATORIOS DE TEMPORADA ===[m
+[31m-📅 Fecha actual (NY): 2024-01-15[m
+[31m-🎯 Buscando sesiones que inician en: 2024-02-14[m
+[31m-🔍 Consultando sesiones...[m
+[31m-📊 Encontradas 3 sesiones[m
+[31m-[m
+[31m-🏐 Procesando sesión abc123 del equipo team456[m
+[31m-👥 Encontradas 12 inscripciones activas[m
+[31m-✅ Email enviado a parent@email.com (msg-id-123)[m
+[31m-[m
+[31m-📊 === RESUMEN DEL JOB ===[m
+[31m-🎯 Sesiones procesadas: 3[m
+[31m-📧 Emails enviados: 15[m
+[31m-❌ Errores: 0[m
+[31m-✅ Job completado exitosamente[m
+[31m-```[m
+[31m-[m
+[31m-## 🧪 Testing[m
+[31m-[m
+[31m-### Casos de Prueba Recomendados:[m
+[31m-[m
+[31m-1. **Test con fecha específica**:[m
+[31m-   ```bash[m
+[31m-   TEST_DATE=2024-01-15 npm run season-reminders[m
+[31m-   ```[m
+[31m-[m
+[31m-2. **Test de configuración**:[m
+[31m-   ```bash[m
+[31m-   npx tsx -e "import { checkSeasonRemindersConfig } from './jobs/sendSeasonReminders'; checkSeasonRemindersConfig().then(console.log)"[m
+[31m-   ```[m
+[31m-[m
+[31m-3. **Test de parseo de días**:[m
+[31m-   - Probar con: `"Mon,Tue,Wed"`, `"m, tue, wednesday"`, `"Monday; Tuesday"`[m
+[31m-   - Verificar que maneja formatos inconsistentes[m
+[31m-[m
+[31m-### Datos de Test Sugeridos:[m
+[31m-[m
+[31m-Para testing, crea datos en Supabase con:[m
+[31m-- **session**: `startdate` = fecha actual + 30 días[m
+[31m-- **enrollment**: Con `isactive = true`[m
+[31m-- **student** y **parent**: Con emails válidos para testing[m
+[31m-[m
+[31m-## 🔒 Seguridad[m
+[31m-[m
+[31m-- ✅ Usa NEXT_PUBLIC_SUPABASE_ANON_KEY con RLS deshabilitado[m
+[31m-- ✅ Valida configuración antes de ejecutar[m
+[31m-- ✅ Manejo de errores sin exponer credenciales[m
+[31m-- ✅ Límites de safety (máx 1000 sesiones, 10000 enrollments)[m
+[31m-- ✅ Deduplicación para evitar spam[m
+[31m-[m
+[31m-## 📈 Futuras Mejoras[m
+[31m-[m
+[31m-- [ ] Modo dry-run completo[m
+[31m-- [ ] Recordatorios adicionales (7 días, 1 día antes)[m
+[31m-- [ ] Templates de email personalizables[m
+[31m-- [ ] Webhooks para notificaciones de estado[m
+[31m-- [ ] Dashboard de monitoreo[m
+[31m-- [ ] Soporte para múltiples zonas horarias[m
+[1mdiff --git a/jobs/sendSeasonReminders.ts b/jobs/sendSeasonReminders.ts[m
+[1mdeleted file mode 100644[m
+[1mindex a35b1be..0000000[m
+[1m--- a/jobs/sendSeasonReminders.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,500 +0,0 @@[m
+[31m-// Cargar variables de entorno si no están disponibles (para scripts CLI)[m
+[31m-if (typeof window === 'undefined' && !process.env.NEXT_PUBLIC_SUPABASE_URL) {[m
+[31m-  try {[m
+[31m-    const dotenv = require('dotenv');[m
+[31m-    const path = require('path');[m
+[31m-    dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-    dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-  } catch (error) {[m
+[31m-    // dotenv no disponible, continuar sin él[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-import { DateTime } from 'luxon';[m
+[31m-import { createClient } from '@supabase/supabase-js';[m
+[31m-import nodemailer from 'nodemailer';[m
+[31m-import { registerReminderAttempt, updateReminderAttemptStatus } from '../lib/retry-scheduler';[m
+[31m-[m
+[31m-// Interfaces para tipado[m
+[31m-interface SessionData {[m
+[31m-  sessionid: string;[m
+[31m-  teamid: string;[m
+[31m-  startdate: string;[m
+[31m-  enddate: string | null;[m
+[31m-  starttime: string;[m
+[31m-  endtime: string;[m
+[31m-  daysofweek: string;[m
+[31m-}[m
+[31m-[m
+[31m-interface EnrollmentData {[m
+[31m-  enrollmentid: string;[m
+[31m-  studentid: string;[m
+[31m-}[m
+[31m-[m
+[31m-interface StudentData {[m
+[31m-  studentid: string;[m
+[31m-  parentid: string;[m
+[31m-  firstname: string;[m
+[31m-  lastname: string;[m
+[31m-}[m
+[31m-[m
+[31m-interface ParentData {[m
+[31m-  parentid: string;[m
+[31m-  firstname: string;[m
+[31m-  lastname: string;[m
+[31m-  email: string;[m
+[31m-}[m
+[31m-[m
+[31m-interface TeamData {[m
+[31m-  teamid: string;[m
+[31m-  teamname?: string;[m
+[31m-  name?: string;[m
+[31m-}[m
+[31m-[m
+[31m-interface EmailData {[m
+[31m-  parentName: string;[m
+[31m-  teamName: string;[m
+[31m-  startDate: string;[m
+[31m-  scheduleHtml: string;[m
+[31m-}[m
+[31m-[m
+[31m-// Configuración[m
+[31m-const TIMEZONE = 'America/New_York';[m
+[31m-[m
+[31m-// Cliente de Supabase usando la clave anónima (RLS habilitado)[m
+[31m-const createSupabaseClient = () => {[m
+[31m-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;[m
+[31m-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;[m
+[31m-  [m
+[31m-  if (!supabaseUrl || !supabaseKey) {[m
+[31m-    throw new Error('Supabase configuration missing');[m
+[31m-  }[m
+[31m-  [m
+[31m-  return createClient(supabaseUrl, supabaseKey);[m
+[31m-};[m
+[31m-[m
+[31m-// Transportador de email reutilizando la configuración existente[m
+[31m-const createEmailTransporter = () => {[m
+[31m-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {[m
+[31m-    throw new Error('Gmail credentials not configured');[m
+[31m-  }[m
+[31m-  [m
+[31m-  return nodemailer.createTransport({[m
+[31m-    service: 'gmail',[m
+[31m-    auth: {[m
+[31m-      user: process.env.GMAIL_USER,[m
+[31m-      pass: process.env.GMAIL_APP_PASSWORD,[m
+[31m-    },[m
+[31m-  });[m
+[31m-};[m
+[31m-[m
+[31m-/**[m
+[31m- * Función robusta para parsear días de la semana[m
+[31m- * Acepta múltiples formatos: "Mon,Tue,Wed", "m, tue, wednesday", etc.[m
+[31m- */[m
+[31m-function parseDaysOfWeek(daysOfWeek: string): number[] {[m
+[31m-  if (!daysOfWeek || typeof daysOfWeek !== 'string') {[m
+[31m-    return [];[m
+[31m-  }[m
+[31m-[m
+[31m-  const dayMapping: { [key: string]: number } = {[m
+[31m-    // Nombres completos en inglés[m
+[31m-    'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4,[m
+[31m-    'friday': 5, 'saturday': 6, 'sunday': 7,[m
+[31m-    [m
+[31m-    // Abreviaciones de 3 letras[m
+[31m-    'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4,[m
+[31m-    'fri': 5, 'sat': 6, 'sun': 7,[m
+[31m-    [m
+[31m-    // Abreviaciones de 1 letra[m
+[31m-    'm': 1, 't': 2, 'w': 3, 'r': 4, 'f': 5, 's': 6, 'u': 7,[m
+[31m-    [m
+[31m-    // Nombres en español (por si acaso)[m
+[31m-    'lunes': 1, 'martes': 2, 'miércoles': 3, 'jueves': 4,[m
+[31m-    'viernes': 5, 'sábado': 6, 'domingo': 7[m
+[31m-  };[m
+[31m-[m
+[31m-  // Limpiar y dividir por múltiples separadores[m
+[31m-  const cleanDays = daysOfWeek[m
+[31m-    .toLowerCase()[m
+[31m-    .split(/[,;|\s\/]+/)[m
+[31m-    .map(day => day.trim())[m
+[31m-    .filter(day => day.length > 0);[m
+[31m-[m
+[31m-  const weekdays = new Set<number>();[m
+[31m-  [m
+[31m-  for (const day of cleanDays) {[m
+[31m-    const weekday = dayMapping[day];[m
+[31m-    if (weekday) {[m
+[31m-      weekdays.add(weekday);[m
+[31m-    }[m
+[31m-  }[m
+[31m-[m
+[31m-  return Array.from(weekdays).sort();[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Construye el HTML del horario de temporada con todas las ocurrencias[m
+[31m- */[m
+[31m-function buildSeasonScheduleHtml([m
+[31m-  session: SessionData,[m
+[31m-  timezone: string = TIMEZONE[m
+[31m-): string {[m
+[31m-  try {[m
+[31m-    const startDate = DateTime.fromISO(session.startdate, { zone: timezone });[m
+[31m-    const endDate = session.enddate [m
+[31m-      ? DateTime.fromISO(session.enddate, { zone: timezone })[m
+[31m-      : startDate; // Si no hay enddate, solo incluir el día de inicio[m
+[31m-[m
+[31m-    const weekdays = parseDaysOfWeek(session.daysofweek);[m
+[31m-    [m
+[31m-    // Si no hay días específicos, incluir el día de inicio[m
+[31m-    if (weekdays.length === 0) {[m
+[31m-      const startDateTime = startDate.set({[m
+[31m-        hour: parseInt(session.starttime.split(':')[0]),[m
+[31m-        minute: parseInt(session.starttime.split(':')[1] || '0')[m
+[31m-      });[m
+[31m-      [m
+[31m-      const endDateTime = startDate.set({[m
+[31m-        hour: parseInt(session.endtime.split(':')[0]),[m
+[31m-        minute: parseInt(session.endtime.split(':')[1] || '0')[m
+[31m-      });[m
+[31m-[m
+[31m-      const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);[m
+[31m-      const formattedTime = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE)} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE)}`;[m
+[31m-      [m
+[31m-      return `<li>${formattedDate.split(', ')[0]}, ${formattedDate.split(', ')[1]}, ${formattedTime}</li>`;[m
+[31m-    }[m
+[31m-[m
+[31m-    const scheduleItems: string[] = [];[m
+[31m-    let currentDate = startDate;[m
+[31m-[m
+[31m-    // Iterar día por día desde startDate hasta endDate[m
+[31m-    while (currentDate <= endDate && scheduleItems.length < 100) { // Límite de seguridad[m
+[31m-      const currentWeekday = currentDate.weekday;[m
+[31m-      [m
+[31m-      if (weekdays.includes(currentWeekday)) {[m
+[31m-        // Crear DateTime con las horas específicas[m
+[31m-        const startDateTime = currentDate.set({[m
+[31m-          hour: parseInt(session.starttime.split(':')[0]),[m
+[31m-          minute: parseInt(session.starttime.split(':')[1] || '0')[m
+[31m-        });[m
+[31m-        [m
+[31m-        const endDateTime = currentDate.set({[m
+[31m-          hour: parseInt(session.endtime.split(':')[0]),[m
+[31m-          minute: parseInt(session.endtime.split(':')[1] || '0')[m
+[31m-        });[m
+[31m-[m
+[31m-        // Formatear como "Tuesday, Jan 21, 6:00 PM – 7:00 PM"[m
+[31m-        const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);[m
+[31m-        const timeRange = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE)} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE)}`;[m
+[31m-        [m
+[31m-        scheduleItems.push(`<li>${formattedDate.split(' at ')[0]}, ${timeRange}</li>`);[m
+[31m-      }[m
+[31m-      [m
+[31m-      currentDate = currentDate.plus({ days: 1 });[m
+[31m-    }[m
+[31m-[m
+[31m-    return scheduleItems.length > 0 ? scheduleItems.join('\n       ') : '<li>Horario por confirmar</li>';[m
+[31m-  } catch (error) {[m
+[31m-    console.error('Error building season schedule HTML:', error);[m
+[31m-    return '<li>Horario por confirmar</li>';[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Genera el HTML del email de recordatorio de temporada[m
+[31m- */[m
+[31m-function createSeasonReminderEmailHtml(emailData: EmailData): string {[m
+[31m-  return `<!doctype html>[m
+[31m-<html>[m
+[31m-  <head>[m
+[31m-    <meta charset="utf-8"/>[m
+[31m-    <meta name="viewport" content="width=device-width,initial-scale=1"/>[m
+[31m-    <title>Season Reminder</title>[m
+[31m-  </head>[m
+[31m-  <body style="margin:0;padding:0;background:#f6f9fc;">[m
+[31m-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">[m
+[31m-      <tr>[m
+[31m-        <td align="center" style="padding:24px;">[m
+[31m-          <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;">[m
+[31m-            <tr>[m
+[31m-              <td style="padding:28px;font-family:Arial,Helvetica,sans-serif;color:#111827;">[m
+[31m-                <p style="margin:0 0 16px 0;font-size:16px;line-height:24px;">[m
+[31m-                  Hi <strong>${emailData.parentName}</strong>,[m
+[31m-                </p>[m
+[31m-                <p style="margin:0 0 16px 0;font-size:16px;line-height:24px;">[m
+[31m-                  This is your reminder that our <strong>Discipline Rift</strong> season for <strong>${emailData.teamName}</strong> begins in one month on[m
+[31m-                  <strong>${emailData.startDate}</strong>![m
+[31m-                </p>[m
+[31m-                <p style="margin:0 0 16px 0;font-size:16px;line-height:24px;">[m
+[31m-                  Get ready for another great season of skill development, growth, and fun.[m
+[31m-                </p>[m
+[31m-                <h3 style="margin:24px 0 8px 0;font-size:18px;line-height:26px;color:#111827;">Season Schedule</h3>[m
+[31m-                <ul style="margin:0 0 16px 20px;padding:0;font-size:16px;line-height:24px;color:#111827;">[m
+[31m-                  ${emailData.scheduleHtml}[m
+[31m-                </ul>[m
+[31m-                <p style="margin:0 0 4px 0;font-size:16px;line-height:24px;">Can't wait!</p>[m
+[31m-                <p style="margin:0;font-size:16px;line-height:24px;"><strong>Discipline Rift Team</strong></p>[m
+[31m-              </td>[m
+[31m-            </tr>[m
+[31m-          </table>[m
+[31m-        </td>[m
+[31m-      </tr>[m
+[31m-    </table>[m
+[31m-  </body>[m
+[31m-</html>`;[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Función principal para ejecutar el job de recordatorios de temporada[m
+[31m- */[m
+[31m-export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {[m
+[31m-  console.log('🚀 === INICIANDO JOB DE RECORDATORIOS DE TEMPORADA ===');[m
+[31m-  [m
+[31m-  try {[m
+[31m-    // Calcular fecha objetivo (hoy + 30 días en zona horaria de Nueva York)[m
+[31m-    const nowNY = opts?.now [m
+[31m-      ? DateTime.fromJSDate(opts.now).setZone(TIMEZONE)[m
+[31m-      : DateTime.now().setZone(TIMEZONE);[m
+[31m-    [m
+[31m-    const targetDateNY = nowNY.plus({ days: 30 }).toISODate();[m
+[31m-    [m
+[31m-    console.log(`📅 Fecha actual (NY): ${nowNY.toISODate()}`);[m
+[31m-    console.log(`🎯 Buscando sesiones que inician en: ${targetDateNY}`);[m
+[31m-[m
+[31m-    const supabase = createSupabaseClient();[m
+[31m-    const transporter = createEmailTransporter();[m
+[31m-[m
+[31m-    // 1. Buscar sesiones que inician exactamente en 30 días[m
+[31m-    console.log('🔍 Consultando sesiones...');[m
+[31m-    const { data: sessions, error: sessionsError } = await supabase[m
+[31m-      .from('session')[m
+[31m-      .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')[m
+[31m-      .eq('startdate', targetDateNY)[m
+[31m-      .limit(1000);[m
+[31m-[m
+[31m-    if (sessionsError) {[m
+[31m-      throw new Error(`Error consultando sesiones: ${sessionsError.message}`);[m
+[31m-    }[m
+[31m-[m
+[31m-    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);[m
+[31m-[m
+[31m-    if (!sessions || sessions.length === 0) {[m
+[31m-      console.log('✅ No hay sesiones para recordar hoy');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    const emailsSent = new Set<string>(); // Para deduplicar emails por (parentid|sessionid)[m
+[31m-    let totalEmailsSent = 0;[m
+[31m-    let totalErrors = 0;[m
+[31m-[m
+[31m-    // Procesar cada sesión[m
+[31m-    for (const session of sessions) {[m
+[31m-      console.log(`\n🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);[m
+[31m-[m
+[31m-      try {[m
+[31m-        // 2. Buscar inscripciones activas para este equipo[m
+[31m-        const { data: enrollments, error: enrollmentsError } = await supabase[m
+[31m-          .from('enrollment')[m
+[31m-          .select('enrollmentid, studentid')[m
+[31m-          .eq('teamid', session.teamid)[m
+[31m-          .eq('isactive', true)[m
+[31m-          .limit(10000);[m
+[31m-[m
+[31m-        if (enrollmentsError) {[m
+[31m-          console.error(`❌ Error consultando inscripciones: ${enrollmentsError.message}`);[m
+[31m-          totalErrors++;[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-[m
+[31m-        if (!enrollments || enrollments.length === 0) {[m
+[31m-          console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-[m
+[31m-        console.log(`👥 Encontradas ${enrollments.length} inscripciones activas`);[m
+[31m-[m
+[31m-        // 3. Buscar estudiantes[m
+[31m-        const studentIds = enrollments.map(e => e.studentid);[m
+[31m-        const { data: students, error: studentsError } = await supabase[m
+[31m-          .from('student')[m
+[31m-          .select('studentid, parentid, firstname, lastname')[m
+[31m-          .in('studentid', studentIds);[m
+[31m-[m
+[31m-        if (studentsError) {[m
+[31m-          console.error(`❌ Error consultando estudiantes: ${studentsError.message}`);[m
+[31m-          totalErrors++;[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-[m
+[31m-        if (!students || students.length === 0) {[m
+[31m-          console.log(`ℹ️ No se encontraron estudiantes`);[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-[m
+[31m-        // 4. Buscar padres[m
+[31m-        const parentIds = [...new Set(students.map(s => s.parentid))];[m
+[31m-        const { data: parents, error: parentsError } = await supabase[m
+[31m-          .from('parent')[m
+[31m-          .select('parentid, firstname, lastname, email')[m
+[31m-          .in('parentid', parentIds);[m
+[31m-[m
+[31m-        if (parentsError) {[m
+[31m-          console.error(`❌ Error consultando padres: ${parentsError.message}`);[m
+[31m-          totalErrors++;[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-[m
+[31m-        if (!parents || parents.length === 0) {[m
+[31m-          console.log(`ℹ️ No se encontraron padres`);[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-[m
+[31m-        // 5. Buscar nombre del equipo (opcional)[m
+[31m-        let teamName = `Team ${session.teamid}`;[m
+[31m-        try {[m
+[31m-          const { data: teamData } = await supabase[m
+[31m-            .from('team')[m
+[31m-            .select('teamname, name')[m
+[31m-            .eq('teamid', session.teamid)[m
+[31m-            .single();[m
+[31m-          [m
+[31m-          if (teamData) {[m
+[31m-            teamName = teamData.teamname || teamData.name || teamName;[m
+[31m-          }[m
+[31m-        } catch (error) {[m
+[31m-          console.log(`ℹ️ No se pudo obtener el nombre del equipo, usando fallback: ${teamName}`);[m
+[31m-        }[m
+[31m-[m
+[31m-        // 6. Construir el horario de temporada[m
+[31m-        const scheduleHtml = buildSeasonScheduleHtml(session);[m
+[31m-[m
+[31m-        // 7. Enviar emails (deduplicando por parent + session)[m
+[31m-        for (const parent of parents) {[m
+[31m-          if (!parent.email) {[m
+[31m-            console.log(`⚠️ Padre ${parent.parentid} sin email, saltando`);[m
+[31m-            continue;[m
+[31m-          }[m
+[31m-[m
+[31m-          const emailKey = `${parent.parentid}|${session.sessionid}`;[m
+[31m-          if (emailsSent.has(emailKey)) {[m
+[31m-            console.log(`🔄 Email ya enviado a padre ${parent.parentid} para sesión ${session.sessionid}`);[m
+[31m-            continue;[m
+[31m-          }[m
+[31m-[m
+[31m-          // Registrar intento antes de enviar[m
+[31m-          const scheduledTime = nowNY.toJSDate();[m
+[31m-          await registerReminderAttempt([m
+[31m-            session.sessionid,[m
+[31m-            parent.parentid,[m
+[31m-            'season_reminder',[m
+[31m-            scheduledTime,[m
+[31m-            'pending'[m
+[31m-          );[m
+[31m-[m
+[31m-          try {[m
+[31m-            const startDate = DateTime.fromISO(session.startdate, { zone: TIMEZONE })[m
+[31m-              .toLocaleString(DateTime.DATE_FULL);[m
+[31m-[m
+[31m-            const emailData: EmailData = {[m
+[31m-              parentName: parent.firstname,[m
+[31m-              teamName,[m
+[31m-              startDate,[m
+[31m-              scheduleHtml[m
+[31m-            };[m
+[31m-[m
+[31m-            const htmlContent = createSeasonReminderEmailHtml(emailData);[m
+[31m-            const textContent = htmlContent[m
+[31m-              .replace(/<[^>]*>/g, '') // Remover tags HTML[m
+[31m-              .replace(/{{scheduleHtml}}/g, scheduleHtml.replace(/<li>/g, '- ').replace(/<\/li>/g, '\n'));[m
+[31m-[m
+[31m-            const mailOptions = {[m
+[31m-              from: {[m
+[31m-                name: 'Discipline Rift',[m
+[31m-                address: process.env.GMAIL_USER!,[m
+[31m-              },[m
+[31m-              to: parent.email,[m
+[31m-              subject: `${teamName} Season Starts in One Month! Discipline Rift`,[m
+[31m-              html: htmlContent,[m
+[31m-              text: textContent[m
+[31m-            };[m
+[31m-[m
+[31m-            const result = await transporter.sendMail(mailOptions);[m
+[31m-            console.log(`✅ Email enviado a ${parent.email} (${result.messageId})`);[m
+[31m-            [m
+[31m-            // Marcar intento como exitoso[m
+[31m-            await updateReminderAttemptStatus([m
+[31m-              session.sessionid,[m
+[31m-              parent.parentid,[m
+[31m-              'season_reminder',[m
+[31m-              'sent',[m
+[31m-              undefined,[m
+[31m-              result.messageId[m
+[31m-            );[m
+[31m-            [m
+[31m-            emailsSent.add(emailKey);[m
+[31m-            totalEmailsSent++;[m
+[31m-[m
+[31m-          } catch (emailError) {[m
+[31m-            console.error(`❌ Error enviando email a ${parent.email}:`, emailError);[m
+[31m-            [m
+[31m-            // Marcar intento como fallido[m
+[31m-            await updateReminderAttemptStatus([m
+[31m-              session.sessionid,[m
+[31m-              parent.parentid,[m
+[31m-              'season_reminder',[m
+[31m-              'failed',[m
+[31m-              emailError instanceof Error ? emailError.message : 'Unknown email error'[m
+[31m-            );[m
+[31m-            [m
+[31m-            totalErrors++;[m
+[31m-          }[m
+[31m-        }[m
+[31m-[m
+[31m-      } catch (sessionError) {[m
+[31m-        console.error(`❌ Error procesando sesión ${session.sessionid}:`, sessionError);[m
+[31m-        totalErrors++;[m
+[31m-      }[m
+[31m-    }[m
+[31m-[m
+[31m-    // Resumen final[m
+[31m-    console.log('\n📊 === RESUMEN DEL JOB ===');[m
+[31m-    console.log(`🎯 Sesiones procesadas: ${sessions.length}`);[m
+[31m-    console.log(`📧 Emails enviados: ${totalEmailsSent}`);[m
+[31m-    console.log(`❌ Errores: ${totalErrors}`);[m
+[31m-    console.log('✅ Job completado exitosamente');[m
+[31m-[m
+[31m-  } catch (error) {[m
+[31m-    console.error('💥 Error fatal en el job de recordatorios de temporada:', error);[m
+[31m-    throw error;[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Función para verificar la configuración antes de ejecutar[m
+[31m-export async function checkSeasonRemindersConfig(): Promise<boolean> {[m
+[31m-  try {[m
+[31m-    // Verificar Supabase[m
+[31m-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;[m
+[31m-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;[m
+[31m-    [m
+[31m-    if (!supabaseUrl || !supabaseKey) {[m
+[31m-      console.error('❌ Configuración de Supabase faltante');[m
+[31m-      console.error('  Requeridas: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY');[m
+[31m-      return false;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Verificar Gmail[m
+[31m-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {[m
+[31m-      console.error('❌ Configuración de Gmail faltante');[m
+[31m-      console.error('  Requeridas: GMAIL_USER, GMAIL_APP_PASSWORD');[m
+[31m-      return false;[m
+[31m-    }[m
+[31m-[m
+[31m-    console.log('✅ Configuración validada correctamente');[m
+[31m-    return true;[m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error verificando configuración:', error);[m
+[31m-    return false;[m
+[31m-  }[m
+[31m-}[m
+[1mdiff --git a/lib/create-reminder-attempts-table.sql b/lib/create-reminder-attempts-table.sql[m
+[1mdeleted file mode 100644[m
+[1mindex 5297171..0000000[m
+[1m--- a/lib/create-reminder-attempts-table.sql[m
+[1m+++ /dev/null[m
+[36m@@ -1,49 +0,0 @@[m
+[31m--- Tabla para rastrear intentos de envío de recordatorios[m
+[31m-CREATE TABLE IF NOT EXISTS reminder_attempts ([m
+[31m-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,[m
+[31m-  session_id UUID NOT NULL,[m
+[31m-  parent_id UUID NOT NULL,[m
+[31m-  email_type VARCHAR(50) NOT NULL DEFAULT 'season_reminder',[m
+[31m-  attempt_number INTEGER NOT NULL DEFAULT 1,[m
+[31m-  scheduled_time TIMESTAMPTZ NOT NULL,[m
+[31m-  executed_time TIMESTAMPTZ,[m
+[31m-  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, sent, failed, retrying[m
+[31m-  error_message TEXT,[m
+[31m-  email_sent_id TEXT, -- ID del email enviado (messageId de nodemailer)[m
+[31m-  created_at TIMESTAMPTZ DEFAULT NOW(),[m
+[31m-  updated_at TIMESTAMPTZ DEFAULT NOW(),[m
+[31m-  [m
+[31m-  -- Índices para consultas eficientes[m
+[31m-  UNIQUE(session_id, parent_id, email_type),[m
+[31m-  INDEX idx_reminder_attempts_status ON reminder_attempts(status),[m
+[31m-  INDEX idx_reminder_attempts_scheduled ON reminder_attempts(scheduled_time),[m
+[31m-  INDEX idx_reminder_attempts_session ON reminder_attempts(session_id),[m
+[31m-  INDEX idx_reminder_attempts_parent ON reminder_attempts(parent_id)[m
+[31m-);[m
+[31m-[m
+[31m--- Función para actualizar updated_at automáticamente[m
+[31m-CREATE OR REPLACE FUNCTION update_reminder_attempts_updated_at()[m
+[31m-RETURNS TRIGGER AS $$[m
+[31m-BEGIN[m
+[31m-  NEW.updated_at = NOW();[m
+[31m-  RETURN NEW;[m
+[31m-END;[m
+[31m-$$ LANGUAGE plpgsql;[m
+[31m-[m
+[31m--- Trigger para actualizar updated_at[m
+[31m-CREATE TRIGGER reminder_attempts_updated_at[m
+[31m-  BEFORE UPDATE ON reminder_attempts[m
+[31m-  FOR EACH ROW[m
+[31m-  EXECUTE FUNCTION update_reminder_attempts_updated_at();[m
+[31m-[m
+[31m--- Comentarios para documentación[m
+[31m-COMMENT ON TABLE reminder_attempts IS 'Rastrea intentos de envío de recordatorios por email';[m
+[31m-COMMENT ON COLUMN reminder_attempts.session_id IS 'ID de la sesión para la cual se envía el recordatorio';[m
+[31m-COMMENT ON COLUMN reminder_attempts.parent_id IS 'ID del padre que recibe el recordatorio';[m
+[31m-COMMENT ON COLUMN reminder_attempts.email_type IS 'Tipo de recordatorio (season_reminder, session_reminder, etc.)';[m
+[31m-COMMENT ON COLUMN reminder_attempts.attempt_number IS 'Número de intento (1, 2, 3...)';[m
+[31m-COMMENT ON COLUMN reminder_attempts.scheduled_time IS 'Hora programada para envío';[m
+[31m-COMMENT ON COLUMN reminder_attempts.executed_time IS 'Hora real de envío exitoso';[m
+[31m-COMMENT ON COLUMN reminder_attempts.status IS 'Estado: pending, sent, failed, retrying';[m
+[31m-COMMENT ON COLUMN reminder_attempts.error_message IS 'Mensaje de error si falló el envío';[m
+[31m-COMMENT ON COLUMN reminder_attempts.email_sent_id IS 'ID del mensaje enviado por nodemailer';[m
+[1mdiff --git a/lib/create-reminder-function.sql b/lib/create-reminder-function.sql[m
+[1mindex a375552..4947e6b 100644[m
+[1m--- a/lib/create-reminder-function.sql[m
+[1m+++ b/lib/create-reminder-function.sql[m
+[36m@@ -67,4 +67,3 @@[m [m$$;[m
+ -- Dar permisos a la función[m
+ GRANT EXECUTE ON FUNCTION get_sessions_for_reminders() TO anon;[m
+ GRANT EXECUTE ON FUNCTION get_sessions_for_reminders() TO authenticated;[m
+[31m-[m
+[1mdiff --git a/lib/create-session-reminders-table.sql b/lib/create-session-reminders-table.sql[m
+[1mindex cd7bf72..f170789 100644[m
+[1m--- a/lib/create-session-reminders-table.sql[m
+[1m+++ b/lib/create-session-reminders-table.sql[m
+[36m@@ -30,4 +30,3 @@[m [mALTER TABLE session_reminders ENABLE ROW LEVEL SECURITY;[m
+ -- Política para permitir operaciones del service role[m
+ CREATE POLICY "Allow service role full access" ON session_reminders[m
+   FOR ALL USING (auth.role() = 'service_role');[m
+[31m-[m
+[1mdiff --git a/lib/email-service.ts b/lib/email-service.ts[m
+[1mindex d270f2d..bf13fd1 100644[m
+[1m--- a/lib/email-service.ts[m
+[1m+++ b/lib/email-service.ts[m
+[36m@@ -425,20 +425,12 @@[m [mexport async function sendPaymentConfirmationEmail([m
+       }[m
+ [m
+       // Calculate practice occurrences[m
+[31m-      // Ensure times are in HH:MM format (remove seconds if present)[m
+[31m-      const cleanStartTime = session.starttime?.includes(':') [m
+[31m-        ? session.starttime.substring(0, 5) [m
+[31m-        : session.starttime;[m
+[31m-      const cleanEndTime = session.endtime?.includes(':') [m
+[31m-        ? session.endtime.substring(0, 5) [m
+[31m-        : session.endtime;[m
+[31m-[m
+       const practiceOccurrences = buildPracticeOccurrences({[m
+         startDate: session.startdate,[m
+         endDate: session.enddate,[m
+         daysOfWeek,[m
+[31m-        startTime: cleanStartTime,[m
+[31m-        endTime: cleanEndTime,[m
+[32m+[m[32m        startTime: session.starttime,[m
+[32m+[m[32m        endTime: session.endtime,[m
+         location: teamData.school.location,[m
+         coachName: session.staff?.name || 'TBD',[m
+         timezone: teamData.timezone || 'America/New_York'[m
+[1mdiff --git a/lib/init-schedulers.ts b/lib/init-schedulers.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 3d93557..0000000[m
+[1m--- a/lib/init-schedulers.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,107 +0,0 @@[m
+[31m-/**[m
+[31m- * Archivo de inicialización de schedulers para Discipline Rift[m
+[31m- * [m
+[31m- * Este archivo debe ser importado en el punto de entrada de la aplicación[m
+[31m- * para iniciar automáticamente todos los jobs programados.[m
+[31m- */[m
+[31m-[m
+[31m-import { startAllSchedulers, stopAllSchedulers } from './scheduler';[m
+[31m-[m
+[31m-let schedulersInitialized = false;[m
+[31m-[m
+[31m-/**[m
+[31m- * Inicializa todos los schedulers del sistema[m
+[31m- * Se ejecuta automáticamente una sola vez[m
+[31m- */[m
+[31m-export function initializeSchedulers(): void {[m
+[31m-  // Solo inicializar una vez[m
+[31m-  if (schedulersInitialized) {[m
+[31m-    console.log('ℹ️ Schedulers ya están inicializados');[m
+[31m-    return;[m
+[31m-  }[m
+[31m-[m
+[31m-  // Solo inicializar en producción o cuando esté explícitamente habilitado[m
+[31m-  const shouldInitialize = [m
+[31m-    process.env.NODE_ENV === 'production' || [m
+[31m-    process.env.ENABLE_SCHEDULERS === '1' ||[m
+[31m-    process.env.RUN_SCHEDULERS === 'true';[m
+[31m-[m
+[31m-  if (!shouldInitialize) {[m
+[31m-    console.log('ℹ️ Schedulers deshabilitados en desarrollo. Para habilitar, usa ENABLE_SCHEDULERS=1');[m
+[31m-    return;[m
+[31m-  }[m
+[31m-[m
+[31m-  try {[m
+[31m-    console.log('🚀 Inicializando schedulers del sistema...');[m
+[31m-    [m
+[31m-    const success = startAllSchedulers();[m
+[31m-    [m
+[31m-    if (success) {[m
+[31m-      schedulersInitialized = true;[m
+[31m-      console.log('✅ Schedulers inicializados exitosamente');[m
+[31m-    } else {[m
+[31m-      console.error('❌ Error al inicializar algunos schedulers');[m
+[31m-    }[m
+[31m-[m
+[31m-    // Manejar cierre graceful de la aplicación[m
+[31m-    process.on('SIGINT', handleGracefulShutdown);[m
+[31m-    process.on('SIGTERM', handleGracefulShutdown);[m
+[31m-    process.on('SIGUSR2', handleGracefulShutdown); // Para nodemon[m
+[31m-[m
+[31m-  } catch (error) {[m
+[31m-    console.error('💥 Error fatal inicializando schedulers:', error);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Maneja el cierre graceful de los schedulers[m
+[31m- */[m
+[31m-function handleGracefulShutdown(signal: string): void {[m
+[31m-  console.log(`\n⚠️ Señal ${signal} recibida, cerrando schedulers...`);[m
+[31m-  [m
+[31m-  try {[m
+[31m-    const success = stopAllSchedulers();[m
+[31m-    [m
+[31m-    if (success) {[m
+[31m-      console.log('✅ Schedulers cerrados exitosamente');[m
+[31m-    } else {[m
+[31m-      console.error('❌ Error cerrando algunos schedulers');[m
+[31m-    }[m
+[31m-    [m
+[31m-    schedulersInitialized = false;[m
+[31m-    [m
+[31m-    // Permitir que el proceso termine naturalmente[m
+[31m-    // No llamamos process.exit() aquí para permitir cleanup adicional[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('💥 Error cerrando schedulers:', error);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Verifica si los schedulers están inicializados[m
+[31m- */[m
+[31m-export function areSchedulersInitialized(): boolean {[m
+[31m-  return schedulersInitialized;[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Fuerza la detención de todos los schedulers[m
+[31m- */[m
+[31m-export function forceStopSchedulers(): void {[m
+[31m-  try {[m
+[31m-    stopAllSchedulers();[m
+[31m-    schedulersInitialized = false;[m
+[31m-    console.log('🛑 Schedulers detenidos forzadamente');[m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error deteniendo schedulers forzadamente:', error);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Auto-inicialización si se está ejecutando en servidor[m
+[31m-if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {[m
+[31m-  // Pequeño delay para permitir que la aplicación se inicialice completamente[m
+[31m-  setTimeout(() => {[m
+[31m-    initializeSchedulers();[m
+[31m-  }, 2000);[m
+[31m-}[m
+[1mdiff --git a/lib/retry-scheduler.ts b/lib/retry-scheduler.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 5ff5a03..0000000[m
+[1m--- a/lib/retry-scheduler.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,341 +0,0 @@[m
+[31m-// Cargar variables de entorno si no están disponibles (para scripts CLI)[m
+[31m-if (typeof window === 'undefined' && !process.env.NEXT_PUBLIC_SUPABASE_URL) {[m
+[31m-  try {[m
+[31m-    const dotenv = require('dotenv');[m
+[31m-    const path = require('path');[m
+[31m-    dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-    dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-  } catch (error) {[m
+[31m-    // dotenv no disponible, continuar sin él[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-import * as cron from 'node-cron';[m
+[31m-import { DateTime } from 'luxon';[m
+[31m-import { createClient } from '@supabase/supabase-js';[m
+[31m-import { runSeasonReminders } from '../jobs/sendSeasonReminders';[m
+[31m-[m
+[31m-// Configuración[m
+[31m-const TIMEZONE = 'America/New_York';[m
+[31m-const RETRY_INTERVAL_MINUTES = 20;[m
+[31m-const MAX_RETRY_ATTEMPTS = 3;[m
+[31m-[m
+[31m-// Cliente de Supabase[m
+[31m-const createSupabaseClient = () => {[m
+[31m-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;[m
+[31m-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;[m
+[31m-  [m
+[31m-  if (!supabaseUrl || !supabaseKey) {[m
+[31m-    throw new Error('Supabase configuration missing for retry scheduler');[m
+[31m-  }[m
+[31m-  [m
+[31m-  return createClient(supabaseUrl, supabaseKey);[m
+[31m-};[m
+[31m-[m
+[31m-let retrySchedulerTask: cron.ScheduledTask | null = null;[m
+[31m-[m
+[31m-/**[m
+[31m- * Procesa reintentos de recordatorios fallidos[m
+[31m- */[m
+[31m-async function processRetryAttempts(): Promise<void> {[m
+[31m-  console.log('🔄 === PROCESANDO REINTENTOS DE RECORDATORIOS ===');[m
+[31m-  [m
+[31m-  try {[m
+[31m-    const supabase = createSupabaseClient();[m
+[31m-    const now = DateTime.now().setZone(TIMEZONE);[m
+[31m-    [m
+[31m-    // Buscar intentos pendientes que necesitan reintento[m
+[31m-    const cutoffTime = now.minus({ minutes: RETRY_INTERVAL_MINUTES }).toISO();[m
+[31m-    [m
+[31m-    const { data: failedAttempts, error } = await supabase[m
+[31m-      .from('reminder_attempts')[m
+[31m-      .select('*')[m
+[31m-      .in('status', ['failed', 'pending'])[m
+[31m-      .lt('scheduled_time', cutoffTime)[m
+[31m-      .lt('attempt_number', MAX_RETRY_ATTEMPTS + 1)[m
+[31m-      .order('scheduled_time', { ascending: true })[m
+[31m-      .limit(50); // Procesar máximo 50 reintentos por vez[m
+[31m-    [m
+[31m-    if (error) {[m
+[31m-      console.error('❌ Error consultando intentos fallidos:', error);[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    if (!failedAttempts || failedAttempts.length === 0) {[m
+[31m-      console.log('ℹ️ No hay reintentos pendientes');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log(`📊 Encontrados ${failedAttempts.length} reintentos pendientes`);[m
+[31m-    [m
+[31m-    // Agrupar por sesión para ejecutar el job completo por sesión[m
+[31m-    const sessionGroups = new Map();[m
+[31m-    for (const attempt of failedAttempts) {[m
+[31m-      if (!sessionGroups.has(attempt.session_id)) {[m
+[31m-        sessionGroups.set(attempt.session_id, []);[m
+[31m-      }[m
+[31m-      sessionGroups.get(attempt.session_id).push(attempt);[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log(`🎯 Procesando ${sessionGroups.size} sesiones con reintentos`);[m
+[31m-    [m
+[31m-    // Procesar cada grupo de sesión[m
+[31m-    for (const [sessionId, attempts] of sessionGroups) {[m
+[31m-      try {[m
+[31m-        console.log(`\n🏐 Procesando reintentos para sesión ${sessionId}`);[m
+[31m-        [m
+[31m-        // Marcar intentos como "retrying"[m
+[31m-        const attemptIds = attempts.map(a => a.id);[m
+[31m-        await supabase[m
+[31m-          .from('reminder_attempts')[m
+[31m-          .update({ [m
+[31m-            status: 'retrying',[m
+[31m-            updated_at: now.toISO()[m
+[31m-          })[m
+[31m-          .in('id', attemptIds);[m
+[31m-        [m
+[31m-        // Obtener información de la sesión para calcular fecha objetivo[m
+[31m-        const { data: session, error: sessionError } = await supabase[m
+[31m-          .from('session')[m
+[31m-          .select('startdate')[m
+[31m-          .eq('sessionid', sessionId)[m
+[31m-          .single();[m
+[31m-        [m
+[31m-        if (sessionError || !session) {[m
+[31m-          console.error(`❌ Error obteniendo sesión ${sessionId}:`, sessionError);[m
+[31m-          [m
+[31m-          // Marcar intentos como fallidos[m
+[31m-          await supabase[m
+[31m-            .from('reminder_attempts')[m
+[31m-            .update({ [m
+[31m-              status: 'failed',[m
+[31m-              error_message: 'Session not found',[m
+[31m-              updated_at: now.toISO()[m
+[31m-            })[m
+[31m-            .in('id', attemptIds);[m
+[31m-          continue;[m
+[31m-        }[m
+[31m-        [m
+[31m-        // Calcular la fecha que sería "hoy" para que esta sesión sea +30 días[m
+[31m-        const sessionStart = DateTime.fromISO(session.startdate, { zone: TIMEZONE });[m
+[31m-        const targetNow = sessionStart.minus({ days: 30 });[m
+[31m-        [m
+[31m-        console.log(`📅 Ejecutando reintento como si fuera: ${targetNow.toISODate()}`);[m
+[31m-        [m
+[31m-        // Ejecutar el job de recordatorios para esta fecha específica[m
+[31m-        await runSeasonReminders({ now: targetNow.toJSDate() });[m
+[31m-        [m
+[31m-        // Si llegamos aquí, el reintento fue exitoso[m
+[31m-        console.log(`✅ Reintento exitoso para sesión ${sessionId}`);[m
+[31m-        [m
+[31m-        // Los intentos exitosos se marcarán como 'sent' dentro de runSeasonReminders[m
+[31m-        // Solo necesitamos limpiar los que quedaron en 'retrying' y no se enviaron[m
+[31m-        const { data: stillRetrying } = await supabase[m
+[31m-          .from('reminder_attempts')[m
+[31m-          .select('id')[m
+[31m-          .eq('session_id', sessionId)[m
+[31m-          .eq('status', 'retrying');[m
+[31m-        [m
+[31m-        if (stillRetrying && stillRetrying.length > 0) {[m
+[31m-          await supabase[m
+[31m-            .from('reminder_attempts')[m
+[31m-            .update({ [m
+[31m-              status: 'failed',[m
+[31m-              error_message: 'Retry completed but email not sent',[m
+[31m-              updated_at: now.toISO()[m
+[31m-            })[m
+[31m-            .in('id', stillRetrying.map(r => r.id));[m
+[31m-        }[m
+[31m-        [m
+[31m-      } catch (retryError) {[m
+[31m-        console.error(`❌ Error en reintento para sesión ${sessionId}:`, retryError);[m
+[31m-        [m
+[31m-        // Incrementar número de intento y marcar como fallido si excede el máximo[m
+[31m-        for (const attempt of attempts) {[m
+[31m-          const newAttemptNumber = attempt.attempt_number + 1;[m
+[31m-          const newStatus = newAttemptNumber > MAX_RETRY_ATTEMPTS ? 'failed' : 'pending';[m
+[31m-          const nextScheduledTime = newStatus === 'pending' [m
+[31m-            ? now.plus({ minutes: RETRY_INTERVAL_MINUTES }).toISO()[m
+[31m-            : attempt.scheduled_time;[m
+[31m-          [m
+[31m-          await supabase[m
+[31m-            .from('reminder_attempts')[m
+[31m-            .update({[m
+[31m-              attempt_number: newAttemptNumber,[m
+[31m-              status: newStatus,[m
+[31m-              error_message: retryError instanceof Error ? retryError.message : 'Unknown retry error',[m
+[31m-              scheduled_time: nextScheduledTime,[m
+[31m-              updated_at: now.toISO()[m
+[31m-            })[m
+[31m-            .eq('id', attempt.id);[m
+[31m-        }[m
+[31m-      }[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Procesamiento de reintentos completado');[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('💥 Error fatal en procesamiento de reintentos:', error);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Inicia el scheduler de reintentos[m
+[31m- */[m
+[31m-export function startRetryScheduler(): boolean {[m
+[31m-  try {[m
+[31m-    if (retrySchedulerTask) {[m
+[31m-      console.log('⚠️ Scheduler de reintentos ya está activo');[m
+[31m-      return true;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('🚀 Iniciando scheduler de reintentos...');[m
+[31m-    console.log(`⏰ Programado para ejecutar cada ${RETRY_INTERVAL_MINUTES} minutos`);[m
+[31m-    [m
+[31m-    // Ejecutar cada 20 minutos[m
+[31m-    const cronExpression = `*/${RETRY_INTERVAL_MINUTES} * * * *`;[m
+[31m-    [m
+[31m-    retrySchedulerTask = cron.schedule([m
+[31m-      cronExpression,[m
+[31m-      async () => {[m
+[31m-        try {[m
+[31m-          console.log(`\n🔄 === EJECUTANDO SCHEDULER DE REINTENTOS ===`);[m
+[31m-          console.log(`⏰ Hora: ${DateTime.now().setZone(TIMEZONE).toLocaleString(DateTime.DATETIME_MED)}`);[m
+[31m-          [m
+[31m-          await processRetryAttempts();[m
+[31m-          [m
+[31m-        } catch (error) {[m
+[31m-          console.error('💥 Error en scheduler de reintentos:', error);[m
+[31m-        }[m
+[31m-      },[m
+[31m-      {[m
+[31m-        scheduled: true,[m
+[31m-        timezone: TIMEZONE[m
+[31m-      }[m
+[31m-    );[m
+[31m-    [m
+[31m-    console.log('✅ Scheduler de reintentos iniciado exitosamente');[m
+[31m-    return true;[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error iniciando scheduler de reintentos:', error);[m
+[31m-    return false;[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Detiene el scheduler de reintentos[m
+[31m- */[m
+[31m-export function stopRetryScheduler(): boolean {[m
+[31m-  try {[m
+[31m-    if (retrySchedulerTask) {[m
+[31m-      retrySchedulerTask.stop();[m
+[31m-      retrySchedulerTask.destroy();[m
+[31m-      retrySchedulerTask = null;[m
+[31m-      console.log('🛑 Scheduler de reintentos detenido');[m
+[31m-      return true;[m
+[31m-    } else {[m
+[31m-      console.log('ℹ️ Scheduler de reintentos no estaba activo');[m
+[31m-      return true;[m
+[31m-    }[m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error deteniendo scheduler de reintentos:', error);[m
+[31m-    return false;[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Verifica si el scheduler de reintentos está activo[m
+[31m- */[m
+[31m-export function isRetrySchedulerActive(): boolean {[m
+[31m-  return retrySchedulerTask !== null && retrySchedulerTask.getStatus() === 'scheduled';[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Registra un intento de recordatorio para futuros reintentos[m
+[31m- */[m
+[31m-export async function registerReminderAttempt([m
+[31m-  sessionId: string,[m
+[31m-  parentId: string,[m
+[31m-  emailType: string = 'season_reminder',[m
+[31m-  scheduledTime: Date,[m
+[31m-  status: 'pending' | 'sent' | 'failed' = 'pending',[m
+[31m-  errorMessage?: string,[m
+[31m-  emailSentId?: string[m
+[31m-): Promise<void> {[m
+[31m-  try {[m
+[31m-    const supabase = createSupabaseClient();[m
+[31m-    [m
+[31m-    const attemptData = {[m
+[31m-      session_id: sessionId,[m
+[31m-      parent_id: parentId,[m
+[31m-      email_type: emailType,[m
+[31m-      attempt_number: 1,[m
+[31m-      scheduled_time: scheduledTime.toISOString(),[m
+[31m-      status,[m
+[31m-      error_message: errorMessage,[m
+[31m-      email_sent_id: emailSentId[m
+[31m-    };[m
+[31m-    [m
+[31m-    // Usar upsert para evitar duplicados[m
+[31m-    const { error } = await supabase[m
+[31m-      .from('reminder_attempts')[m
+[31m-      .upsert(attemptData, {[m
+[31m-        onConflict: 'session_id,parent_id,email_type'[m
+[31m-      });[m
+[31m-    [m
+[31m-    if (error) {[m
+[31m-      console.error('❌ Error registrando intento de recordatorio:', error);[m
+[31m-    } else {[m
+[31m-      console.log(`📝 Intento registrado: ${sessionId} -> ${parentId} (${status})`);[m
+[31m-    }[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error en registerReminderAttempt:', error);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Actualiza el estado de un intento de recordatorio[m
+[31m- */[m
+[31m-export async function updateReminderAttemptStatus([m
+[31m-  sessionId: string,[m
+[31m-  parentId: string,[m
+[31m-  emailType: string,[m
+[31m-  status: 'sent' | 'failed',[m
+[31m-  errorMessage?: string,[m
+[31m-  emailSentId?: string[m
+[31m-): Promise<void> {[m
+[31m-  try {[m
+[31m-    const supabase = createSupabaseClient();[m
+[31m-    const now = DateTime.now().setZone(TIMEZONE);[m
+[31m-    [m
+[31m-    const updateData: any = {[m
+[31m-      status,[m
+[31m-      updated_at: now.toISO()[m
+[31m-    };[m
+[31m-    [m
+[31m-    if (status === 'sent') {[m
+[31m-      updateData.executed_time = now.toISO();[m
+[31m-      if (emailSentId) {[m
+[31m-        updateData.email_sent_id = emailSentId;[m
+[31m-      }[m
+[31m-    } else if (status === 'failed' && errorMessage) {[m
+[31m-      updateData.error_message = errorMessage;[m
+[31m-    }[m
+[31m-    [m
+[31m-    const { error } = await supabase[m
+[31m-      .from('reminder_attempts')[m
+[31m-      .update(updateData)[m
+[31m-      .eq('session_id', sessionId)[m
+[31m-      .eq('parent_id', parentId)[m
+[31m-      .eq('email_type', emailType);[m
+[31m-    [m
+[31m-    if (error) {[m
+[31m-      console.error('❌ Error actualizando estado de intento:', error);[m
+[31m-    }[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error en updateReminderAttemptStatus:', error);[m
+[31m-  }[m
+[31m-}[m
+[1mdiff --git a/lib/schedule/buildPracticeOccurrences.ts b/lib/schedule/buildPracticeOccurrences.ts[m
+[1mindex ee0577b..7d54179 100644[m
+[1m--- a/lib/schedule/buildPracticeOccurrences.ts[m
+[1m+++ b/lib/schedule/buildPracticeOccurrences.ts[m
+[36m@@ -104,87 +104,36 @@[m [mexport function buildPracticeOccurrences(params: PracticeScheduleParams): Practi[m
+       return [];[m
+     }[m
+ [m
+[31m-    // Parse dates using explicit timezone handling to avoid date shifting[m
+[31m-    // Split the date string and create Date objects more explicitly[m
+[31m-    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);[m
+[31m-    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);[m
+[31m-    [m
+[31m-    // Create dates in local time to avoid timezone conversion issues[m
+[31m-    const start = new Date(startYear, startMonth - 1, startDay); // month is 0-indexed[m
+[31m-    const end = new Date(endYear, endMonth - 1, endDay);[m
+[32m+[m[32m    const start = new Date(startDate + "T00:00:00");[m
+[32m+[m[32m    const end = new Date(endDate + "T23:59:59");[m
+     const exceptionsSet = new Set(exceptions);[m
+     [m
+[31m-    // NEW LOGIC: Find the first occurrence that matches the desired days[m
+[31m-    // If startDate doesn't match the target day, look backward first[m
+[31m-    const actualStartDate = new Date(start);[m
+[31m-    const currentDayOfWeek = actualStartDate.getDay();[m
+[31m-    [m
+[31m-    // Check if the start date matches any of the target days[m
+[31m-    const isStartDateValid = targetDays.includes(currentDayOfWeek);[m
+[31m-    [m
+[31m-    if (!isStartDateValid) {[m
+[31m-      // Look backward up to 7 days to find a matching day[m
+[31m-      let foundValidStart = false;[m
+[31m-      for (let i = 1; i <= 7; i++) {[m
+[31m-        const testDate = new Date(start);[m
+[31m-        testDate.setDate(testDate.getDate() - i);[m
+[31m-        [m
+[31m-        if (targetDays.includes(testDate.getDay())) {[m
+[31m-          actualStartDate.setDate(actualStartDate.getDate() - i);[m
+[31m-          foundValidStart = true;[m
+[31m-          console.log(`[PRACTICE_OCCURRENCES] 🔄 Adjusted start date from ${startDate} to ${actualStartDate.getFullYear()}-${String(actualStartDate.getMonth() + 1).padStart(2, '0')}-${String(actualStartDate.getDate()).padStart(2, '0')} to match ${daysOfWeek.join(', ')}`);[m
+[31m-          break;[m
+[31m-        }[m
+[31m-      }[m
+[31m-      [m
+[31m-      // If no valid day found backward, look forward (original behavior)[m
+[31m-      if (!foundValidStart) {[m
+[31m-        for (let i = 1; i <= 7; i++) {[m
+[31m-          const testDate = new Date(start);[m
+[31m-          testDate.setDate(testDate.getDate() + i);[m
+[31m-          [m
+[31m-          if (targetDays.includes(testDate.getDay())) {[m
+[31m-            actualStartDate.setDate(actualStartDate.getDate() + i);[m
+[31m-            console.log(`[PRACTICE_OCCURRENCES] ⏭️ Adjusted start date forward from ${startDate} to ${actualStartDate.getFullYear()}-${String(actualStartDate.getMonth() + 1).padStart(2, '0')}-${String(actualStartDate.getDate()).padStart(2, '0')} to match ${daysOfWeek.join(', ')}`);[m
+[31m-            break;[m
+[31m-          }[m
+[31m-        }[m
+[31m-      }[m
+[31m-    }[m
+[31m-    [m
+     const sessions: PracticeOccurrence[] = [];[m
+[31m-    const currentDate = new Date(actualStartDate);[m
+[32m+[m[32m    const currentDate = new Date(start);[m
+     let sessionCounter = 0;[m
+[31m-    [m
+[31m-    // Calculate max sessions more accurately[m
+[31m-    // Get total days in range and calculate potential sessions[m
+[31m-    const totalDays = Math.ceil((end.getTime() - actualStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 to include end date[m
+[31m-    const potentialSessions = Math.ceil(totalDays / 7) * targetDays.length + 2; // Add buffer for edge cases[m
+[31m-    const maxSessions = Math.min(50, potentialSessions);[m
+[32m+[m[32m    const maxSessions = Math.min([m
+[32m+[m[32m      50,[m
+[32m+[m[32m      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 7))[m
+[32m+[m[32m    );[m
+ [m
+     while (currentDate <= end && sessionCounter < maxSessions) {[m
+       const dayOfWeek = currentDate.getDay();[m
+[31m-      // Create ISO date string manually to ensure consistency[m
+[31m-      const year = currentDate.getFullYear();[m
+[31m-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');[m
+[31m-      const day = String(currentDate.getDate()).padStart(2, '0');[m
+[31m-      const currentDateISO = `${year}-${month}-${day}`;[m
+[32m+[m[32m      const currentDateISO = currentDate.toISOString().split("T")[0];[m
+ [m
+       if (targetDays.includes(dayOfWeek) && !exceptionsSet.has(currentDateISO)) {[m
+         const dayName =[m
+           Object.keys(dayMap).find((key) => dayMap[key] === dayOfWeek) ||[m
+           "Unknown";[m
+ [m
+[31m-        // Format for English (Team Details UI) - Force timezone to avoid shifting[m
+[32m+[m[32m        // Format for English (Team Details UI)[m
+         const formattedDate = currentDate.toLocaleDateString("en-US", {[m
+           weekday: "long",[m
+           month: "short",[m
+           day: "numeric",[m
+           year: "numeric",[m
+[31m-          timeZone: timezone[m
+         });[m
+ [m
+[31m-        // Format for English (Email) - Miami timezone with consistent date[m
+[32m+[m[32m        // Format for English (Email) - Miami timezone[m
+         const formattedDateES = currentDate.toLocaleDateString("en-US", {[m
+           weekday: "long",[m
+           day: "2-digit",[m
+[1mdiff --git a/lib/scheduler.ts b/lib/scheduler.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 4f4998c..0000000[m
+[1m--- a/lib/scheduler.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,142 +0,0 @@[m
+[31m-import * as cron from 'node-cron';[m
+[31m-import { runSeasonReminders, checkSeasonRemindersConfig } from '../jobs/sendSeasonReminders';[m
+[31m-import { startRetryScheduler, stopRetryScheduler, isRetrySchedulerActive } from './retry-scheduler';[m
+[31m-[m
+[31m-/**[m
+[31m- * Configuración del scheduler para jobs automáticos[m
+[31m- */[m
+[31m-[m
+[31m-// Job de recordatorios de temporada - cada día a las 20:30 America/New_York[m
+[31m-const SEASON_REMINDERS_SCHEDULE = '30 20 * * *';[m
+[31m-const TIMEZONE = 'America/New_York';[m
+[31m-[m
+[31m-let seasonRemindersTask: cron.ScheduledTask | null = null;[m
+[31m-[m
+[31m-/**[m
+[31m- * Inicia el scheduler de recordatorios de temporada[m
+[31m- */[m
+[31m-export function startSeasonRemindersScheduler(): boolean {[m
+[31m-  try {[m
+[31m-    // Verificar que no esté ya iniciado[m
+[31m-    if (seasonRemindersTask) {[m
+[31m-      console.log('⚠️ Scheduler de recordatorios de temporada ya está activo');[m
+[31m-      return true;[m
+[31m-    }[m
+[31m-[m
+[31m-    console.log('🚀 Iniciando scheduler de recordatorios de temporada...');[m
+[31m-    console.log(`⏰ Programado para ejecutar diariamente a las 20:30 ${TIMEZONE}`);[m
+[31m-[m
+[31m-    seasonRemindersTask = cron.schedule([m
+[31m-      SEASON_REMINDERS_SCHEDULE,[m
+[31m-      async () => {[m
+[31m-        try {[m
+[31m-          console.log(`\n🎯 === EJECUTANDO JOB PROGRAMADO DE RECORDATORIOS DE TEMPORADA ===`);[m
+[31m-          console.log(`⏰ Hora de ejecución: ${new Date().toLocaleString('en-US', { timeZone: TIMEZONE })}`);[m
+[31m-          [m
+[31m-          // Verificar configuración antes de ejecutar[m
+[31m-          const configValid = await checkSeasonRemindersConfig();[m
+[31m-          if (!configValid) {[m
+[31m-            console.error('❌ Configuración inválida, saltando ejecución');[m
+[31m-            return;[m
+[31m-          }[m
+[31m-[m
+[31m-          await runSeasonReminders();[m
+[31m-          console.log('✅ Job programado completado exitosamente\n');[m
+[31m-        } catch (error) {[m
+[31m-          console.error('💥 Error en job programado de recordatorios de temporada:', error);[m
+[31m-        }[m
+[31m-      },[m
+[31m-      {[m
+[31m-        scheduled: true,[m
+[31m-        timezone: TIMEZONE[m
+[31m-      }[m
+[31m-    );[m
+[31m-[m
+[31m-    console.log('✅ Scheduler de recordatorios de temporada iniciado exitosamente');[m
+[31m-    return true;[m
+[31m-[m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error iniciando scheduler de recordatorios de temporada:', error);[m
+[31m-    return false;[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Detiene el scheduler de recordatorios de temporada[m
+[31m- */[m
+[31m-export function stopSeasonRemindersScheduler(): boolean {[m
+[31m-  try {[m
+[31m-    if (seasonRemindersTask) {[m
+[31m-      seasonRemindersTask.stop();[m
+[31m-      seasonRemindersTask.destroy();[m
+[31m-      seasonRemindersTask = null;[m
+[31m-      console.log('🛑 Scheduler de recordatorios de temporada detenido');[m
+[31m-      return true;[m
+[31m-    } else {[m
+[31m-      console.log('ℹ️ Scheduler de recordatorios de temporada no estaba activo');[m
+[31m-      return true;[m
+[31m-    }[m
+[31m-  } catch (error) {[m
+[31m-    console.error('❌ Error deteniendo scheduler de recordatorios de temporada:', error);[m
+[31m-    return false;[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Verifica si el scheduler está activo[m
+[31m- */[m
+[31m-export function isSeasonRemindersSchedulerActive(): boolean {[m
+[31m-  return seasonRemindersTask !== null && seasonRemindersTask.getStatus() === 'scheduled';[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Obtiene información del estado del scheduler[m
+[31m- */[m
+[31m-export function getSeasonRemindersSchedulerInfo() {[m
+[31m-  return {[m
+[31m-    isActive: isSeasonRemindersSchedulerActive(),[m
+[31m-    schedule: SEASON_REMINDERS_SCHEDULE,[m
+[31m-    timezone: TIMEZONE,[m
+[31m-    nextExecution: seasonRemindersTask ? 'Calculando...' : 'No programado'[m
+[31m-  };[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Inicia todos los schedulers del sistema[m
+[31m- */[m
+[31m-export function startAllSchedulers(): boolean {[m
+[31m-  console.log('🚀 === INICIANDO TODOS LOS SCHEDULERS ===');[m
+[31m-  [m
+[31m-  const seasonRemindersStarted = startSeasonRemindersScheduler();[m
+[31m-  const retrySchedulerStarted = startRetryScheduler();[m
+[31m-  [m
+[31m-  const allStarted = seasonRemindersStarted && retrySchedulerStarted;[m
+[31m-  [m
+[31m-  if (allStarted) {[m
+[31m-    console.log('✅ Todos los schedulers iniciados exitosamente');[m
+[31m-  } else {[m
+[31m-    console.log('⚠️ Algunos schedulers fallaron al iniciar');[m
+[31m-  }[m
+[31m-  [m
+[31m-  return allStarted;[m
+[31m-}[m
+[31m-[m
+[31m-/**[m
+[31m- * Detiene todos los schedulers del sistema[m
+[31m- */[m
+[31m-export function stopAllSchedulers(): boolean {[m
+[31m-  console.log('🛑 === DETENIENDO TODOS LOS SCHEDULERS ===');[m
+[31m-  [m
+[31m-  const seasonRemindersStopped = stopSeasonRemindersScheduler();[m
+[31m-  const retrySchedulerStopped = stopRetryScheduler();[m
+[31m-  [m
+[31m-  const allStopped = seasonRemindersStopped && retrySchedulerStopped;[m
+[31m-  [m
+[31m-  if (allStopped) {[m
+[31m-    console.log('✅ Todos los schedulers detenidos exitosamente');[m
+[31m-  } else {[m
+[31m-    console.log('⚠️ Algunos schedulers fallaron al detenerse');[m
+[31m-  }[m
+[31m-  [m
+[31m-  return allStopped;[m
+[31m-}[m
+[1mdiff --git a/merge-to-main.bat b/merge-to-main.bat[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a5db060[m
+[1m--- /dev/null[m
+[1m+++ b/merge-to-main.bat[m
+[36m@@ -0,0 +1,47 @@[m
+[32m+[m[32m@echo off[m
+[32m+[m[32mecho ========================================[m
+[32m+[m[32mecho MERGE A MAIN Y PUSH AL REPOSITORIO[m
+[32m+[m[32mecho ========================================[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 1. Verificando rama actual...[m
+[32m+[m[32mgit branch[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 2. Añadiendo cambios si los hay...[m
+[32m+[m[32mgit add .[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 3. Commiteando cambios en fresh-start...[m
+[32m+[m[32mgit commit -m "feat: Implement season reminders system and fix date issues"[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 4. Cambiando a rama main...[m
+[32m+[m[32mgit checkout main[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 5. Pulling latest changes from main...[m
+[32m+[m[32mgit pull origin main[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 6. Merging fresh-start into main...[m
+[32m+[m[32mgit merge fresh-start[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 7. Pushing to main...[m
+[32m+[m[32mgit push origin main[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 8. Verificando estado final...[m
+[32m+[m[32mgit status[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho 9. Ultimo commit en main...[m
+[32m+[m[32mgit log --oneline -1[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho ========================================[m
+[32m+[m[32mecho MERGE COMPLETADO[m
+[32m+[m[32mecho ========================================[m
+[32m+[m
+[32m+[m[32mpause[m
+[1mdiff --git a/package-lock.json b/package-lock.json[m
+[1mindex 0d61c75..28c8b72 100644[m
+[1m--- a/package-lock.json[m
+[1m+++ b/package-lock.json[m
+[36m@@ -39,23 +39,18 @@[m
+         "@radix-ui/react-tooltip": "1.1.6",[m
+         "@supabase/ssr": "^0.5.2",[m
+         "@supabase/supabase-js": "^2.52.1",[m
+[31m-        "@types/luxon": "^3.7.1",[m
+[31m-        "@types/node-cron": "^3.0.11",[m
+         "@types/nodemailer": "^6.4.17",[m
+         "autoprefixer": "^10.4.20",[m
+         "class-variance-authority": "^0.7.1",[m
+         "clsx": "^2.1.1",[m
+         "cmdk": "1.0.4",[m
+         "date-fns": "4.1.0",[m
+[31m-        "dotenv": "^17.2.1",[m
+         "embla-carousel-react": "8.5.1",[m
+         "geist": "^1.3.1",[m
+         "input-otp": "1.4.1",[m
+         "lucide-react": "^0.454.0",[m
+[31m-        "luxon": "^3.7.1",[m
+         "next": "^15.4.5",[m
+         "next-themes": "^0.4.4",[m
+[31m-        "node-cron": "^4.2.1",[m
+         "nodemailer": "^7.0.5",[m
+         "react": "^19.1.1",[m
+         "react-day-picker": "9.8.0",[m
+[36m@@ -77,7 +72,6 @@[m
+         "@types/react-dom": "^19",[m
+         "postcss": "^8.5",[m
+         "tailwindcss": "^3.4.17",[m
+[31m-        "tsx": "^4.20.4",[m
+         "typescript": "^5"[m
+       }[m
+     },[m
+[36m@@ -118,448 +112,6 @@[m
+         "tslib": "^2.4.0"[m
+       }[m
+     },[m
+[31m-    "node_modules/@esbuild/aix-ppc64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-OaGtL73Jck6pBKjNIe24BnFE6agGl+6KxDtTfHhy1HmhthfKouEcOhqpSL64K4/0WCtbKFLOdzD/44cJ4k9opA==",[m
+[31m-      "cpu": [[m
+[31m-        "ppc64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "aix"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/android-arm": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-5WNI1DaMtxQ7t7B6xa572XMXpHAaI/9Hnhk8lcxF4zVN4xstUgTlvuGDorBguKEnZO70qwEcLpfifMLoxiPqHQ==",[m
+[31m-      "cpu": [[m
+[31m-        "arm"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "android"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/android-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-IDrddSmpSv51ftWslJMvl3Q2ZT98fUSL2/rlUXuVqRXHCs5EUF1/f+jbjF5+NG9UffUDMCiTyh8iec7u8RlTLg==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "android"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/android-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-I853iMZ1hWZdNllhVZKm34f4wErd4lMyeV7BLzEExGEIZYsOzqDWDf+y082izYUE8gtJnYHdeDpN/6tUdwvfiw==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "android"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/darwin-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-XIpIDMAjOELi/9PB30vEbVMs3GV1v2zkkPnuyRRURbhqjyzIINwj+nbQATh4H9GxUgH1kFsEyQMxwiLFKUS6Rg==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "darwin"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/darwin-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-jhHfBzjYTA1IQu8VyrjCX4ApJDnH+ez+IYVEoJHeqJm9VhG9Dh2BYaJritkYK3vMaXrf7Ogr/0MQ8/MeIefsPQ==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "darwin"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/freebsd-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-z93DmbnY6fX9+KdD4Ue/H6sYs+bhFQJNCPZsi4XWJoYblUqT06MQUdBCpcSfuiN72AbqeBFu5LVQTjfXDE2A6Q==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "freebsd"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/freebsd-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-mrKX6H/vOyo5v71YfXWJxLVxgy1kyt1MQaD8wZJgJfG4gq4DpQGpgTB74e5yBeQdyMTbgxp0YtNj7NuHN0PoZg==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "freebsd"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-arm": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-HBU2Xv78SMgaydBmdor38lg8YDnFKSARg1Q6AT0/y2ezUAKiZvc211RDFHlEZRFNRVhcMamiToo7bDx3VEOYQw==",[m
+[31m-      "cpu": [[m
+[31m-        "arm"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-BlB7bIcLT3G26urh5Dmse7fiLmLXnRlopw4s8DalgZ8ef79Jj4aUcYbk90g8iCa2467HX8SAIidbL7gsqXHdRw==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-ia32": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-e7S3MOJPZGp2QW6AK6+Ly81rC7oOSerQ+P8L0ta4FhVi+/j/v2yZzx5CqqDaWjtPFfYz21Vi1S0auHrap3Ma3A==",[m
+[31m-      "cpu": [[m
+[31m-        "ia32"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-loong64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-Sbe10Bnn0oUAB2AalYztvGcK+o6YFFA/9829PhOCUS9vkJElXGdphz0A3DbMdP8gmKkqPmPcMJmJOrI3VYB1JQ==",[m
+[31m-      "cpu": [[m
+[31m-        "loong64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-mips64el": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-YcM5br0mVyZw2jcQeLIkhWtKPeVfAerES5PvOzaDxVtIyZ2NUBZKNLjC5z3/fUlDgT6w89VsxP2qzNipOaaDyA==",[m
+[31m-      "cpu": [[m
+[31m-        "mips64el"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-ppc64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-++0HQvasdo20JytyDpFvQtNrEsAgNG2CY1CLMwGXfFTKGBGQT3bOeLSYE2l1fYdvML5KUuwn9Z8L1EWe2tzs1w==",[m
+[31m-      "cpu": [[m
+[31m-        "ppc64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-riscv64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-uNIBa279Y3fkjV+2cUjx36xkx7eSjb8IvnL01eXUKXez/CBHNRw5ekCGMPM0BcmqBxBcdgUWuUXmVWwm4CH9kg==",[m
+[31m-      "cpu": [[m
+[31m-        "riscv64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-s390x": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-Mfiphvp3MjC/lctb+7D287Xw1DGzqJPb/J2aHHcHxflUo+8tmN/6d4k6I2yFR7BVo5/g7x2Monq4+Yew0EHRIA==",[m
+[31m-      "cpu": [[m
+[31m-        "s390x"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/linux-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-iSwByxzRe48YVkmpbgoxVzn76BXjlYFXC7NvLYq+b+kDjyyk30J0JY47DIn8z1MO3K0oSl9fZoRmZPQI4Hklzg==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "linux"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/netbsd-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-9jNJl6FqaUG+COdQMjSCGW4QiMHH88xWbvZ+kRVblZsWrkXlABuGdFJ1E9L7HK+T0Yqd4akKNa/lO0+jDxQD4Q==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "netbsd"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/netbsd-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-RLLdkflmqRG8KanPGOU7Rpg829ZHu8nFy5Pqdi9U01VYtG9Y0zOG6Vr2z4/S+/3zIyOxiK6cCeYNWOFR9QP87g==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "netbsd"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/openbsd-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-YaFBlPGeDasft5IIM+CQAhJAqS3St3nJzDEgsgFixcfZeyGPCd6eJBWzke5piZuZ7CtL656eOSYKk4Ls2C0FRQ==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "openbsd"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/openbsd-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-1MkgTCuvMGWuqVtAvkpkXFmtL8XhWy+j4jaSO2wxfJtilVCi0ZE37b8uOdMItIHz4I6z1bWWtEX4CJwcKYLcuA==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "openbsd"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/openharmony-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-4Xd0xNiMVXKh6Fa7HEJQbrpP3m3DDn43jKxMjxLLRjWnRsfxjORYJlXPO4JNcXtOyfajXorRKY9NkOpTHptErg==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "openharmony"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/sunos-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-WjH4s6hzo00nNezhp3wFIAfmGZ8U7KtrJNlFMRKxiI9mxEK1scOMAaa9i4crUtu+tBr+0IN6JCuAcSBJZfnphw==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "sunos"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/win32-arm64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-mGFrVJHmZiRqmP8xFOc6b84/7xa5y5YvR1x8djzXpJBSv/UsNK6aqec+6JDjConTgvvQefdGhFDAs2DLAds6gQ==",[m
+[31m-      "cpu": [[m
+[31m-        "arm64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "win32"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/win32-ia32": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-b33gLVU2k11nVx1OhX3C8QQP6UHQK4ZtN56oFWvVXvz2VkDoe6fbG8TOgHFxEvqeqohmRnIHe5A1+HADk4OQww==",[m
+[31m-      "cpu": [[m
+[31m-        "ia32"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "win32"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+[31m-    "node_modules/@esbuild/win32-x64": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-PPOl1mi6lpLNQxnGoyAfschAodRFYXJ+9fs6WHXz7CSWKbOqiMZsubC+BQsVKuul+3vKLuwTHsS2c2y9EoKwxQ==",[m
+[31m-      "cpu": [[m
+[31m-        "x64"[m
+[31m-      ],[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "optional": true,[m
+[31m-      "os": [[m
+[31m-        "win32"[m
+[31m-      ],[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/@floating-ui/core": {[m
+       "version": "1.7.2",[m
+       "resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.2.tgz",[m
+[36m@@ -3509,12 +3061,6 @@[m
+       "integrity": "sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==",[m
+       "license": "MIT"[m
+     },[m
+[31m-    "node_modules/@types/luxon": {[m
+[31m-      "version": "3.7.1",[m
+[31m-      "resolved": "https://registry.npmjs.org/@types/luxon/-/luxon-3.7.1.tgz",[m
+[31m-      "integrity": "sha512-H3iskjFIAn5SlJU7OuxUmTEpebK6TKB8rxZShDslBMZJ5u9S//KM1sbdAisiSrqwLQncVjnpi2OK2J51h+4lsg==",[m
+[31m-      "license": "MIT"[m
+[31m-    },[m
+     "node_modules/@types/node": {[m
+       "version": "22.16.5",[m
+       "resolved": "https://registry.npmjs.org/@types/node/-/node-22.16.5.tgz",[m
+[36m@@ -3524,12 +3070,6 @@[m
+         "undici-types": "~6.21.0"[m
+       }[m
+     },[m
+[31m-    "node_modules/@types/node-cron": {[m
+[31m-      "version": "3.0.11",[m
+[31m-      "resolved": "https://registry.npmjs.org/@types/node-cron/-/node-cron-3.0.11.tgz",[m
+[31m-      "integrity": "sha512-0ikrnug3/IyneSHqCBeslAhlK2aBfYek1fGo4bP4QnZPmiqSGRK+Oy7ZMisLWkesffJvQ1cqAcBnJC+8+nxIAg==",[m
+[31m-      "license": "MIT"[m
+[31m-    },[m
+     "node_modules/@types/nodemailer": {[m
+       "version": "6.4.17",[m
+       "resolved": "https://registry.npmjs.org/@types/nodemailer/-/nodemailer-6.4.17.tgz",[m
+[36m@@ -4154,18 +3694,6 @@[m
+         "csstype": "^3.0.2"[m
+       }[m
+     },[m
+[31m-    "node_modules/dotenv": {[m
+[31m-      "version": "17.2.1",[m
+[31m-      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-17.2.1.tgz",[m
+[31m-      "integrity": "sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==",[m
+[31m-      "license": "BSD-2-Clause",[m
+[31m-      "engines": {[m
+[31m-        "node": ">=12"[m
+[31m-      },[m
+[31m-      "funding": {[m
+[31m-        "url": "https://dotenvx.com"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/dunder-proto": {[m
+       "version": "1.0.1",[m
+       "resolved": "https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz",[m
+[36m@@ -4256,48 +3784,6 @@[m
+         "node": ">= 0.4"[m
+       }[m
+     },[m
+[31m-    "node_modules/esbuild": {[m
+[31m-      "version": "0.25.9",[m
+[31m-      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.25.9.tgz",[m
+[31m-      "integrity": "sha512-CRbODhYyQx3qp7ZEwzxOk4JBqmD/seJrzPa/cGjY1VtIn5E09Oi9/dB4JwctnfZ8Q8iT7rioVv5k/FNT/uf54g==",[m
+[31m-      "dev": true,[m
+[31m-      "hasInstallScript": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "bin": {[m
+[31m-        "esbuild": "bin/esbuild"[m
+[31m-      },[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18"[m
+[31m-      },[m
+[31m-      "optionalDependencies": {[m
+[31m-        "@esbuild/aix-ppc64": "0.25.9",[m
+[31m-        "@esbuild/android-arm": "0.25.9",[m
+[31m-        "@esbuild/android-arm64": "0.25.9",[m
+[31m-        "@esbuild/android-x64": "0.25.9",[m
+[31m-        "@esbuild/darwin-arm64": "0.25.9",[m
+[31m-        "@esbuild/darwin-x64": "0.25.9",[m
+[31m-        "@esbuild/freebsd-arm64": "0.25.9",[m
+[31m-        "@esbuild/freebsd-x64": "0.25.9",[m
+[31m-        "@esbuild/linux-arm": "0.25.9",[m
+[31m-        "@esbuild/linux-arm64": "0.25.9",[m
+[31m-        "@esbuild/linux-ia32": "0.25.9",[m
+[31m-        "@esbuild/linux-loong64": "0.25.9",[m
+[31m-        "@esbuild/linux-mips64el": "0.25.9",[m
+[31m-        "@esbuild/linux-ppc64": "0.25.9",[m
+[31m-        "@esbuild/linux-riscv64": "0.25.9",[m
+[31m-        "@esbuild/linux-s390x": "0.25.9",[m
+[31m-        "@esbuild/linux-x64": "0.25.9",[m
+[31m-        "@esbuild/netbsd-arm64": "0.25.9",[m
+[31m-        "@esbuild/netbsd-x64": "0.25.9",[m
+[31m-        "@esbuild/openbsd-arm64": "0.25.9",[m
+[31m-        "@esbuild/openbsd-x64": "0.25.9",[m
+[31m-        "@esbuild/openharmony-arm64": "0.25.9",[m
+[31m-        "@esbuild/sunos-x64": "0.25.9",[m
+[31m-        "@esbuild/win32-arm64": "0.25.9",[m
+[31m-        "@esbuild/win32-ia32": "0.25.9",[m
+[31m-        "@esbuild/win32-x64": "0.25.9"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/escalade": {[m
+       "version": "3.2.0",[m
+       "resolved": "https://registry.npmjs.org/escalade/-/escalade-3.2.0.tgz",[m
+[36m@@ -4478,19 +3964,6 @@[m
+         "node": ">= 0.4"[m
+       }[m
+     },[m
+[31m-    "node_modules/get-tsconfig": {[m
+[31m-      "version": "4.10.1",[m
+[31m-      "resolved": "https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.10.1.tgz",[m
+[31m-      "integrity": "sha512-auHyJ4AgMz7vgS8Hp3N6HXSmlMdUyhSUrfBF16w153rxtLIEOE+HGqaBppczZvnHLqQJfiHotCYpNhl0lUROFQ==",[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "dependencies": {[m
+[31m-        "resolve-pkg-maps": "^1.0.0"[m
+[31m-      },[m
+[31m-      "funding": {[m
+[31m-        "url": "https://github.com/privatenumber/get-tsconfig?sponsor=1"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/glob": {[m
+       "version": "10.4.5",[m
+       "resolved": "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz",[m
+[36m@@ -4753,15 +4226,6 @@[m
+         "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0-rc"[m
+       }[m
+     },[m
+[31m-    "node_modules/luxon": {[m
+[31m-      "version": "3.7.1",[m
+[31m-      "resolved": "https://registry.npmjs.org/luxon/-/luxon-3.7.1.tgz",[m
+[31m-      "integrity": "sha512-RkRWjA926cTvz5rAb1BqyWkKbbjzCGchDUIKMCUvNi17j6f6j8uHGDV82Aqcqtzd+icoYpELmG3ksgGiFNNcNg==",[m
+[31m-      "license": "MIT",[m
+[31m-      "engines": {[m
+[31m-        "node": ">=12"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/math-intrinsics": {[m
+       "version": "1.1.0",[m
+       "resolved": "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz",[m
+[36m@@ -4936,15 +4400,6 @@[m
+         "node": "^10 || ^12 || >=14"[m
+       }[m
+     },[m
+[31m-    "node_modules/node-cron": {[m
+[31m-      "version": "4.2.1",[m
+[31m-      "resolved": "https://registry.npmjs.org/node-cron/-/node-cron-4.2.1.tgz",[m
+[31m-      "integrity": "sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==",[m
+[31m-      "license": "ISC",[m
+[31m-      "engines": {[m
+[31m-        "node": ">=6.0.0"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/node-releases": {[m
+       "version": "2.0.19",[m
+       "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-2.0.19.tgz",[m
+[36m@@ -5540,16 +4995,6 @@[m
+         "url": "https://github.com/sponsors/ljharb"[m
+       }[m
+     },[m
+[31m-    "node_modules/resolve-pkg-maps": {[m
+[31m-      "version": "1.0.0",[m
+[31m-      "resolved": "https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz",[m
+[31m-      "integrity": "sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==",[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "funding": {[m
+[31m-        "url": "https://github.com/privatenumber/resolve-pkg-maps?sponsor=1"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/reusify": {[m
+       "version": "1.1.0",[m
+       "resolved": "https://registry.npmjs.org/reusify/-/reusify-1.1.0.tgz",[m
+[36m@@ -6065,26 +5510,6 @@[m
+       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",[m
+       "license": "0BSD"[m
+     },[m
+[31m-    "node_modules/tsx": {[m
+[31m-      "version": "4.20.4",[m
+[31m-      "resolved": "https://registry.npmjs.org/tsx/-/tsx-4.20.4.tgz",[m
+[31m-      "integrity": "sha512-yyxBKfORQ7LuRt/BQKBXrpcq59ZvSW0XxwfjAt3w2/8PmdxaFzijtMhTawprSHhpzeM5BgU2hXHG3lklIERZXg==",[m
+[31m-      "dev": true,[m
+[31m-      "license": "MIT",[m
+[31m-      "dependencies": {[m
+[31m-        "esbuild": "~0.25.0",[m
+[31m-        "get-tsconfig": "^4.7.5"[m
+[31m-      },[m
+[31m-      "bin": {[m
+[31m-        "tsx": "dist/cli.mjs"[m
+[31m-      },[m
+[31m-      "engines": {[m
+[31m-        "node": ">=18.0.0"[m
+[31m-      },[m
+[31m-      "optionalDependencies": {[m
+[31m-        "fsevents": "~2.3.3"[m
+[31m-      }[m
+[31m-    },[m
+     "node_modules/typescript": {[m
+       "version": "5.8.3",[m
+       "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.8.3.tgz",[m
+[1mdiff --git a/package.json b/package.json[m
+[1mindex 87900c7..7bdf6c9 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -6,20 +6,7 @@[m
+     "build": "next build",[m
+     "dev": "next dev",[m
+     "lint": "next lint",[m
+[31m-    "start": "next start",[m
+[31m-    "season-reminders": "npx tsx scripts/run-season-reminders.ts",[m
+[31m-    "season-reminders:dry-run": "DRY_RUN=1 npx tsx scripts/run-season-reminders.ts",[m
+[31m-    "season-reminders:test": "TEST_DATE=2024-01-15 npx tsx scripts/run-season-reminders.ts",[m
+[31m-    "create-test-data": "npx tsx scripts/create-test-data.ts",[m
+[31m-    "cleanup-test-data": "npx tsx scripts/create-test-data.ts --cleanup",[m
+[31m-    "test-reminders": "npx tsx scripts/test-with-existing-data.ts",[m
+[31m-    "cleanup-test-reminders": "npx tsx scripts/test-with-existing-data.ts --cleanup",[m
+[31m-    "test-email": "npx tsx scripts/simple-email-test.ts",[m
+[31m-    "test-schedule": "npx tsx scripts/test-practice-schedule.ts",[m
+[31m-    "test-date-problem": "npx tsx scripts/test-date-problem.ts",[m
+[31m-    "test-payment-email": "npx tsx scripts/test-payment-email.ts",[m
+[31m-    "debug-email-dates": "npx tsx scripts/debug-email-dates.ts",[m
+[31m-    "test-end-date": "npx tsx scripts/test-end-date-issue.ts"[m
+[32m+[m[32m    "start": "next start"[m
+   },[m
+   "dependencies": {[m
+     "@hookform/resolvers": "^3.9.1",[m
+[36m@@ -52,23 +39,18 @@[m
+     "@radix-ui/react-tooltip": "1.1.6",[m
+     "@supabase/ssr": "^0.5.2",[m
+     "@supabase/supabase-js": "^2.52.1",[m
+[31m-    "@types/luxon": "^3.7.1",[m
+[31m-    "@types/node-cron": "^3.0.11",[m
+     "@types/nodemailer": "^6.4.17",[m
+     "autoprefixer": "^10.4.20",[m
+     "class-variance-authority": "^0.7.1",[m
+     "clsx": "^2.1.1",[m
+     "cmdk": "1.0.4",[m
+     "date-fns": "4.1.0",[m
+[31m-    "dotenv": "^17.2.1",[m
+     "embla-carousel-react": "8.5.1",[m
+     "geist": "^1.3.1",[m
+     "input-otp": "1.4.1",[m
+     "lucide-react": "^0.454.0",[m
+[31m-    "luxon": "^3.7.1",[m
+     "next": "^15.4.5",[m
+     "next-themes": "^0.4.4",[m
+[31m-    "node-cron": "^4.2.1",[m
+     "nodemailer": "^7.0.5",[m
+     "react": "^19.1.1",[m
+     "react-day-picker": "9.8.0",[m
+[36m@@ -90,7 +72,6 @@[m
+     "@types/react-dom": "^19",[m
+     "postcss": "^8.5",[m
+     "tailwindcss": "^3.4.17",[m
+[31m-    "tsx": "^4.20.4",[m
+     "typescript": "^5"[m
+   },[m
+   "description": "![Discipline Rift](https://img.shields.io/badge/Status-Active-brightgreen) ![Next.js](https://img.shields.io/badge/Next.js-15.2.4-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)",[m
+[1mdiff --git a/push-changes.bat b/push-changes.bat[m
+[1mnew file mode 100644[m
+[1mindex 0000000..da1ae97[m
+[1m--- /dev/null[m
+[1m+++ b/push-changes.bat[m
+[36m@@ -0,0 +1,21 @@[m
+[32m+[m[32m@echo off[m
+[32m+[m[32mecho Verificando estado del repositorio...[m
+[32m+[m[32mgit status[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho Verificando ramas...[m
+[32m+[m[32mgit branch -a[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho Intentando push a fresh-start...[m
+[32m+[m[32mgit push origin fresh-start[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho Intentando push con upstream...[m
+[32m+[m[32mgit push -u origin fresh-start[m
+[32m+[m
+[32m+[m[32mecho.[m
+[32m+[m[32mecho Estado final...[m
+[32m+[m[32mgit status[m
+[32m+[m
+[32m+[m[32mpause[m
+[1mdiff --git a/scripts/create-test-data.ts b/scripts/create-test-data.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 8b74ccc..0000000[m
+[1m--- a/scripts/create-test-data.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,262 +0,0 @@[m
+[31m-#!/usr/bin/env npx tsx[m
+[31m-[m
+[31m-/**[m
+[31m- * Script para crear datos de prueba para el sistema de recordatorios[m
+[31m- */[m
+[31m-[m
+[31m-// Cargar variables de entorno[m
+[31m-import dotenv from 'dotenv';[m
+[31m-import path from 'path';[m
+[31m-[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-[m
+[31m-import { DateTime } from 'luxon';[m
+[31m-import { createClient } from '@supabase/supabase-js';[m
+[31m-import { randomUUID } from 'crypto';[m
+[31m-[m
+[31m-const TIMEZONE = 'America/New_York';[m
+[31m-[m
+[31m-const createSupabaseClient = () => {[m
+[31m-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;[m
+[31m-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;[m
+[31m-  [m
+[31m-  if (!supabaseUrl || !supabaseKey) {[m
+[31m-    throw new Error('Supabase configuration missing');[m
+[31m-  }[m
+[31m-  [m
+[31m-  return createClient(supabaseUrl, supabaseKey);[m
+[31m-};[m
+[31m-[m
+[31m-async function createTestData() {[m
+[31m-  try {[m
+[31m-    console.log('🧪 === CREANDO DATOS DE PRUEBA ===');[m
+[31m-    [m
+[31m-    const supabase = createSupabaseClient();[m
+[31m-    const now = DateTime.now().setZone(TIMEZONE);[m
+[31m-    const testDate = now.plus({ days: 30 }).toISODate(); // 30 días en el futuro[m
+[31m-    [m
+[31m-    console.log(`📅 Creando sesión de prueba para: ${testDate}`);[m
+[31m-    [m
+[31m-    // 1. Crear un padre de prueba[m
+[31m-    const testParentId = randomUUID();[m
+[31m-    console.log('👨‍👩‍👧‍👦 Creando padre de prueba...');[m
+[31m-    [m
+[31m-    const { data: parent, error: parentError } = await supabase[m
+[31m-      .from('parent')[m
+[31m-      .insert({[m
+[31m-        parentid: testParentId,[m
+[31m-        firstname: 'Juan',[m
+[31m-        lastname: 'Pérez',[m
+[31m-        email: 'test.parent@example.com', // Cambia esto por tu email real para recibir la prueba[m
+[31m-        phone: '555-0123'[m
+[31m-      })[m
+[31m-      .select()[m
+[31m-      .single();[m
+[31m-    [m
+[31m-    if (parentError) {[m
+[31m-      console.error('❌ Error creando padre:', parentError);[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Padre creado:', parent.firstname, parent.lastname);[m
+[31m-    [m
+[31m-    // 2. Crear un estudiante de prueba[m
+[31m-    const testStudentId = randomUUID();[m
+[31m-    console.log('👨‍🎓 Creando estudiante de prueba...');[m
+[31m-    [m
+[31m-    const { data: student, error: studentError } = await supabase[m
+[31m-      .from('student')[m
+[31m-      .insert({[m
+[31m-        studentid: testStudentId,[m
+[31m-        parentid: testParentId,[m
+[31m-        firstname: 'María',[m
+[31m-        lastname: 'Pérez',[m
+[31m-        dob: '2008-06-15', // Fecha de nacimiento[m
+[31m-        grade: '10th Grade',[m
+[31m-        ecname: 'Ana Pérez',     // Emergency contact name[m
+[31m-        ecphone: '555-0124',     // Emergency contact phone[m
+[31m-        ecrelationship: 'Aunt'   // Emergency contact relationship[m
+[31m-      })[m
+[31m-      .select()[m
+[31m-      .single();[m
+[31m-    [m
+[31m-    if (studentError) {[m
+[31m-      console.error('❌ Error creando estudiante:', studentError);[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Estudiante creado:', student.firstname, student.lastname);[m
+[31m-    [m
+[31m-    // 3. Crear un equipo de prueba[m
+[31m-    const testTeamId = randomUUID();[m
+[31m-    console.log('🏐 Creando equipo de prueba...');[m
+[31m-    [m
+[31m-    const { data: team, error: teamError } = await supabase[m
+[31m-      .from('team')[m
+[31m-      .insert({[m
+[31m-        teamid: testTeamId,[m
+[31m-        name: 'Volleyball Test Team',[m
+[31m-        description: 'Equipo de prueba para sistema de recordatorios'[m
+[31m-      })[m
+[31m-      .select()[m
+[31m-      .single();[m
+[31m-    [m
+[31m-    if (teamError) {[m
+[31m-      console.error('❌ Error creando equipo:', teamError);[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Equipo creado:', team.name);[m
+[31m-    [m
+[31m-    // 4. Crear una sesión de prueba[m
+[31m-    const testSessionId = randomUUID();[m
+[31m-    console.log('📅 Creando sesión de prueba...');[m
+[31m-    [m
+[31m-    const { data: session, error: sessionError } = await supabase[m
+[31m-      .from('session')[m
+[31m-      .insert({[m
+[31m-        sessionid: testSessionId,[m
+[31m-        teamid: testTeamId,[m
+[31m-        startdate: testDate,[m
+[31m-        enddate: now.plus({ days: 60 }).toISODate(), // 60 días en el futuro[m
+[31m-        starttime: '18:00',[m
+[31m-        endtime: '19:30',[m
+[31m-        daysofweek: 'Monday,Wednesday,Friday'[m
+[31m-      })[m
+[31m-      .select()[m
+[31m-      .single();[m
+[31m-    [m
+[31m-    if (sessionError) {[m
+[31m-      console.error('❌ Error creando sesión:', sessionError);[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Sesión creada:', session.startdate, 'al', session.enddate);[m
+[31m-    [m
+[31m-    // 5. Crear inscripción activa[m
+[31m-    const testEnrollmentId = randomUUID();[m
+[31m-    console.log('📝 Creando inscripción de prueba...');[m
+[31m-    [m
+[31m-    const { data: enrollment, error: enrollmentError } = await supabase[m
+[31m-      .from('enrollment')[m
+[31m-      .insert({[m
+[31m-        enrollmentid: testEnrollmentId,[m
+[31m-        studentid: testStudentId,[m
+[31m-        teamid: testTeamId,[m
+[31m-        isactive: true[m
+[31m-      })[m
+[31m-      .select()[m
+[31m-      .single();[m
+[31m-    [m
+[31m-    if (enrollmentError) {[m
+[31m-      console.error('❌ Error creando inscripción:', enrollmentError);[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Inscripción creada:', enrollment.enrollmentid);[m
+[31m-    [m
+[31m-    // 6. Resumen[m
+[31m-    console.log('\n📊 === RESUMEN DE DATOS DE PRUEBA ===');[m
+[31m-    console.log(`👨‍👩‍👧‍👦 Padre: ${parent.firstname} ${parent.lastname} (${parent.email})`);[m
+[31m-    console.log(`👨‍🎓 Estudiante: ${student.firstname} ${student.lastname}`);[m
+[31m-    console.log(`🏐 Equipo: ${team.name}`);[m
+[31m-    console.log(`📅 Sesión: ${session.startdate} - ${session.enddate}`);[m
+[31m-    console.log(`⏰ Horario: ${session.starttime} - ${session.endtime}`);[m
+[31m-    console.log(`📆 Días: ${session.daysofweek}`);[m
+[31m-    console.log(`✅ Inscripción activa: ${enrollment.isactive}`);[m
+[31m-    [m
+[31m-    console.log('\n🎯 === DATOS PARA PRUEBA ===');[m
+[31m-    console.log(`Para probar, ejecuta:`);[m
+[31m-    console.log(`npm run season-reminders -- --date=${now.toISODate()}`);[m
+[31m-    console.log(`\nEsto debería encontrar la sesión y enviar un email a: ${parent.email}`);[m
+[31m-    [m
+[31m-    return {[m
+[31m-      parentId: testParentId,[m
+[31m-      studentId: testStudentId,[m
+[31m-      teamId: testTeamId,[m
+[31m-      sessionId: testSessionId,[m
+[31m-      enrollmentId: testEnrollmentId,[m
+[31m-      testDate,[m
+[31m-      parentEmail: parent.email[m
+[31m-    };[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('💥 Error creando datos de prueba:', error);[m
+[31m-    throw error;[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-async function cleanupTestData() {[m
+[31m-  try {[m
+[31m-    console.log('🧹 === LIMPIANDO DATOS DE PRUEBA ===');[m
+[31m-    [m
+[31m-    const supabase = createSupabaseClient();[m
+[31m-    [m
+[31m-    // Buscar y eliminar datos de prueba (buscar por nombres de prueba en lugar de IDs)[m
+[31m-    const cleanupQueries = [[m
+[31m-      { table: 'enrollment', condition: { teamid: 'in.(select teamid from team where teamname like \'%Test%\')' }},[m
+[31m-      { table: 'session', condition: { teamid: 'in.(select teamid from team where teamname like \'%Test%\')' }},[m
+[31m-      { table: 'student', condition: { firstname: 'eq.María', lastname: 'eq.Pérez' }},[m
+[31m-      { table: 'parent', condition: { firstname: 'eq.Juan', lastname: 'eq.Pérez' }},[m
+[31m-      { table: 'team', condition: { name: 'like.%Test%' }}[m
+[31m-    ];[m
+[31m-    [m
+[31m-    for (const query of cleanupQueries) {[m
+[31m-      try {[m
+[31m-        let deleteQuery = supabase.from(query.table).delete();[m
+[31m-        [m
+[31m-        // Aplicar condiciones[m
+[31m-        for (const [key, value] of Object.entries(query.condition)) {[m
+[31m-          if (value.startsWith('eq.')) {[m
+[31m-            deleteQuery = deleteQuery.eq(key, value.substring(3));[m
+[31m-          } else if (value.startsWith('like.')) {[m
+[31m-            deleteQuery = deleteQuery.like(key, value.substring(5));[m
+[31m-          } else if (value.startsWith('in.')) {[m
+[31m-            // Para consultas complejas, usar rpc o similar[m
+[31m-            console.log(`⚠️ Saltando limpieza compleja para ${query.table}`);[m
+[31m-            continue;[m
+[31m-          }[m
+[31m-        }[m
+[31m-        [m
+[31m-        const { error } = await deleteQuery;[m
+[31m-        [m
+[31m-        if (!error) {[m
+[31m-          console.log(`✅ Limpiado tabla ${query.table}`);[m
+[31m-        } else {[m
+[31m-          console.log(`⚠️ Error limpiando ${query.table}:`, error.message);[m
+[31m-        }[m
+[31m-      } catch (cleanupError) {[m
+[31m-        console.log(`⚠️ Error en limpieza de ${query.table}:`, cleanupError);[m
+[31m-      }[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Limpieza completada');[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('💥 Error limpiando datos de prueba:', error);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-async function main() {[m
+[31m-  const args = process.argv.slice(2);[m
+[31m-  const isCleanup = args.includes('--cleanup');[m
+[31m-  [m
+[31m-  if (isCleanup) {[m
+[31m-    await cleanupTestData();[m
+[31m-  } else {[m
+[31m-    await createTestData();[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Manejar señales de interrupción[m
+[31m-process.on('SIGINT', () => {[m
+[31m-  console.log('\n⚠️ Operación interrumpida');[m
+[31m-  process.exit(0);[m
+[31m-});[m
+[31m-[m
+[31m-// Ejecutar[m
+[31m-main().catch((error) => {[m
+[31m-  console.error('💥 Error fatal:', error);[m
+[31m-  process.exit(1);[m
+[31m-});[m
+[1mdiff --git a/scripts/debug-email-dates.ts b/scripts/debug-email-dates.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 735f1a5..0000000[m
+[1m--- a/scripts/debug-email-dates.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,138 +0,0 @@[m
+[31m-#!/usr/bin/env npx tsx[m
+[31m-[m
+[31m-/**[m
+[31m- * Script para debuggear específicamente las fechas en el email[m
+[31m- */[m
+[31m-[m
+[31m-// Cargar variables de entorno[m
+[31m-import dotenv from 'dotenv';[m
+[31m-import path from 'path';[m
+[31m-[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-[m
+[31m-import { buildPracticeOccurrences, formatTimeES } from '../lib/schedule/buildPracticeOccurrences';[m
+[31m-[m
+[31m-function debugEmailDates() {[m
+[31m-  console.log('🔍 === DEBUG DE FECHAS DEL EMAIL ===');[m
+[31m-  [m
+[31m-  // Datos exactos como vienen de la base de datos según tu problema[m
+[31m-  const sessionData = {[m
+[31m-    startdate: '2025-09-18', // Jueves según la DB[m
+[31m-    enddate: '2025-10-23',[m
+[31m-    starttime: '15:15:00',   // Con segundos como viene de Supabase[m
+[31m-    endtime: '16:15:00',[m
+[31m-    daysofweek: 'Wednesday'  // Pero queremos miércoles[m
+[31m-  };[m
+[31m-[m
+[31m-  console.log('\n📋 DATOS ORIGINALES (como vienen de Supabase):');[m
+[31m-  console.log(JSON.stringify(sessionData, null, 2));[m
+[31m-[m
+[31m-  // Proceso igual que en el email service[m
+[31m-  console.log('\n🔄 PROCESANDO COMO EN EMAIL SERVICE...');[m
+[31m-[m
+[31m-  // 1. Parse days of week[m
+[31m-  let daysOfWeek: string[] = [];[m
+[31m-  try {[m
+[31m-    if (typeof sessionData.daysofweek === "string") {[m
+[31m-      const rawValue = sessionData.daysofweek.trim();[m
+[31m-      if (rawValue.includes(",")) {[m
+[31m-        daysOfWeek = rawValue.split(",").map((day: string) => day.trim());[m
+[31m-      } else {[m
+[31m-        daysOfWeek = [rawValue];[m
+[31m-      }[m
+[31m-    }[m
+[31m-  } catch (error) {[m
+[31m-    console.warn("Error parsing days of week:", error);[m
+[31m-    daysOfWeek = ["Monday", "Wednesday", "Friday"];[m
+[31m-  }[m
+[31m-[m
+[31m-  console.log('Días de la semana parseados:', daysOfWeek);[m
+[31m-[m
+[31m-  // 2. Clean times (remove seconds)[m
+[31m-  const cleanStartTime = sessionData.starttime?.includes(':') [m
+[31m-    ? sessionData.starttime.substring(0, 5) [m
+[31m-    : sessionData.starttime;[m
+[31m-  const cleanEndTime = sessionData.endtime?.includes(':') [m
+[31m-    ? sessionData.endtime.substring(0, 5) [m
+[31m-    : sessionData.endtime;[m
+[31m-[m
+[31m-  console.log('Tiempos limpiados:');[m
+[31m-  console.log(`  Start: ${sessionData.starttime} -> ${cleanStartTime}`);[m
+[31m-  console.log(`  End: ${sessionData.endtime} -> ${cleanEndTime}`);[m
+[31m-[m
+[31m-  // 3. Parametros para buildPracticeOccurrences[m
+[31m-  const params = {[m
+[31m-    startDate: sessionData.startdate,[m
+[31m-    endDate: sessionData.enddate,[m
+[31m-    daysOfWeek,[m
+[31m-    startTime: cleanStartTime,[m
+[31m-    endTime: cleanEndTime,[m
+[31m-    location: 'Orlando, FL',[m
+[31m-    coachName: 'Ranya',[m
+[31m-    timezone: 'America/New_York'[m
+[31m-  };[m
+[31m-[m
+[31m-  console.log('\n📋 PARÁMETROS ENVIADOS A buildPracticeOccurrences:');[m
+[31m-  console.log(JSON.stringify(params, null, 2));[m
+[31m-[m
+[31m-  // 4. Generar occurrences[m
+[31m-  console.log('\n⚙️ GENERANDO PRACTICE OCCURRENCES...');[m
+[31m-  const practiceOccurrences = buildPracticeOccurrences(params);[m
+[31m-[m
+[31m-  console.log(`📊 Generadas ${practiceOccurrences.length} sesiones:`);[m
+[31m-  [m
+[31m-  practiceOccurrences.forEach((occurrence, index) => {[m
+[31m-    const timeFormatted = formatTimeES(occurrence.time);[m
+[31m-    console.log(`\n${index + 1}. ${occurrence.formattedDateES}`);[m
+[31m-    console.log(`   Time: ${timeFormatted}`);[m
+[31m-    console.log(`   Raw date object: ${occurrence.date.toString()}`);[m
+[31m-    console.log(`   UTC: ${occurrence.date.toISOString().split('T')[0]}`);[m
+[31m-    console.log(`   Local: ${occurrence.date.getFullYear()}-${String(occurrence.date.getMonth() + 1).padStart(2, '0')}-${String(occurrence.date.getDate()).padStart(2, '0')}`);[m
+[31m-  });[m
+[31m-[m
+[31m-  // 5. Verificación específica del problema[m
+[31m-  console.log('\n🎯 === VERIFICACIÓN DEL PROBLEMA ===');[m
+[31m-  if (practiceOccurrences.length > 0) {[m
+[31m-    const firstPractice = practiceOccurrences[0];[m
+[31m-    const dateInEmail = firstPractice.formattedDateES;[m
+[31m-    [m
+[31m-    console.log(`Fecha que aparecerá en el email: "${dateInEmail}"`);[m
+[31m-    [m
+[31m-    // Extraer el día del mes de la fecha formateada[m
+[31m-    const dayMatch = dateInEmail.match(/(\d{1,2})/);[m
+[31m-    if (dayMatch) {[m
+[31m-      const dayInEmail = parseInt(dayMatch[1]);[m
+[31m-      console.log(`Día del mes en el email: ${dayInEmail}`);[m
+[31m-      [m
+[31m-      // Verificar el problema[m
+[31m-      if (dayInEmail === 17) {[m
+[31m-        console.log('✅ CORRECTO: Muestra el 17 (miércoles correcto)');[m
+[31m-      } else if (dayInEmail === 16) {[m
+[31m-        console.log('❌ PROBLEMA CONFIRMADO: Muestra el 16 (un día antes)');[m
+[31m-      } else if (dayInEmail === 24) {[m
+[31m-        console.log('⚠️ Muestra el 24 (siguiente miércoles después del 18)');[m
+[31m-      } else {[m
+[31m-        console.log(`🤔 Muestra el día ${dayInEmail} - verificar manualmente`);[m
+[31m-      }[m
+[31m-    }[m
+[31m-[m
+[31m-    // Información adicional[m
+[31m-    console.log('\n📅 CONTEXTO:');[m
+[31m-    console.log('- Base de datos dice: 2025-09-18 (jueves)');[m
+[31m-    console.log('- Buscamos día: Wednesday (miércoles)');[m
+[31m-    console.log('- Miércoles anterior: 2025-09-17');[m
+[31m-    console.log('- Miércoles siguiente: 2025-09-24');[m
+[31m-    console.log(`- El email muestra: ${dateInEmail}`);[m
+[31m-  }[m
+[31m-[m
+[31m-  return practiceOccurrences;[m
+[31m-}[m
+[31m-[m
+[31m-// Ejecutar debug[m
+[31m-try {[m
+[31m-  const result = debugEmailDates();[m
+[31m-  console.log(`\n🎉 Debug completado. Analizadas ${result.length} sesiones.`);[m
+[31m-} catch (error) {[m
+[31m-  console.error('💥 Error en debug:', error);[m
+[31m-}[m
+[1mdiff --git a/scripts/run-season-reminders.ts b/scripts/run-season-reminders.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 92f90eb..0000000[m
+[1m--- a/scripts/run-season-reminders.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,149 +0,0 @@[m
+[31m-#!/usr/bin/env npx tsx[m
+[31m-[m
+[31m-/**[m
+[31m- * Script CLI para ejecutar manualmente el job de recordatorios de temporada[m
+[31m- * [m
+[31m- * Uso:[m
+[31m- *   npm run season-reminders              # Ejecutar con fecha actual[m
+[31m- *   npm run season-reminders:dry-run     # Modo dry-run (sin enviar emails)[m
+[31m- *   npm run season-reminders:test        # Ejecutar con fecha específica para testing[m
+[31m- */[m
+[31m-[m
+[31m-// Cargar variables de entorno desde .env.local[m
+[31m-import dotenv from 'dotenv';[m
+[31m-import path from 'path';[m
+[31m-[m
+[31m-// Cargar .env.local primero, luego .env[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-[m
+[31m-import { DateTime } from 'luxon';[m
+[31m-import { runSeasonReminders, checkSeasonRemindersConfig } from '../jobs/sendSeasonReminders';[m
+[31m-[m
+[31m-// Configuración[m
+[31m-const TIMEZONE = 'America/New_York';[m
+[31m-[m
+[31m-// Parsear argumentos de línea de comandos[m
+[31m-const args = process.argv.slice(2);[m
+[31m-const isDryRun = process.env.DRY_RUN === '1' || args.includes('--dry-run');[m
+[31m-const testDate = process.env.TEST_DATE || args.find(arg => arg.startsWith('--date='))?.split('=')[1];[m
+[31m-const isHelp = args.includes('--help') || args.includes('-h');[m
+[31m-[m
+[31m-function showHelp() {[m
+[31m-  console.log(`[m
+[31m-🏐 Script de Recordatorios de Temporada - Discipline Rift[m
+[31m-[m
+[31m-DESCRIPCIÓN:[m
+[31m-  Ejecuta el job de recordatorios de temporada para enviar emails a padres[m
+[31m-  cuando la temporada de su equipo comienza en exactamente 30 días.[m
+[31m-[m
+[31m-USO:[m
+[31m-  npx tsx scripts/run-season-reminders.ts [OPCIONES][m
+[31m-[m
+[31m-OPCIONES:[m
+[31m-  --dry-run               Modo de prueba (no envía emails reales)[m
+[31m-  --date=YYYY-MM-DD      Ejecutar como si fuera esta fecha específica[m
+[31m-  --help, -h             Mostrar esta ayuda[m
+[31m-[m
+[31m-VARIABLES DE ENTORNO:[m
+[31m-  DRY_RUN=1              Habilitar modo dry-run[m
+[31m-  TEST_DATE=YYYY-MM-DD   Fecha específica para testing[m
+[31m-[m
+[31m-EJEMPLOS:[m
+[31m-  # Ejecutar normalmente[m
+[31m-  npx tsx scripts/run-season-reminders.ts[m
+[31m-  [m
+[31m-  # Modo dry-run (no envía emails)[m
+[31m-  npx tsx scripts/run-season-reminders.ts --dry-run[m
+[31m-  [m
+[31m-  # Testing con fecha específica[m
+[31m-  npx tsx scripts/run-season-reminders.ts --date=2024-01-15[m
+[31m-  [m
+[31m-  # Con variables de entorno[m
+[31m-  DRY_RUN=1 TEST_DATE=2024-01-15 npx tsx scripts/run-season-reminders.ts[m
+[31m-[m
+[31m-CONFIGURACIÓN REQUERIDA:[m
+[31m-  - NEXT_PUBLIC_SUPABASE_URL[m
+[31m-  - NEXT_PUBLIC_SUPABASE_ANON_KEY[m
+[31m-  - GMAIL_USER[m
+[31m-  - GMAIL_APP_PASSWORD[m
+[31m-`);[m
+[31m-}[m
+[31m-[m
+[31m-async function main() {[m
+[31m-  try {[m
+[31m-    if (isHelp) {[m
+[31m-      showHelp();[m
+[31m-      process.exit(0);[m
+[31m-    }[m
+[31m-[m
+[31m-    console.log('🚀 === SCRIPT CLI DE RECORDATORIOS DE TEMPORADA ===');[m
+[31m-    [m
+[31m-    if (isDryRun) {[m
+[31m-      console.log('⚠️ MODO DRY-RUN ACTIVADO - NO SE ENVIARÁN EMAILS REALES');[m
+[31m-    }[m
+[31m-[m
+[31m-    // Preparar fecha de ejecución[m
+[31m-    let executionDate: Date;[m
+[31m-    if (testDate) {[m
+[31m-      const parsedDate = DateTime.fromISO(testDate, { zone: TIMEZONE });[m
+[31m-      if (!parsedDate.isValid) {[m
+[31m-        throw new Error(`Fecha inválida: ${testDate}. Use formato YYYY-MM-DD`);[m
+[31m-      }[m
+[31m-      executionDate = parsedDate.toJSDate();[m
+[31m-      console.log(`🧪 MODO TEST - Ejecutando como si fuera: ${testDate} (${TIMEZONE})`);[m
+[31m-    } else {[m
+[31m-      executionDate = DateTime.now().setZone(TIMEZONE).toJSDate();[m
+[31m-      console.log(`📅 Ejecutando con fecha actual: ${DateTime.now().setZone(TIMEZONE).toISODate()} (${TIMEZONE})`);[m
+[31m-    }[m
+[31m-[m
+[31m-    // Verificar configuración[m
+[31m-    console.log('\n🔍 Verificando configuración...');[m
+[31m-    const configValid = await checkSeasonRemindersConfig();[m
+[31m-    [m
+[31m-    if (!configValid) {[m
+[31m-      console.error('❌ La configuración no es válida. Verifique las variables de entorno:');[m
+[31m-      console.error('   - NEXT_PUBLIC_SUPABASE_URL');[m
+[31m-      console.error('   - NEXT_PUBLIC_SUPABASE_ANON_KEY');[m
+[31m-      console.error('   - GMAIL_USER');[m
+[31m-      console.error('   - GMAIL_APP_PASSWORD');[m
+[31m-      process.exit(1);[m
+[31m-    }[m
+[31m-[m
+[31m-    console.log('✅ Configuración válida');[m
+[31m-[m
+[31m-    // Ejecutar el job[m
+[31m-    console.log('\n🎯 Iniciando ejecución del job...');[m
+[31m-    [m
+[31m-    if (isDryRun) {[m
+[31m-      console.log('🚨 ATENCIÓN: Este sería un dry-run, pero la función actual no soporta este modo.');[m
+[31m-      console.log('   Los emails se enviarán realmente. Para implementar dry-run, modifique');[m
+[31m-      console.log('   la función runSeasonReminders para aceptar un parámetro dryRun.');[m
+[31m-    }[m
+[31m-[m
+[31m-    await runSeasonReminders({ now: executionDate });[m
+[31m-    [m
+[31m-    console.log('\n✅ Ejecución completada exitosamente');[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('\n💥 Error durante la ejecución:', error);[m
+[31m-    process.exit(1);[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Manejar señales de interrupción[m
+[31m-process.on('SIGINT', () => {[m
+[31m-  console.log('\n⚠️ Ejecución interrumpida por el usuario');[m
+[31m-  process.exit(0);[m
+[31m-});[m
+[31m-[m
+[31m-process.on('SIGTERM', () => {[m
+[31m-  console.log('\n⚠️ Ejecución terminada');[m
+[31m-  process.exit(0);[m
+[31m-});[m
+[31m-[m
+[31m-// Ejecutar script principal[m
+[31m-main().catch((error) => {[m
+[31m-  console.error('💥 Error fatal:', error);[m
+[31m-  process.exit(1);[m
+[31m-});[m
+[1mdiff --git a/scripts/simple-email-test.ts b/scripts/simple-email-test.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 0f21d41..0000000[m
+[1m--- a/scripts/simple-email-test.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,187 +0,0 @@[m
+[31m-#!/usr/bin/env npx tsx[m
+[31m-[m
+[31m-/**[m
+[31m- * Prueba simple del sistema de envío de emails[m
+[31m- */[m
+[31m-[m
+[31m-// Cargar variables de entorno[m
+[31m-import dotenv from 'dotenv';[m
+[31m-import path from 'path';[m
+[31m-[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-[m
+[31m-import { DateTime } from 'luxon';[m
+[31m-import nodemailer from 'nodemailer';[m
+[31m-[m
+[31m-async function testEmailSending() {[m
+[31m-  try {[m
+[31m-    console.log('📧 === PRUEBA SIMPLE DE ENVÍO DE EMAIL ===');[m
+[31m-    [m
+[31m-    // Verificar configuración[m
+[31m-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {[m
+[31m-      console.error('❌ Configuración de Gmail faltante');[m
+[31m-      console.error('Verifique que GMAIL_USER y GMAIL_APP_PASSWORD están en .env.local');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    [m
+[31m-    console.log('✅ Configuración de Gmail encontrada');[m
+[31m-    console.log(`📤 Enviando desde: ${process.env.GMAIL_USER}`);[m
+[31m-    [m
+[31m-    // Crear transportador[m
+[31m-    const transporter = nodemailer.createTransport({[m
+[31m-      service: 'gmail',[m
+[31m-      auth: {[m
+[31m-        user: process.env.GMAIL_USER,[m
+[31m-        pass: process.env.GMAIL_APP_PASSWORD,[m
+[31m-      },[m
+[31m-    });[m
+[31m-    [m
+[31m-    // Verificar conexión[m
+[31m-    console.log('🔍 Verificando conexión SMTP...');[m
+[31m-    await transporter.verify();[m
+[31m-    console.log('✅ Conexión SMTP válida');[m
+[31m-    [m
+[31m-    // Crear email de prueba[m
+[31m-    const now = DateTime.now().setZone('America/New_York');[m
+[31m-    const testDate = now.plus({ days: 30 }).toLocaleString(DateTime.DATE_FULL);[m
+[31m-    [m
+[31m-    const htmlContent = `[m
+[31m-    <!doctype html>[m
+[31m-    <html>[m
+[31m-      <head>[m
+[31m-        <meta charset="utf-8"/>[m
+[31m-        <meta name="viewport" content="width=device-width,initial-scale=1"/>[m
+[31m-        <title>Season Reminder Test</title>[m
+[31m-      </head>[m
+[31m-      <body style="margin:0;padding:0;background:#f6f9fc;">[m
+[31m-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">[m
+[31m-          <tr>[m
+[31m-            <td align="center" style="padding:24px;">[m
+[31m-              <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;">[m
+[31m-                <tr>[m
+[31m-                  <td style="padding:28px;font-family:Arial,Helvetica,sans-serif;color:#111827;">[m
+[31m-                    <h2 style="color:#1e40af;">🏐 Discipline Rift - Prueba de Sistema</h2>[m
+[31m-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:24px;">[m
+[31m-                      Hi <strong>Usuario de Prueba</strong>,[m
+[31m-                    </p>[m
+[31m-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:24px;">[m
+[31m-                      This is a test email from the <strong>Discipline Rift</strong> season reminder system.[m
+[31m-                      If you receive this email, it means the system is working correctly![m
+[31m-                    </p>[m
+[31m-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:24px;">[m
+[31m-                      🎯 Test completed on: ${now.toLocaleString(DateTime.DATETIME_FULL)}[m
+[31m-                    </p>[m
+[31m-                    <h3 style="margin:24px 0 8px 0;font-size:18px;line-height:26px;color:#111827;">Sample Season Schedule</h3>[m
+[31m-                    <ul style="margin:0 0 16px 20px;padding:0;font-size:16px;line-height:24px;color:#111827;">[m
+[31m-                      <li>Monday, ${testDate}, 6:00 PM – 7:30 PM</li>[m
+[31m-                      <li>Wednesday, ${testDate}, 6:00 PM – 7:30 PM</li>[m
+[31m-                      <li>Friday, ${testDate}, 6:00 PM – 7:30 PM</li>[m
+[31m-                    </ul>[m
+[31m-                    <div style="background:#10b981;color:white;padding:16px;border-radius:8px;margin:20px 0;">[m
+[31m-                      <strong>✅ Sistema de recordatorios funcionando correctamente</strong>[m
+[31m-                    </div>[m
+[31m-                    <p style="margin:0;font-size:16px;line-height:24px;"><strong>Discipline Rift Team</strong></p>[m
+[31m-                  </td>[m
+[31m-                </tr>[m
+[31m-              </table>[m
+[31m-            </td>[m
+[31m-          </tr>[m
+[31m-        </table>[m
+[31m-      </body>[m
+[31m-    </html>`;[m
+[31m-    [m
+[31m-    const textContent = `[m
+[31m-Discipline Rift - Prueba de Sistema[m
+[31m-[m
+[31m-Hi Usuario de Prueba,[m
+[31m-[m
+[31m-This is a test email from the Discipline Rift season reminder system.[m
+[31m-If you receive this email, it means the system is working correctly![m
+[31m-[m
+[31m-Test completed on: ${now.toLocaleString(DateTime.DATETIME_FULL)}[m
+[31m-[m
+[31m-Sample Season Schedule:[m
+[31m-- Monday, ${testDate}, 6:00 PM – 7:30 PM[m
+[31m-- Wednesday, ${testDate}, 6:00 PM – 7:30 PM[m
+[31m-- Friday, ${testDate}, 6:00 PM – 7:30 PM[m
+[31m-[m
+[31m-✅ Sistema de recordatorios funcionando correctamente[m
+[31m-[m
+[31m-Discipline Rift Team[m
+[31m-    `;[m
+[31m-    [m
+[31m-    // Configurar email[m
+[31m-    const mailOptions = {[m
+[31m-      from: {[m
+[31m-        name: 'Discipline Rift Test',[m
+[31m-        address: process.env.GMAIL_USER,[m
+[31m-      },[m
+[31m-      to: process.env.GMAIL_USER, // Enviar a ti mismo para prueba[m
+[31m-      subject: 'Test Team Season Starts in One Month! Discipline Rift',[m
+[31m-      html: htmlContent,[m
+[31m-      text: textContent[m
+[31m-    };[m
+[31m-    [m
+[31m-    console.log('📤 Enviando email de prueba...');[m
+[31m-    console.log(`📧 Para: ${mailOptions.to}`);[m
+[31m-    console.log(`📋 Asunto: ${mailOptions.subject}`);[m
+[31m-    [m
+[31m-    const result = await transporter.sendMail(mailOptions);[m
+[31m-    [m
+[31m-    console.log('\n🎉 === EMAIL ENVIADO EXITOSAMENTE ===');[m
+[31m-    console.log(`✅ Message ID: ${result.messageId}`);[m
+[31m-    console.log(`📧 Email enviado a: ${mailOptions.to}`);[m
+[31m-    console.log(`🕐 Hora de envío: ${now.toLocaleString(DateTime.DATETIME_FULL)}`);[m
+[31m-    [m
+[31m-    console.log('\n📋 === RESUMEN DE LA PRUEBA ===');[m
+[31m-    console.log('✅ Configuración de Gmail: OK');[m
+[31m-    console.log('✅ Conexión SMTP: OK');[m
+[31m-    console.log('✅ Envío de email: OK');[m
+[31m-    console.log('✅ Template HTML: OK');[m
+[31m-    console.log('✅ Template de texto: OK');[m
+[31m-    [m
+[31m-    console.log('\n🎯 === PRÓXIMOS PASOS ===');[m
+[31m-    console.log('1. Revisa tu bandeja de entrada');[m
+[31m-    console.log('2. Verifica que el email se vea correctamente');[m
+[31m-    console.log('3. El sistema de recordatorios está listo para usarse');[m
+[31m-    console.log('4. Puedes crear datos de prueba en Supabase para probar el flujo completo');[m
+[31m-    [m
+[31m-    return { success: true, messageId: result.messageId };[m
+[31m-    [m
+[31m-  } catch (error) {[m
+[31m-    console.error('\n💥 ERROR EN PRUEBA DE EMAIL:');[m
+[31m-    console.error(error);[m
+[31m-    [m
+[31m-    if (error instanceof Error) {[m
+[31m-      if (error.message.includes('Invalid login')) {[m
+[31m-        console.error('\n🔧 SOLUCIÓN SUGERIDA:');[m
+[31m-        console.error('1. Verifica que GMAIL_APP_PASSWORD sea correcto');[m
+[31m-        console.error('2. Asegúrate de que 2FA esté habilitado en Gmail');[m
+[31m-        console.error('3. Genera una nueva App Password si es necesario');[m
+[31m-      } else if (error.message.includes('connection')) {[m
+[31m-        console.error('\n🔧 SOLUCIÓN SUGERIDA:');[m
+[31m-        console.error('1. Verifica tu conexión a internet');[m
+[31m-        console.error('2. Verifica que no haya firewall bloqueando SMTP');[m
+[31m-      }[m
+[31m-    }[m
+[31m-    [m
+[31m-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Ejecutar prueba[m
+[31m-testEmailSending()[m
+[31m-  .then((result) => {[m
+[31m-    if (result.success) {[m
+[31m-      console.log('\n🎉 ¡PRUEBA COMPLETADA EXITOSAMENTE!');[m
+[31m-      process.exit(0);[m
+[31m-    } else {[m
+[31m-      console.log('\n❌ Prueba fallida');[m
+[31m-      process.exit(1);[m
+[31m-    }[m
+[31m-  })[m
+[31m-  .catch((error) => {[m
+[31m-    console.error('💥 Error fatal:', error);[m
+[31m-    process.exit(1);[m
+[31m-  });[m
+[1mdiff --git a/scripts/test-date-problem.ts b/scripts/test-date-problem.ts[m
+[1mdeleted file mode 100644[m
+[1mindex cd8a51b..0000000[m
+[1m--- a/scripts/test-date-problem.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,137 +0,0 @@[m
+[31m-#!/usr/bin/env npx tsx[m
+[31m-[m
+[31m-/**[m
+[31m- * Script para replicar el problema específico de fechas[m
+[31m- */[m
+[31m-[m
+[31m-// Cargar variables de entorno[m
+[31m-import dotenv from 'dotenv';[m
+[31m-import path from 'path';[m
+[31m-[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-[m
+[31m-import { buildPracticeOccurrences, formatTimeES } from '../lib/schedule/buildPracticeOccurrences';[m
+[31m-[m
+[31m-function testDateProblem() {[m
+[31m-  console.log('🔍 === PRUEBA DEL PROBLEMA DE FECHAS ===');[m
+[31m-  [m
+[31m-  // Simulemos el escenario exacto: si el usuario dice que debería ser [m
+[31m-  // "miércoles 18 de septiembre" pero en realidad 18 es jueves[m
+[31m-  console.log('\n📅 Verificando qué día es 18 de septiembre de 2025:');[m
+[31m-  const date18 = new Date(2025, 8, 18); // Septiembre es mes 8 (0-indexed)[m
+[31m-  console.log(`18 de septiembre de 2025 es: ${date18.toLocaleDateString('en-US', { weekday: 'long' })}`);[m
+[31m-  [m
+[31m-  // Ahora probemos con diferentes startDates para ver el comportamiento[m
+[31m-  const testCases = [[m
+[31m-    {[m
+[31m-      name: 'Caso 1: startDate = 2025-09-18 (jueves)',[m
+[31m-      startDate: '2025-09-18',[m
+[31m-      endDate: '2025-10-23',[m
+[31m-      daysOfWeek: ['Wednesday'][m
+[31m-    },[m
+[31m-    {[m
+[31m-      name: 'Caso 2: startDate = 2025-09-17 (miércoles)', [m
+[31m-      startDate: '2025-09-17',[m
+[31m-      endDate: '2025-10-23',[m
+[31m-      daysOfWeek: ['Wednesday'][m
+[31m-    },[m
+[31m-    {[m
+[31m-      name: 'Caso 3: startDate = 2025-09-16 (martes)',[m
+[31m-      startDate: '2025-09-16', [m
+[31m-      endDate: '2025-10-23',[m
+[31m-      daysOfWeek: ['Wednesday'][m
+[31m-    }[m
+[31m-  ];[m
+[31m-  [m
+[31m-  testCases.forEach((testCase, index) => {[m
+[31m-    console.log(`\n${testCase.name}:`);[m
+[31m-    console.log('='.repeat(50));[m
+[31m-    [m
+[31m-    const params = {[m
+[31m-      startDate: testCase.startDate,[m
+[31m-      endDate: testCase.endDate,[m
+[31m-      daysOfWeek: testCase.daysOfWeek,[m
+[31m-      startTime: '15:15',[m
+[31m-      endTime: '16:15',[m
+[31m-      location: 'Orlando, FL',[m
+[31m-      coachName: 'Ranya',[m
+[31m-      timezone: 'America/New_York'[m
+[31m-    };[m
+[31m-    [m
+[31m-    const occurrences = buildPracticeOccurrences(params);[m
+[31m-    [m
+[31m-    if (occurrences.length > 0) {[m
+[31m-      const first = occurrences[0];[m
+[31m-      console.log(`Primera práctica: ${first.formattedDateES}`);[m
+[31m-      console.log(`Fecha del objeto Date: ${first.date.getDate()} (día del mes)`);[m
+[31m-      console.log(`Día de la semana: ${first.dayOfWeek}`);[m
+[31m-      [m
+[31m-      // Verificar si hay un problema de timezone[m
+[31m-      const utcDate = first.date.toISOString().split('T')[0];[m
+[31m-      const localDate = `${first.date.getFullYear()}-${String(first.date.getMonth() + 1).padStart(2, '0')}-${String(first.date.getDate()).padStart(2, '0')}`;[m
+[31m-      console.log(`UTC ISO: ${utcDate}`);[m
+[31m-      console.log(`Local ISO: ${localDate}`);[m
+[31m-      [m
+[31m-      if (utcDate !== localDate) {[m
+[31m-        console.log('⚠️ DIFERENCIA DETECTADA entre UTC y local');[m
+[31m-      }[m
+[31m-    } else {[m
+[31m-      console.log('❌ No se generaron sesiones');[m
+[31m-    }[m
+[31m-  });[m
+[31m-  [m
+[31m-  console.log('\n🧪 === PRUEBA CON DATOS COMO VIENEN DE SUPABASE ===');[m
+[31m-  [m
+[31m-  // Simulemos cómo vienen los datos de Supabase (posiblemente con timezone issues)[m
+[31m-  const supabaseSimulation = {[m
+[31m-    startdate: '2025-09-18', // Como varchar desde Supabase[m
+[31m-    enddate: '2025-10-23',[m
+[31m-    starttime: '15:15:00',   // Como time desde Supabase  [m
+[31m-    endtime: '16:15:00',[m
+[31m-    daysofweek: 'Wednesday'[m
+[31m-  };[m
+[31m-  [m
+[31m-  console.log('Datos simulados de Supabase:');[m
+[31m-  console.log(JSON.stringify(supabaseSimulation, null, 2));[m
+[31m-  [m
+[31m-  // Procesarlos como lo hace el código actual[m
+[31m-  const daysOfWeekArray = supabaseSimulation.daysofweek.split(',').map(d => d.trim());[m
+[31m-  [m
+[31m-  const finalParams = {[m
+[31m-    startDate: supabaseSimulation.startdate,[m
+[31m-    endDate: supabaseSimulation.enddate,[m
+[31m-    daysOfWeek: daysOfWeekArray,[m
+[31m-    startTime: supabaseSimulation.starttime.substring(0, 5), // Quitar segundos[m
+[31m-    endTime: supabaseSimulation.endtime.substring(0, 5),[m
+[31m-    location: 'Orlando, FL',[m
+[31m-    coachName: 'Ranya',[m
+[31m-    timezone: 'America/New_York'[m
+[31m-  };[m
+[31m-  [m
+[31m-  console.log('\nParámetros procesados:');[m
+[31m-  console.log(JSON.stringify(finalParams, null, 2));[m
+[31m-  [m
+[31m-  const finalOccurrences = buildPracticeOccurrences(finalParams);[m
+[31m-  [m
+[31m-  console.log('\n📋 Resultado final:');[m
+[31m-  if (finalOccurrences.length > 0) {[m
+[31m-    const first = finalOccurrences[0];[m
+[31m-    console.log(`Primera fecha: ${first.formattedDateES}`);[m
+[31m-    console.log(`¿Es el día 18?: ${first.formattedDateES.includes('18') ? 'SÍ' : 'NO'}`);[m
+[31m-    console.log(`¿Es el día 17?: ${first.formattedDateES.includes('17') ? 'SÍ' : 'NO'}`);[m
+[31m-    [m
+[31m-    if (first.formattedDateES.includes('17')) {[m
+[31m-      console.log('✅ CORRECTO: Muestra el 17 (miércoles)');[m
+[31m-    } else if (first.formattedDateES.includes('18')) {[m
+[31m-      console.log('❌ PROBLEMA: Muestra el 18 (pero 18 es jueves, no miércoles)');[m
+[31m-    }[m
+[31m-  }[m
+[31m-}[m
+[31m-[m
+[31m-// Ejecutar prueba[m
+[31m-try {[m
+[31m-  testDateProblem();[m
+[31m-} catch (error) {[m
+[31m-  console.error('💥 Error en la prueba:', error);[m
+[31m-}[m
+[1mdiff --git a/scripts/test-end-date-issue.ts b/scripts/test-end-date-issue.ts[m
+[1mdeleted file mode 100644[m
+[1mindex 2430c51..0000000[m
+[1m--- a/scripts/test-end-date-issue.ts[m
+[1m+++ /dev/null[m
+[36m@@ -1,148 +0,0 @@[m
+[31m-#!/usr/bin/env npx tsx[m
+[31m-[m
+[31m-/**[m
+[31m- * Script para debuggear específicamente el problema de la última sesión[m
+[31m- */[m
+[31m-[m
+[31m-// Cargar variables de entorno[m
+[31m-import dotenv from 'dotenv';[m
+[31m-import path from 'path';[m
+[31m-[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });[m
+[31m-dotenv.config({ path: path.resolve(process.cwd(), '.env') });[m
+[31m-[m
+[31m-import { buildPracticeOccurrences } from '../lib/schedule/buildPracticeOccurrences';[m
+[31m-[m
+[31m-function testEndDateIssue() {[m
+[31m-  console.log('🔍 === TEST DEL PROBLEMA DE LA ÚLTIMA SESIÓN ===');[m
+[31m-  [m
+[31m-  // Caso de prueba: sesiones que van de septiembre 17 a octubre 23[m
+[31m-  // Miércoles cada semana[m
+[31m-  const testCases = [[m
+[31m-    {[m
+[31m-      name: "Caso Real (Sep 17 - Oct 23, Miércoles)",[m
+[31m-      startDate: '2025-09-17', // Miércoles[m
+[31m-      endDate: '2025-10-23',   // Jueves[m
+[31m-      daysOfWeek: ['Wednesday'],[m
+[31m-      startTime: '15:15',[m
+[31m-      endTime: '16:15'[m
+[31m-    },[m
+[31m-    {[m
+[31m-      name: "Caso donde endDate es exactamente miércoles",[m
+[31m-      startDate: '2025-09-17', // Miércoles  [m
+[31m-      endDate: '2025-10-22',   // Miércoles (exacto)[m
+[31m-      daysOfWeek: ['Wednesday'],[m
+[31m-      startTime: '15:15',[m
+[31m-      endTime: '16:15'[m
+[31m-    },[m
+[31m-    {[m
+[31m-      name: "Caso simple (4 semanas exactas)",[m
+[31m-      startDate: '2025-01-01', // Miércoles[m
+[31m-      endDate: '2025-01-22',   // Miércoles (3 semanas después)[m
+[31m-      daysOfWeek: ['Wednesday'],[m
+[31m-      startTime: '15:15',[m
+[31m-      endTime: '16:15'[m
+[31m-    }[m
+[31m-  ];[m
+[31m-[m
+[31m-  testCases.forEach((testCase, index) => {[m
+[31m-    console.log(`\n${index + 1}. ${testCase.name}`);[m
+[31m-    // Crear fech

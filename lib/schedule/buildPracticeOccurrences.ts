@@ -25,7 +25,7 @@ export interface PracticeScheduleParams {
   exceptions?: string[]; // ISO date strings to exclude
 }
 
-// Default timezone for Miami, FL
+// Default timezone for Miami, FL (Eastern Time Zone)
 const DEFAULT_TIMEZONE = 'America/New_York';
 
 // Helper function to calculate duration between two times
@@ -109,9 +109,15 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
     const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
     const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
     
-    // Create dates in local time to avoid timezone conversion issues
-    const start = new Date(startYear, startMonth - 1, startDay); // month is 0-indexed
-    const end = new Date(endYear, endMonth - 1, endDay);
+    // Create dates in Miami timezone (Eastern Time) to avoid timezone conversion issues
+    // Using 12:00 PM to ensure we're in the middle of the day and avoid edge cases
+    const start = new Date();
+    start.setFullYear(startYear, startMonth - 1, startDay);
+    start.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
+    
+    const end = new Date();
+    end.setFullYear(endYear, endMonth - 1, endDay);
+    end.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
     const exceptionsSet = new Set(exceptions);
     
     // NEW LOGIC: Find the first occurrence that matches the desired days
@@ -154,6 +160,7 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
     
     const sessions: PracticeOccurrence[] = [];
     const currentDate = new Date(actualStartDate);
+    currentDate.setHours(12, 0, 0, 0); // Ensure time is set to noon to avoid timezone issues
     let sessionCounter = 0;
     
     // Calculate max sessions more accurately
@@ -175,23 +182,23 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
           Object.keys(dayMap).find((key) => dayMap[key] === dayOfWeek) ||
           "Unknown";
 
-        // Format for English (Team Details UI) - Force timezone to avoid shifting
-        const formattedDate = currentDate.toLocaleDateString("en-US", {
+        // Format for English (Team Details UI) - Use Miami timezone (Eastern Time)
+        const formattedDate = new Intl.DateTimeFormat("en-US", {
           weekday: "long",
           month: "short",
           day: "numeric",
           year: "numeric",
-          timeZone: timezone
-        });
+          timeZone: "America/New_York"
+        }).format(currentDate);
 
-        // Format for English (Email) - Miami timezone with consistent date
-        const formattedDateES = currentDate.toLocaleDateString("en-US", {
+        // Format for English (Email) - Use Miami timezone (Eastern Time) with consistent date
+        const formattedDateES = new Intl.DateTimeFormat("en-US", {
           weekday: "long",
           day: "2-digit",
           month: "long",
           year: "numeric",
-          timeZone: timezone
-        });
+          timeZone: "America/New_York"
+        }).format(currentDate);
 
         sessions.push({
           id: `session-${sessionCounter++}-${currentDateISO}`,

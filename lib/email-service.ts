@@ -441,7 +441,7 @@ export async function sendPaymentConfirmationEmail(
         endTime: cleanEndTime,
         location: teamData.school.location,
         coachName: session.staff?.name || 'TBD',
-        timezone: teamData.timezone || 'America/New_York'
+        timezone: 'America/New_York'
       });
 
       // Format times in Spanish and add to team data

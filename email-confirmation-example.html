@@ -1,0 +1,356 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Registration Confirmation - Discipline Rift</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          background-color: #f8fafc;
+        }
+        
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+          background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+          color: white;
+          padding: 40px 30px;
+          text-align: center;
+        }
+        
+        .header h1 {
+          font-size: 28px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        
+        .header p {
+          font-size: 16px;
+          opacity: 0.9;
+        }
+        
+        .success-icon {
+          width: 80px;
+          height: 80px;
+          background-color: #10b981;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          font-size: 40px;
+        }
+        
+        .content {
+          padding: 40px 30px;
+        }
+        
+        .section {
+          margin-bottom: 30px;
+          padding: 25px;
+          border-radius: 8px;
+          border-left: 4px solid #3b82f6;
+          background-color: #f8fafc;
+        }
+        
+        .section h3 {
+          color: #1e40af;
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 15px;
+          display: flex;
+          align-items: center;
+        }
+        
+        .section-icon {
+          margin-right: 10px;
+          font-size: 20px;
+        }
+        
+        .info-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+          margin-top: 15px;
+        }
+        
+        .info-item {
+          padding: 12px;
+          background-color: white;
+          border-radius: 6px;
+          border: 1px solid #e5e7eb;
+        }
+        
+        .info-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 5px;
+        }
+        
+        .info-value {
+          font-size: 14px;
+          font-weight: 500;
+          color: #1f2937;
+        }
+        
+        .amount-highlight {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+          margin: 20px 0;
+        }
+        
+        .amount-highlight .amount {
+          font-size: 32px;
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        
+        .footer {
+          background-color: #1f2937;
+          color: #9ca3af;
+          padding: 30px;
+          text-align: center;
+        }
+        
+        .footer h4 {
+          color: white;
+          margin-bottom: 15px;
+        }
+        
+        .contact-info {
+          margin: 20px 0;
+        }
+        
+        .contact-info p {
+          margin: 5px 0;
+        }
+        
+        @media (max-width: 600px) {
+          .container {
+            margin: 10px;
+            border-radius: 8px;
+          }
+          
+          .header, .content, .footer {
+            padding: 20px;
+          }
+          
+          .info-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .amount-highlight .amount {
+            font-size: 24px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <div class="success-icon">✅</div>
+          <h1>Registration Successful!</h1>
+          <p>Your payment has been processed successfully</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+          <!-- Payment Confirmation -->
+          <div class="amount-highlight">
+            <div class="amount">$129.00</div>
+            <div>Payment confirmed on August 17, 2025 at 01:40 PM</div>
+          </div>
+          
+          <!-- Student Information -->
+          <div class="section">
+            <h3><span class="section-icon">👨‍🎓</span>Student Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Full Name</div>
+                <div class="info-value">Kennedy Lowery</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Grade</div>
+                <div class="info-value">5</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Emergency Contact</div>
+                <div class="info-value">Brie Lowery</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Emergency Phone</div>
+                <div class="info-value">3216620332</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Team Information -->
+          <div class="section">
+            <h3><span class="section-icon">🏐</span>Team Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Team Name</div>
+                <div class="info-value">VOLLEYBALL PERSHING</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">School</div>
+                <div class="info-value">Pershing Elementary School</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">Orlando, FL</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Price</div>
+                <div class="info-value">$129.00</div>
+              </div>
+            </div>
+            
+            
+              <div style="margin-top: 15px; padding: 15px; background-color: white; border-radius: 6px; border: 1px solid #e5e7eb;">
+                <div class="info-label">Description</div>
+                <div class="info-value">When?
+Every Thursday after school.  Practice is from 3:15 to 4:15pm.
+
+How?
+The program provides all necessary gear and equipment, including nets, balls, and drill components.
+
+Why?
+To inspire teams to develop a passion for volleyball by teaching and developing key skills like passing, setting, hitting, and serving, along with important sport-centered life lessons.</div>
+              </div>
+            
+          </div>
+          
+          <!-- Practice Schedule - Individual Sessions -->
+          
+            <div class="section">
+              <h3><span class="section-icon">📅</span>Practice Schedule</h3>
+              <div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  
+                    <li style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 2px;">
+                          Thursday, September 18, 2025
+                        </div>
+                        <div style="color: #6b7280; font-size: 13px;">
+                          3:15 PM – 4:15 PM
+                        </div>
+                      </div>
+                      <div style="text-align: right; color: #9ca3af; font-size: 12px;">
+                        School Gymnasium
+                      </div>
+                    </li>
+                  
+                    <li style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 2px;">
+                          Thursday, September 25, 2025
+                        </div>
+                        <div style="color: #6b7280; font-size: 13px;">
+                          3:15 PM – 4:15 PM
+                        </div>
+                      </div>
+                      <div style="text-align: right; color: #9ca3af; font-size: 12px;">
+                        School Gymnasium
+                      </div>
+                    </li>
+                  
+                    <li style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 2px;">
+                          Thursday, October 02, 2025
+                        </div>
+                        <div style="color: #6b7280; font-size: 13px;">
+                          3:15 PM – 4:15 PM
+                        </div>
+                      </div>
+                      <div style="text-align: right; color: #9ca3af; font-size: 12px;">
+                        School Gymnasium
+                      </div>
+                    </li>
+                  
+                    <li style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 2px;">
+                          Thursday, October 09, 2025
+                        </div>
+                        <div style="color: #6b7280; font-size: 13px;">
+                          3:15 PM – 4:15 PM
+                        </div>
+                      </div>
+                      <div style="text-align: right; color: #9ca3af; font-size: 12px;">
+                        School Gymnasium
+                      </div>
+                    </li>
+                  
+                    <li style="padding: 12px 0; border-bottom: none; display: flex; justify-content: space-between; align-items: center;">
+                      <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 2px;">
+                          Thursday, October 16, 2025
+                        </div>
+                        <div style="color: #6b7280; font-size: 13px;">
+                          3:15 PM – 4:15 PM
+                        </div>
+                      </div>
+                      <div style="text-align: right; color: #9ca3af; font-size: 12px;">
+                        School Gymnasium
+                      </div>
+                    </li>
+                  
+                </ul>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f3f4f6; font-size: 12px; color: #6b7280; text-align: center;">
+                  <strong>Coach:</strong> Ranya | 
+                  <strong>Location:</strong> Orlando, FL
+                  <br>
+                  <span style="opacity: 0.8;">Schedule shown in Miami timezone (EST/EDT)</span>
+                </div>
+              </div>
+            </div>
+          
+          
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+          <h4>Discipline Rift</h4>
+          <div class="contact-info">
+            <p>📧 Support: info@disciplinerift.com</p>
+            <p>📞 Phone: (407) 6147454</p>
+            <p>🌐 Web: www.disciplinerift.com</p>
+          </div>
+          
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #374151;">
+            <p style="font-size: 12px;">
+              This is an automated email. If you have any questions, please don't hesitate to contact us.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  
