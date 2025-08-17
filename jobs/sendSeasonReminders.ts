@@ -160,8 +160,8 @@ function buildSeasonScheduleHtml(
         minute: parseInt(session.endtime.split(':')[1] || '0')
       });
 
-      const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
-      const formattedTime = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE)} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE)}`;
+      const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY, { locale: 'en-US' });
+      const formattedTime = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })}`;
       
       return `<li>${formattedDate.split(', ')[0]}, ${formattedDate.split(', ')[1]}, ${formattedTime}</li>`;
     }
@@ -185,9 +185,9 @@ function buildSeasonScheduleHtml(
           minute: parseInt(session.endtime.split(':')[1] || '0')
         });
 
-        // Formatear como "Tuesday, Jan 21, 6:00 PM – 7:00 PM"
-        const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
-        const timeRange = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE)} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE)}`;
+        // Formatear como "Tuesday, Jan 21, 6:00 PM – 7:00 PM" en inglés
+        const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY, { locale: 'en-US' });
+        const timeRange = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })}`;
         
         scheduleItems.push(`<li>${formattedDate.split(' at ')[0]}, ${timeRange}</li>`);
       }
@@ -195,10 +195,10 @@ function buildSeasonScheduleHtml(
       currentDate = currentDate.plus({ days: 1 });
     }
 
-    return scheduleItems.length > 0 ? scheduleItems.join('\n       ') : '<li>Horario por confirmar</li>';
+    return scheduleItems.length > 0 ? scheduleItems.join('\n       ') : '<li>Schedule to be confirmed</li>';
   } catch (error) {
     console.error('Error building season schedule HTML:', error);
-    return '<li>Horario por confirmar</li>';
+    return '<li>Schedule to be confirmed</li>';
   }
 }
 
