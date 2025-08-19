@@ -441,7 +441,7 @@ export async function sendPaymentConfirmationEmail(
         endTime: cleanEndTime,
         location: teamData.school.location,
         coachName: session.staff?.name || 'TBD',
-        timezone: 'America/New_York'
+        timezone: teamData.timezone || 'America/New_York'
       });
 
       // Format times in Spanish and add to team data
@@ -847,18 +847,18 @@ const createSessionReminderTemplate = (
 ) => {
   const reminderMessages = {
     '30d': {
-      title: '🗓️ Recordatorio: Tu sesión de entrenamiento es en 30 días',
-      message: 'Tu sesión de entrenamiento se acerca. Asegúrate de tener todo listo.',
+      title: '🗓️ Reminder: Your training session is in 30 days',
+      message: 'Your training session is approaching. Make sure you have everything ready.',
       urgency: 'info'
     },
     '7d': {
-      title: '⏰ Recordatorio: Tu sesión de entrenamiento es en 7 días',
-      message: 'Tu sesión de entrenamiento es la próxima semana. Prepara tu equipo deportivo.',
+      title: '⏰ Reminder: Your training session is in 7 days',
+      message: 'Your training session is next week. Prepare your sports equipment.',
       urgency: 'warning'
     },
     '1d': {
-      title: '🚨 Recordatorio: Tu sesión de entrenamiento es MAÑANA',
-      message: 'Tu sesión de entrenamiento es mañana. ¡No olvides asistir!',
+      title: '🚨 Reminder: Your training session is TOMORROW',
+      message: 'Your training session is tomorrow. Don\'t forget to attend!',
       urgency: 'urgent'
     }
   };
@@ -886,25 +886,25 @@ const createSessionReminderTemplate = (
       </div>
 
       <div style="background-color: #f8fafc; padding: 25px; border-radius: 8px; border-left: 4px solid ${urgencyColors[reminder.urgency as keyof typeof urgencyColors]}; margin-bottom: 25px;">
-        <h2 style="color: #1e40af; margin-top: 0; font-size: 20px;">📋 Detalles de la Sesión</h2>
+        <h2 style="color: #1e40af; margin-top: 0; font-size: 20px;">📋 Session Details</h2>
         
         <div style="background-color: white; padding: 20px; border-radius: 6px; margin: 15px 0;">
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 120px;">Estudiante:</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 120px;">Student:</td>
               <td style="padding: 8px 0; color: #1f2937;">${studentName}</td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Equipo:</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Team:</td>
               <td style="padding: 8px 0; color: #1f2937;">${teamName}</td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Escuela:</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">School:</td>
               <td style="padding: 8px 0; color: #1f2937;">${schoolName}</td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Fecha:</td>
-              <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">${new Date(sessionDate).toLocaleDateString('es-ES', { 
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Date:</td>
+              <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">${new Date(sessionDate).toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
@@ -912,11 +912,11 @@ const createSessionReminderTemplate = (
               })}</td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Hora:</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Time:</td>
               <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">${sessionTime}</td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Ubicación:</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Location:</td>
               <td style="padding: 8px 0; color: #1f2937;">${schoolLocation}</td>
             </tr>
           </table>
@@ -924,19 +924,19 @@ const createSessionReminderTemplate = (
       </div>
 
       <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 25px;">
-        <h3 style="color: #059669; margin-top: 0; font-size: 18px;">✅ Qué traer a la sesión:</h3>
+        <h3 style="color: #059669; margin-top: 0; font-size: 18px;">✅ What to bring to the session:</h3>
         <ul style="margin: 10px 0; padding-left: 20px; color: #374151;">
-          <li>Ropa deportiva cómoda</li>
-          <li>Zapatos deportivos apropiados</li>
-          <li>Botella de agua</li>
-          <li>Toalla pequeña</li>
-          <li>Actitud positiva y ganas de aprender</li>
+          <li>Comfortable athletic clothing</li>
+          <li>Appropriate athletic shoes</li>
+          <li>Water bottle</li>
+          <li>Small towel</li>
+          <li>Positive attitude and eagerness to learn</li>
         </ul>
       </div>
 
       <div style="text-align: center; margin: 30px 0;">
         <p style="color: #6b7280; font-size: 14px;">
-          Si tienes alguna pregunta o necesitas reprogramar, contáctanos:<br>
+          If you have any questions or need to reschedule, contact us:<br>
           📧 <a href="mailto:info@disciplinerift.com" style="color: #3b82f6;">info@disciplinerift.com</a><br>
           📞 <a href="tel:+14076147454" style="color: #3b82f6;">(407) 614-7454</a>
         </p>
@@ -944,8 +944,8 @@ const createSessionReminderTemplate = (
 
       <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; border-radius: 8px; text-align: center; margin-top: 30px;">
         <p style="margin: 0; font-size: 12px;">
-          Este es un recordatorio automático de Discipline Rift<br>
-          Enviado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}
+          This is an automated reminder from Discipline Rift<br>
+          Sent on ${new Date().toLocaleDateString('en-US')} at ${new Date().toLocaleTimeString('en-US')}
         </p>
       </div>
 
@@ -985,12 +985,12 @@ export async function sendSessionReminderEmail(data: {
     );
 
     const reminderTypeNames = {
-      '30d': '30 días',
-      '7d': '7 días', 
-      '1d': '1 día'
+      '30d': '30 days',
+      '7d': '7 days', 
+      '1d': '1 day'
     };
 
-    const reminderName = reminderTypeNames[data.reminderType as keyof typeof reminderTypeNames] || 'próximamente';
+    const reminderName = reminderTypeNames[data.reminderType as keyof typeof reminderTypeNames] || 'soon';
 
     // Configurar el correo
     const mailOptions = {
@@ -999,7 +999,7 @@ export async function sendSessionReminderEmail(data: {
         address: process.env.GMAIL_USER!,
       },
       to: data.parentEmail,
-      subject: `🏐 Recordatorio: Sesión de ${data.studentName} en ${reminderName}`,
+      subject: `🏐 Reminder: ${data.studentName}'s session in ${reminderName}`,
       html: htmlContent,
     };
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Script para generar preview con datos REALES de la base de datos
+// Script para generar preview de recordatorios para Wednesday, September 17, 2025
 const { createClient } = require('@supabase/supabase-js');
 const { DateTime } = require('luxon');
 const fs = require('fs');
@@ -17,14 +17,12 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 const TIMEZONE = 'America/New_York';
 
-// Calcular fecha objetivo: hoy + 30 días
-const nowNY = DateTime.now().setZone(TIMEZONE);
-const targetDateNY = nowNY.plus({ days: 30 }).toISODate();
+// Fecha específica: Wednesday, September 17, 2025
+const targetDate = '2025-09-17';
 
-console.log(`📅 Fecha actual (NY): ${nowNY.toISODate()}`);
-console.log(`🎯 Buscando sesiones que inician exactamente en: ${targetDateNY}`);
+console.log(`🎯 Buscando sesiones que inician exactamente el: ${targetDate} (Wednesday, September 17, 2025)`);
 
-// Función para parsear días de la semana (copiada del archivo original)
+// Función para parsear días de la semana
 function parseDaysOfWeek(daysOfWeek) {
   if (!daysOfWeek || typeof daysOfWeek !== 'string') {
     return [];
@@ -36,8 +34,6 @@ function parseDaysOfWeek(daysOfWeek) {
     'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4,
     'fri': 5, 'sat': 6, 'sun': 7,
     'm': 1, 't': 2, 'w': 3, 'r': 4, 'f': 5, 's': 6, 'u': 7,
-    'lunes': 1, 'martes': 2, 'miércoles': 3, 'jueves': 4,
-    'viernes': 5, 'sábado': 6, 'domingo': 7
   };
 
   const cleanDays = daysOfWeek
@@ -58,7 +54,7 @@ function parseDaysOfWeek(daysOfWeek) {
   return Array.from(weekdays).sort();
 }
 
-// Función para construir el horario de temporada con datos reales (copiada y adaptada)
+// Función para construir el horario de temporada
 function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
   try {
     const startDate = DateTime.fromISO(session.startdate, { zone: timezone });
@@ -118,7 +114,7 @@ function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
   }
 }
 
-// Template del email (mismo que en sendSeasonReminders.ts)
+// Template del email
 function createSeasonReminderEmailHtml(emailData) {
   return `<!doctype html>
 <html>
@@ -228,123 +224,130 @@ function createSeasonReminderEmailHtml(emailData) {
 </html>`;
 }
 
-async function getActualSeasonReminderData() {
+async function getSeptember17SessionData() {
   try {
-    console.log('🔍 Consultando sesiones que empiezan exactamente en 30 días...');
+    console.log('🔍 Consultando sesiones que empiezan el Wednesday, September 17, 2025...');
     
-    // 1. Buscar sesiones que inician exactamente en 30 días
+    // Buscar sesiones que inician exactamente el 17 de septiembre
     const { data: sessions, error: sessionsError } = await supabase
       .from('session')
       .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
-      .eq('startdate', targetDateNY)
+      .eq('startdate', targetDate)
       .limit(1000);
 
     if (sessionsError) {
       throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
     }
 
-    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
+    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones para el 17 de septiembre`);
 
     if (!sessions || sessions.length === 0) {
-      console.log('❌ No hay sesiones que empiecen exactamente en 30 días');
-      return null;
+      console.log('❌ No hay sesiones que empiecen el 17 de septiembre de 2025');
+      return { sessions: [], enrollmentData: [] };
     }
 
-    // Tomar la primera sesión encontrada
-    const session = sessions[0];
-    console.log(`🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
+    // Para cada sesión, buscar inscripciones activas
+    const allEnrollmentData = [];
+    
+    for (const session of sessions) {
+      console.log(`🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
 
-    // 2. Buscar inscripciones activas para este equipo
-    const { data: enrollments, error: enrollmentsError } = await supabase
-      .from('enrollment')
-      .select('enrollmentid, studentid')
-      .eq('teamid', session.teamid)
-      .eq('isactive', true)
-      .limit(1);
-
-    if (enrollmentsError || !enrollments || enrollments.length === 0) {
-      console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);
-      return null;
-    }
-
-    console.log(`👥 Encontradas ${enrollments.length} inscripciones activas`);
-
-    // 3. Buscar estudiante
-    const { data: students, error: studentsError } = await supabase
-      .from('student')
-      .select('studentid, parentid, firstname, lastname')
-      .eq('studentid', enrollments[0].studentid)
-      .single();
-
-    if (studentsError || !students) {
-      console.log(`ℹ️ No se encontró estudiante`);
-      return null;
-    }
-
-    // 4. Buscar padre
-    const { data: parent, error: parentError } = await supabase
-      .from('parent')
-      .select('parentid, firstname, lastname, email')
-      .eq('parentid', students.parentid)
-      .single();
-
-    if (parentError || !parent) {
-      console.log(`ℹ️ No se encontró padre`);
-      return null;
-    }
-
-    // 5. Buscar nombre del equipo
-    let teamName = `Team ${session.teamid.slice(-8)}`;
-    try {
-      const { data: teamData, error: teamError } = await supabase
-        .from('team')
-        .select('name')
+      // Buscar inscripciones activas para este equipo
+      const { data: enrollments, error: enrollmentsError } = await supabase
+        .from('enrollment')
+        .select('enrollmentid, studentid')
         .eq('teamid', session.teamid)
-        .single();
-      
-      if (teamError) {
-        console.log(`⚠️ Error consultando equipo ${session.teamid}: ${teamError.message}`);
-      } else if (teamData) {
-        teamName = teamData.name || teamName;
-        console.log(`✅ Nombre del equipo obtenido: ${teamName}`);
+        .eq('isactive', true);
+
+      if (enrollmentsError || !enrollments || enrollments.length === 0) {
+        console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);
+        continue;
       }
-    } catch (error) {
-      console.log(`ℹ️ No se pudo obtener el nombre del equipo, usando fallback: ${teamName}`);
+
+      console.log(`👥 Encontradas ${enrollments.length} inscripciones activas para ${session.teamid}`);
+
+      // Buscar estudiantes
+      const studentIds = enrollments.map(e => e.studentid);
+      const { data: students, error: studentsError } = await supabase
+        .from('student')
+        .select('studentid, parentid, firstname, lastname')
+        .in('studentid', studentIds);
+
+      if (studentsError || !students) {
+        console.log(`ℹ️ No se encontraron estudiantes para el equipo ${session.teamid}`);
+        continue;
+      }
+
+      // Buscar padres únicos
+      const parentIds = [...new Set(students.map(s => s.parentid))];
+      const { data: parents, error: parentsError } = await supabase
+        .from('parent')
+        .select('parentid, firstname, lastname, email')
+        .in('parentid', parentIds);
+
+      if (parentsError || !parents) {
+        console.log(`ℹ️ No se encontraron padres para el equipo ${session.teamid}`);
+        continue;
+      }
+
+      // Buscar nombre del equipo
+      let teamName = `Team ${session.teamid.slice(-8)}`;
+      try {
+        const { data: teamData } = await supabase
+          .from('team')
+          .select('name')
+          .eq('teamid', session.teamid)
+          .single();
+        
+        if (teamData) {
+          teamName = teamData.name || teamName;
+        }
+      } catch (error) {
+        console.log(`ℹ️ No se pudo obtener nombre del equipo ${session.teamid}`);
+      }
+
+      // Agregar datos de esta sesión
+      allEnrollmentData.push({
+        session,
+        teamName,
+        students,
+        parents,
+        enrollmentCount: enrollments.length
+      });
     }
 
-    return {
-      session,
-      student: students,
-      parent,
-      teamName
-    };
+    return { sessions, enrollmentData: allEnrollmentData };
 
   } catch (error) {
-    console.error('💥 Error en getActualSeasonReminderData:', error);
-    return null;
+    console.error('💥 Error en getSeptember17SessionData:', error);
+    return { sessions: [], enrollmentData: [] };
   }
 }
 
 async function main() {
-  console.log('🚀 Generando preview de recordatorio de temporada con DATOS REALES...');
+  console.log('🚀 Generando preview para recordatorios del Wednesday, September 17, 2025...');
   
-  const reminderData = await getActualSeasonReminderData();
+  const { sessions, enrollmentData } = await getSeptember17SessionData();
   
-  if (!reminderData) {
-    console.log('❌ No se pudo obtener datos reales para el preview');
+  if (enrollmentData.length === 0) {
+    console.log('❌ No se encontraron datos para generar preview');
     return;
   }
 
-  // 6. Construir el horario de temporada
-  const scheduleHtml = buildSeasonScheduleHtml(reminderData.session);
+  // Tomar el primer equipo con inscripciones para el preview
+  const firstTeamData = enrollmentData[0];
+  const firstParent = firstTeamData.parents[0];
 
-  // 7. Formatear fecha de inicio
-  const startDate = DateTime.fromISO(reminderData.session.startdate, { zone: TIMEZONE })
+  // Construir el horario de temporada
+  const scheduleHtml = buildSeasonScheduleHtml(firstTeamData.session);
+
+  // Formatear fecha de inicio
+  const startDate = DateTime.fromISO(firstTeamData.session.startdate, { zone: TIMEZONE })
     .toLocaleString(DateTime.DATE_FULL, { locale: 'en-US' });
 
   const emailData = {
-    parentName: reminderData.parent.firstname,
-    teamName: reminderData.teamName,
+    parentName: firstParent.firstname,
+    teamName: firstTeamData.teamName,
     startDate,
     scheduleHtml
   };
@@ -352,21 +355,32 @@ async function main() {
   const htmlContent = createSeasonReminderEmailHtml(emailData);
   
   // Guardar el HTML
-  fs.writeFileSync('real-season-reminder-preview.html', htmlContent);
-  console.log('✅ Preview con datos reales generado: real-season-reminder-preview.html');
+  fs.writeFileSync('real-september-17-preview.html', htmlContent);
+  console.log('✅ Preview generado: real-september-17-preview.html');
   
-  // Mostrar resumen de datos reales
-  console.log('\n📊 === DATOS REALES UTILIZADOS ===');
-  console.log(`📧 Padre: ${reminderData.parent.firstname} ${reminderData.parent.lastname}`);
-  console.log(`📩 Email: ${reminderData.parent.email}`);
-  console.log(`👨‍🎓 Estudiante: ${reminderData.student.firstname} ${reminderData.student.lastname}`);
-  console.log(`🏐 Equipo: ${reminderData.teamName}`);
-  console.log(`📅 Fecha de inicio: ${startDate}`);
-  console.log(`⏰ Horario: ${reminderData.session.starttime} - ${reminderData.session.endtime}`);
-  console.log(`📆 Días: ${reminderData.session.daysofweek}`);
-  console.log(`🆔 Session ID: ${reminderData.session.sessionid}`);
+  // Mostrar resumen completo
+  console.log('\n📊 === RESUMEN COMPLETO DE SESIONES DEL 17 DE SEPTIEMBRE ===');
+  
+  let totalEmails = 0;
+  enrollmentData.forEach((data, index) => {
+    console.log(`\n🏐 ${index + 1}. Equipo: ${data.teamName}`);
+    console.log(`   📧 Padres que recibirán email: ${data.parents.length}`);
+    console.log(`   👨‍🎓 Estudiantes inscritos: ${data.enrollmentCount}`);
+    console.log(`   ⏰ Horario: ${data.session.starttime} - ${data.session.endtime}`);
+    console.log(`   📆 Días: ${data.session.daysofweek}`);
+    totalEmails += data.parents.length;
+  });
+
+  console.log(`\n📊 === TOTALES ===`);
+  console.log(`🎯 Total de sesiones: ${sessions.length}`);
+  console.log(`🏐 Equipos con inscripciones activas: ${enrollmentData.length}`);
+  console.log(`📧 Total de emails que se enviarían: ${totalEmails}`);
+  
+  console.log(`\n📧 === DATOS DEL PREVIEW ===`);
+  console.log(`Padre: ${firstParent.firstname} ${firstParent.lastname}`);
+  console.log(`Email: ${firstParent.email}`);
+  console.log(`Equipo: ${firstTeamData.teamName}`);
+  console.log(`Fecha: ${startDate}`);
 }
 
 main().catch(console.error);
-
-

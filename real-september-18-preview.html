@@ -1,32 +1,4 @@
-#!/usr/bin/env node
-
-// Script para generar un preview del correo de recordatorio de temporada
-const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
-require('dotenv').config({ path: '.env.local' });
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Missing Supabase credentials');
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-// Simulamos la fecha de búsqueda: hoy + 30 días = 16 de septiembre (Tuesday)
-const today = new Date('2025-08-17'); // Simular fecha actual
-const targetDate = new Date(today);
-targetDate.setDate(targetDate.getDate() + 30);
-const targetDateString = targetDate.toISOString().split('T')[0]; // 2025-09-16
-
-console.log(`🗓️ Fecha simulada actual: ${today.toISOString().split('T')[0]}`);
-console.log(`🎯 Buscando sesiones que inician el: ${targetDateString}`);
-
-// Template del email en inglés
-function createSeasonReminderEmailHtml(emailData) {
-  return `<!doctype html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8"/>
@@ -71,13 +43,13 @@ function createSeasonReminderEmailHtml(emailData) {
                 </div>
 
                 <p style="margin:0 0 24px 0;font-size:18px;line-height:28px;color:#374151;text-align:center;">
-                  Hi <strong style="color:#1e40af;">${emailData.parentName}</strong>,
+                  Hi <strong style="color:#1e40af;">Ana Luisa</strong>,
                 </p>
                 
                 <div style="background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);border-radius:12px;padding:24px;margin:0 0 32px 0;border-left:4px solid #3b82f6;">
                   <p style="margin:0 0 16px 0;font-size:16px;line-height:26px;color:#475569;">
-                    This is your reminder that the <strong style="color:#1e40af;">${emailData.teamName}</strong> 
-                    season begins in exactly one month on <strong style="color:#dc2626;">${emailData.startDate}</strong>.
+                    This is your reminder that the <strong style="color:#1e40af;">TENNIS LAKEMONT</strong> 
+                    season begins in exactly one month on <strong style="color:#dc2626;">September 18, 2025</strong>.
                   </p>
                   <p style="margin:0;font-size:16px;line-height:26px;color:#475569;">
                     Get ready for another great season filled with skill development, growth, and fun!
@@ -91,7 +63,12 @@ function createSeasonReminderEmailHtml(emailData) {
                   </h3>
                   <div style="background:#f8fafc;border-radius:8px;padding:20px;">
                     <ul style="margin:0;padding:0;list-style:none;font-size:15px;line-height:24px;color:#475569;">
-                      ${emailData.scheduleHtml.replace(/<li>/g, '<li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">').replace(/<\/li>/g, '</li>')}
+                      <li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">Thu, Sep 18, 2025, 3:15 PM, 3:15 PM – 4:15 PM</li>
+       <li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">Thu, Sep 25, 2025, 3:15 PM, 3:15 PM – 4:15 PM</li>
+       <li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">Thu, Oct 2, 2025, 3:15 PM, 3:15 PM – 4:15 PM</li>
+       <li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">Thu, Oct 9, 2025, 3:15 PM, 3:15 PM – 4:15 PM</li>
+       <li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">Thu, Oct 16, 2025, 3:15 PM, 3:15 PM – 4:15 PM</li>
+       <li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">Thu, Oct 23, 2025, 3:15 PM, 3:15 PM – 4:15 PM</li>
                     </ul>
                   </div>
                 </div>
@@ -131,121 +108,4 @@ function createSeasonReminderEmailHtml(emailData) {
       </tr>
     </table>
   </body>
-</html>`;
-}
-
-// Función simplificada para generar horario en inglés
-function generateEnglishSchedule() {
-  const startDate = new Date('2025-09-16'); // Tuesday, September 16
-  const schedule = [];
-  
-  // Generar 6 sesiones de ejemplo: Martes y Jueves
-  for (let i = 0; i < 6; i++) {
-    const sessionDate = new Date(startDate);
-    
-    if (i % 2 === 0) {
-      // Martes
-      sessionDate.setDate(startDate.getDate() + (i * 3.5));
-    } else {
-      // Jueves
-      sessionDate.setDate(startDate.getDate() + 2 + ((i - 1) * 3.5));
-    }
-    
-    const dateStr = sessionDate.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'short',
-      day: 'numeric',
-      timeZone: 'America/New_York'
-    });
-    
-    schedule.push(`<li>${dateStr}, 6:00 PM – 8:00 PM</li>`);
-  }
-  
-  return schedule.join('\n       ');
-}
-
-async function getSessionStartingOnDate() {
-  try {
-    console.log('🔍 Buscando sesiones que empiezan el Tuesday, September 16...');
-    
-    const { data: sessions, error } = await supabase
-      .from('session')
-      .select(`
-        sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek,
-        team!inner (
-          name,
-          school (
-            name
-          )
-        )
-      `)
-      .eq('startdate', targetDateString)
-      .limit(1);
-
-    if (error) {
-      console.error('❌ Error fetching sessions:', error);
-      return null;
-    }
-
-    if (!sessions || sessions.length === 0) {
-      console.log('ℹ️ No se encontraron sesiones para esa fecha, usando datos de ejemplo');
-      return {
-        team: { 
-          name: 'Volleyball High School Girls Team',
-          school: { name: 'Lincoln High School' }
-        },
-        startdate: targetDateString,
-        starttime: '18:00',
-        endtime: '20:00',
-        daysofweek: 'Tuesday,Thursday'
-      };
-    }
-
-    console.log('✅ Sesión encontrada:', sessions[0].team?.name);
-    return sessions[0];
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return null;
-  }
-}
-
-async function main() {
-  console.log('🚀 Generando preview del correo de recordatorio de temporada...');
-  
-  const sessionData = await getSessionStartingOnDate();
-  
-  if (!sessionData) {
-    console.log('❌ No se pudo obtener datos de sesión');
-    return;
-  }
-  
-  // Datos del email
-  const emailData = {
-    parentName: 'Maria Gonzalez',
-    teamName: sessionData.team?.name || 'Volleyball Team',
-    startDate: new Date(sessionData.startdate).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: 'America/New_York'
-    }),
-    scheduleHtml: generateEnglishSchedule()
-  };
-  
-  const htmlContent = createSeasonReminderEmailHtml(emailData);
-  
-  // Guardar el HTML
-  fs.writeFileSync('season-reminder-preview.html', htmlContent);
-  console.log('✅ Preview generado: season-reminder-preview.html');
-  
-  // Mostrar resumen
-  console.log('\n📊 Datos del preview:');
-  console.log(`Equipo: ${emailData.teamName}`);
-  console.log(`Fecha de inicio: ${emailData.startDate}`);
-  console.log(`Padre: ${emailData.parentName}`);
-}
-
-main().catch(console.error);
-
-
+</html>
