@@ -18,6 +18,8 @@ declare module "lucide-react" {
   export const TagIcon: ComponentType<IconProps>;
   export const ChevronDown: ComponentType<IconProps>;
   export const ChevronUp: ComponentType<IconProps>;
+  export const ChevronLeft: ComponentType<IconProps>;
+  export const ChevronRight: ComponentType<IconProps>;
   export const LogIn: ComponentType<IconProps>;
   export const UserPlus: ComponentType<IconProps>;
   export const Loader2: ComponentType<IconProps>;

@@ -32,7 +32,7 @@ export default function FAQSection() {
       category: "PROGRAMS",
       question: "WHAT AGE GROUPS DO YOUR PROGRAMS SERVE?",
       answer:
-        "Our programs are designed for children and teens between the ages of 8 and 18. We offer different skill levels and age-appropriate training for each sport to ensure proper development and enjoyment.",
+        "Our programs are designed for children and teens between the ages of 5 and 11. We offer different skill levels and age-appropriate training for each sport to ensure proper development and enjoyment.",
     },
     {
       category: "REGISTRATION",
@@ -47,28 +47,10 @@ export default function FAQSection() {
         "Participants should bring appropriate athletic clothing, sport-specific shoes, a water bottle, and a small towel. For volleyball, knee pads are recommended. For tennis, players should bring their racquet if they have one (we can provide equipment if needed). For pickleball, we provide all necessary equipment.",
     },
     {
-      category: "FINANCIAL",
-      question: "DO YOU OFFER SCHOLARSHIPS OR FINANCIAL ASSISTANCE?",
-      answer:
-        "Yes, we believe every child should have access to quality sports training regardless of financial circumstances. We offer a limited number of scholarships and financial assistance options. Please contact our office for more information and application details.",
-    },
-    {
-      category: "POLICIES",
-      question: "WHAT IS YOUR CANCELLATION AND REFUND POLICY?",
-      answer:
-        "Cancellations made more than 14 days before the program start date are eligible for a full refund minus a $25 processing fee. Cancellations within 7-14 days receive a 50% refund. Cancellations less than 7 days before the start date are not eligible for refunds but may be transferred to another program or participant.",
-    },
-    {
       category: "COACHES",
       question: "ARE YOUR COACHES CERTIFIED?",
       answer:
         "All our coaches are certified in their respective sports and have undergone background checks. Many of our coaches are former collegiate or professional athletes with years of coaching experience. They are trained in age-appropriate coaching techniques and safety protocols.",
-    },
-    {
-      category: "PROGRAMS",
-      question: "DO YOU OFFER PRIVATE LESSONS?",
-      answer:
-        "Yes, we offer private and semi-private lessons for all three sports. These can be scheduled based on coach availability and facility access. Private lessons are a great way to focus on specific skills and accelerate improvement.",
     },
     {
       category: "PROGRAMS",
@@ -87,18 +69,6 @@ export default function FAQSection() {
       question: "CAN PARENTS WATCH THE TRAINING SESSIONS?",
       answer:
         "Yes, we have designated viewing areas for parents at all our training facilities. We encourage parental support while maintaining a focused training environment for the participants.",
-    },
-    {
-      category: "PROGRAMS",
-      question: "DO YOU OFFER YEAR-ROUND PROGRAMS OR JUST SEASONAL?",
-      answer:
-        "We offer both seasonal programs and year-round training options. Our seasonal programs typically run for 8-12 weeks, while our year-round programs provide continuous development with appropriate breaks throughout the year.",
-    },
-    {
-      category: "CLUB",
-      question: "HOW DO I JOIN THE COMPETITIVE CLUB TEAMS?",
-      answer:
-        "Club team selection is based on tryouts that we hold several times throughout the year. Information about upcoming tryouts can be found on our website or by contacting our office. Players on club teams commit to more intensive training and competition schedules.",
     },
   ]
 

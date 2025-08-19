@@ -247,7 +247,8 @@ export default function JoinTeamSection() {
           </h2>
           <div className="max-w-4xl mx-auto">
             <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-800 px-4 sm:px-6 md:px-8 leading-relaxed bg-white/70 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">
-              We're always building a team of passionate coaches to bring energy and skill to every practice. Make a real impact on the next generation of athletes! More than coaching; it's leadership and transformation through sports.
+            We’re always building a team of passionate coaches to bring energy and skill to every practice. Make a real impact on the next generation of athletes! 
+
             </p>
           </div>
         </AnimatedSection>

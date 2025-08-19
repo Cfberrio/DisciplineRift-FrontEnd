@@ -71,7 +71,7 @@ export default function Header() {
               isScrolled ? "text-dr-blue" : "text-white",
             )}
           >
-            DISCIPLINE RIft
+            DISCIPLINE RIFT
           </Link>
 
           {/* Desktop Navigation */}

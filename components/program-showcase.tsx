@@ -87,7 +87,7 @@ export default function ProgramShowcase() {
 
   return (
     <section
-      className="py-8 xs:py-12 sm:py-16 md:py-0 relative overflow-hidden bg-center programs-section-mobile"
+      className="py-8 xs:py-12 sm:py-16 md:py-0 relative overflow-hidden bg-center programs-section-mobile xl:[background-position:center_30%] xl:[background-size:cover] 2xl:[background-position:center_25%] 2xl:[background-size:100%_auto]"
       id="programs"
       style={{ 
         backgroundImage: "url('/programs-background.png')", 
@@ -104,8 +104,8 @@ export default function ProgramShowcase() {
       {/* TÍTULO DEL BACKGROUND - SOLO MÓVIL */}
   
 
-      {/* CONTAINER DEL CARRUSEL - MOVIDO MÁS ABAJO EN MÓVIL */}
-      <div className="container relative z-10 px-4 pt-[70vh] xs:pt-[75vh] sm:pt-[80vh] md:pt-40 programs-container-mobile">
+      {/* CONTAINER DEL CARRUSEL - AJUSTADO PARA MAC M1 14" */}
+      <div className="container relative z-10 px-4 pt-[70vh] xs:pt-[75vh] sm:pt-[80vh] md:pt-40 xl:pt-[25vh] 2xl:pt-40 programs-container-mobile">
         
         {/* TÍTULO DESKTOP - MANTENER COMO ESTÁ */}
       
@@ -116,45 +116,47 @@ export default function ProgramShowcase() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center relative">
             {/* Left arrow */}
             <button
               onClick={prevSlide}
-              className="absolute left-0 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 xs:p-2 transform -translate-y-1/2 top-1/2 shadow-lg programs-nav-mobile"
+              className="absolute left-0 xs:left-1 sm:left-2 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 xs:p-2 sm:p-2.5 md:p-3 transform -translate-y-1/2 top-1/2 shadow-lg transition-all duration-200 programs-nav-mobile"
               aria-label="Previous program"
             >
-              <ChevronLeft size={24} className="xs:w-6 xs:h-6 md:w-8 md:h-8" />
+              <ChevronLeft className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
             </button>
 
-            {/* Cards container */}
-            <div className="flex justify-center items-center w-full max-w-3xl mx-auto px-4 xs:px-6 sm:px-8">
-              {/* Previous card (smaller) */}
-              <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 mr-4 programs-card-side-mobile">
-                <div className="relative rounded-lg overflow-hidden">
-                  <div className="aspect-[4/5] relative">
+            {/* Cards container - reducido para mejor layout */}
+            <div className="flex justify-center items-center w-full max-w-6xl xl:max-w-4xl 2xl:max-w-5xl mx-auto px-2 xs:px-4 sm:px-6 md:px-8">
+              {/* Previous card (smaller) - más reducido */}
+              <div className="hidden lg:block w-1/8 xl:w-1/6 transform scale-55 opacity-60 transition-all duration-500 mr-1 xl:mr-2 programs-card-side-mobile">
+                <div className="relative rounded-lg overflow-hidden shadow-lg">
+                  <div className="aspect-[3/4] sm:aspect-[3/4] relative">
                     <Image
                       src={programs[prevIndex].image || "/placeholder.svg"}
                       alt={programs[prevIndex].alt}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
+                      sizes="(max-width: 768px) 0px, (max-width: 1024px) 0px, (max-width: 1280px) 150px, 200px"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                      <h3 className="text-3xl wild-youth-text-white text-center">{programs[prevIndex].title}</h3>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 xl:p-4">
+                      <h3 className="text-lg xl:text-2xl wild-youth-text-white text-center">{programs[prevIndex].title}</h3>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Current card (larger) */}
-              <div className="w-full md:w-2/5 transition-all duration-500 z-10 programs-card-main-mobile">
-                <div className="relative rounded-lg overflow-hidden transform rotate-1">
-                  <div className="aspect-[4/5] relative">
+              {/* Current card (larger) - reducido para mejor layout */}
+              <div className="w-full max-w-xs xs:max-w-sm sm:max-w-sm md:max-w-md lg:w-2/5 xl:w-1/3 xl:max-w-xs 2xl:w-1/3 2xl:max-w-md transition-all duration-500 z-10 programs-card-main-mobile mx-auto">
+                <div className="relative rounded-lg overflow-hidden transform rotate-1 shadow-2xl">
+                  <div className="aspect-[3/4] sm:aspect-[3/4] relative">
                     <Image
                       src={programs[currentIndex].image || "/placeholder.svg"}
                       alt={programs[currentIndex].alt}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
                       priority
+                      sizes="(max-width: 640px) 70vw, (max-width: 768px) 60vw, (max-width: 1024px) 50vw, (max-width: 1280px) 300px, (max-width: 1600px) 250px, 300px"
                     />
                     <div className="absolute bottom-0 left-0 right-0 p-3 xs:p-4 sm:p-6">
                       <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl wild-youth-text-white text-center mb-1 xs:mb-2">
@@ -167,18 +169,19 @@ export default function ProgramShowcase() {
                 </div>
               </div>
 
-              {/* Next card (smaller) */}
-              <div className="hidden md:block w-1/5 transform scale-75 opacity-70 transition-all duration-500 ml-4 programs-card-side-mobile">
-                <div className="relative rounded-lg overflow-hidden">
-                  <div className="aspect-[4/5] relative">
+              {/* Next card (smaller) - más reducido */}
+              <div className="hidden lg:block w-1/8 xl:w-1/6 transform scale-55 opacity-60 transition-all duration-500 ml-1 xl:ml-2 programs-card-side-mobile">
+                <div className="relative rounded-lg overflow-hidden shadow-lg">
+                  <div className="aspect-[3/4] sm:aspect-[3/4] relative">
                     <Image
                       src={programs[nextIndex].image || "/placeholder.svg"}
                       alt={programs[nextIndex].alt}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
+                      sizes="(max-width: 768px) 0px, (max-width: 1024px) 0px, (max-width: 1280px) 150px, 200px"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                      <h3 className="text-3xl wild-youth-text-white text-center">{programs[nextIndex].title}</h3>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 xl:p-4">
+                      <h3 className="text-lg xl:text-2xl wild-youth-text-white text-center">{programs[nextIndex].title}</h3>
                     </div>
                   </div>
                 </div>
@@ -188,31 +191,37 @@ export default function ProgramShowcase() {
             {/* Right arrow */}
             <button
               onClick={nextSlide}
-              className="absolute right-0 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 xs:p-2 transform -translate-y-1/2 top-1/2 shadow-lg programs-nav-mobile"
+              className="absolute right-0 xs:right-1 sm:right-2 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 xs:p-2 sm:p-2.5 md:p-3 transform -translate-y-1/2 top-1/2 shadow-lg transition-all duration-200 programs-nav-mobile"
               aria-label="Next program"
             >
-              <ChevronRight size={24} className="xs:w-6 xs:h-6 md:w-8 md:h-8" />
+              <ChevronRight className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
             </button>
           </div>
 
-          {/* Dots indicator (muy pequeño) */}
-          <div className="flex justify-center mt-1 xs:mt-1 space-x-0.5 programs-dots-mobile">
+          {/* Dots indicator - responsive sizing */}
+          <div className="flex justify-center mt-2 xs:mt-3 sm:mt-4 space-x-1 xs:space-x-1.5 sm:space-x-2 programs-dots-mobile">
             {programs.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-1 h-1 rounded-full programs-dot-mobile ${index === currentIndex ? "bg-yellow-400" : "bg-white/40"}`}
+                className={`w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 programs-dot-mobile ${
+                  index === currentIndex 
+                    ? "bg-yellow-400 scale-125" 
+                    : "bg-white/40 hover:bg-white/60"
+                }`}
                 aria-label={`Go to program ${index + 1}`}
               />
             ))}
           </div>
 
-          {/* Description */}
-          <div className="text-center mt-6 xs:mt-8 text-white/90 px-4 xs:px-6 sm:px-8 programs-description-mobile">
-                          <h4 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4 programs-subtitle-mobile">
-                {programs[currentIndex].sport.toUpperCase()}
-              </h4>
-            <p className="max-w-3xl mx-auto whitespace-pre-line text-sm xs:text-base sm:text-lg programs-text-mobile">{programs[currentIndex].description}</p>
+          {/* Description - responsive spacing and typography */}
+          <div className="text-center mt-4 xs:mt-6 sm:mt-8 text-white/90 px-4 xs:px-6 sm:px-8 md:px-12 programs-description-mobile">
+            <h4 className="text-base xs:text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4 programs-subtitle-mobile">
+              {programs[currentIndex].sport.toUpperCase()}
+            </h4>
+            <p className="max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto whitespace-pre-line text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed programs-text-mobile">
+              {programs[currentIndex].description}
+            </p>
           </div>
         </div>
       </div>
