@@ -1,6 +1,3 @@
-#!/usr/bin/env node
-
-// Script para generar preview con datos REALES de la base de datos
 const { createClient } = require('@supabase/supabase-js');
 const { DateTime } = require('luxon');
 const fs = require('fs');
@@ -16,107 +13,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 const TIMEZONE = 'America/New_York';
-
-// Calcular fecha objetivo: hoy + 30 días
-const nowNY = DateTime.now().setZone(TIMEZONE);
-const targetDateNY = nowNY.plus({ days: 30 }).toISODate();
-
-console.log(`📅 Fecha actual (NY): ${nowNY.toISODate()}`);
-console.log(`🎯 Buscando sesiones que inician exactamente en: ${targetDateNY}`);
-
-// Función para parsear días de la semana (copiada del archivo original)
-function parseDaysOfWeek(daysOfWeek) {
-  if (!daysOfWeek || typeof daysOfWeek !== 'string') {
-    return [];
-  }
-
-  const dayMapping = {
-    'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4,
-    'friday': 5, 'saturday': 6, 'sunday': 7,
-    'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4,
-    'fri': 5, 'sat': 6, 'sun': 7,
-    'm': 1, 't': 2, 'w': 3, 'r': 4, 'f': 5, 's': 6, 'u': 7,
-    'lunes': 1, 'martes': 2, 'miércoles': 3, 'jueves': 4,
-    'viernes': 5, 'sábado': 6, 'domingo': 7
-  };
-
-  const cleanDays = daysOfWeek
-    .toLowerCase()
-    .split(/[,;|\s\/]+/)
-    .map(day => day.trim())
-    .filter(day => day.length > 0);
-
-  const weekdays = new Set();
-  
-  for (const day of cleanDays) {
-    const weekday = dayMapping[day];
-    if (weekday) {
-      weekdays.add(weekday);
-    }
-  }
-
-  return Array.from(weekdays).sort();
-}
-
-// Función para construir el horario de temporada con datos reales (copiada y adaptada)
-function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
-  try {
-    const startDate = DateTime.fromISO(session.startdate, { zone: timezone });
-    const endDate = session.enddate 
-      ? DateTime.fromISO(session.enddate, { zone: timezone })
-      : startDate;
-
-    const weekdays = parseDaysOfWeek(session.daysofweek);
-    
-    if (weekdays.length === 0) {
-      const startDateTime = startDate.set({
-        hour: parseInt(session.starttime.split(':')[0]),
-        minute: parseInt(session.starttime.split(':')[1] || '0')
-      });
-      
-      const endDateTime = startDate.set({
-        hour: parseInt(session.endtime.split(':')[0]),
-        minute: parseInt(session.endtime.split(':')[1] || '0')
-      });
-
-      const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY, { locale: 'en-US' });
-      const formattedTime = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })}`;
-      
-      return `<li>${formattedDate.split(', ')[0]}, ${formattedDate.split(', ')[1]}, ${formattedTime}</li>`;
-    }
-
-    const scheduleItems = [];
-    let currentDate = startDate;
-
-    while (currentDate <= endDate && scheduleItems.length < 10) {
-      const currentWeekday = currentDate.weekday;
-      
-      if (weekdays.includes(currentWeekday)) {
-        const startDateTime = currentDate.set({
-          hour: parseInt(session.starttime.split(':')[0]),
-          minute: parseInt(session.starttime.split(':')[1] || '0')
-        });
-        
-        const endDateTime = currentDate.set({
-          hour: parseInt(session.endtime.split(':')[0]),
-          minute: parseInt(session.endtime.split(':')[1] || '0')
-        });
-
-        const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY, { locale: 'en-US' });
-        const timeRange = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })}`;
-        
-        scheduleItems.push(`<li>${formattedDate.split(' at ')[0]}, ${timeRange}</li>`);
-      }
-      
-      currentDate = currentDate.plus({ days: 1 });
-    }
-
-    return scheduleItems.length > 0 ? scheduleItems.join('\n       ') : '<li>Schedule to be confirmed</li>';
-  } catch (error) {
-    console.error('Error building season schedule HTML:', error);
-    return '<li>Schedule to be confirmed</li>';
-  }
-}
 
 // Template del email (mismo que en sendSeasonReminders.ts)
 function createSeasonReminderEmailHtml(emailData) {
@@ -228,25 +124,29 @@ function createSeasonReminderEmailHtml(emailData) {
 </html>`;
 }
 
+
+
 async function getActualSeasonReminderData() {
   try {
-    console.log('🔍 Consultando sesiones que empiezan exactamente en 30 días...');
+    console.log('🔍 Consultando sesiones para Friday, September 19, 2025...');
     
-    // 1. Buscar sesiones que inician exactamente en 30 días
+    const targetDate = '2025-09-19';
+    
+    // 1. Buscar sesiones que inician exactamente el 19 de septiembre de 2025
     const { data: sessions, error: sessionsError } = await supabase
       .from('session')
       .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
-      .eq('startdate', targetDateNY)
+      .eq('startdate', targetDate)
       .limit(1000);
 
     if (sessionsError) {
       throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
     }
 
-    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
+    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones para Friday, September 19, 2025`);
 
     if (!sessions || sessions.length === 0) {
-      console.log('❌ No hay sesiones que empiecen exactamente en 30 días');
+      console.log('❌ No hay sesiones que empiecen el Friday, September 19, 2025');
       return null;
     }
 
@@ -325,8 +225,102 @@ async function getActualSeasonReminderData() {
   }
 }
 
+// Función para parsear días de la semana (copiada del archivo original)
+function parseDaysOfWeek(daysOfWeek) {
+  if (!daysOfWeek || typeof daysOfWeek !== 'string') {
+    return [];
+  }
+
+  const dayMapping = {
+    'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4,
+    'friday': 5, 'saturday': 6, 'sunday': 7,
+    'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4,
+    'fri': 5, 'sat': 6, 'sun': 7,
+    'm': 1, 't': 2, 'w': 3, 'r': 4, 'f': 5, 's': 6, 'u': 7,
+    'lunes': 1, 'martes': 2, 'miércoles': 3, 'jueves': 4,
+    'viernes': 5, 'sábado': 6, 'domingo': 7
+  };
+
+  const cleanDays = daysOfWeek
+    .toLowerCase()
+    .split(/[,;|\s\/]+/)
+    .map(day => day.trim())
+    .filter(day => day.length > 0);
+
+  const weekdays = new Set();
+  
+  for (const day of cleanDays) {
+    const weekday = dayMapping[day];
+    if (weekday) {
+      weekdays.add(weekday);
+    }
+  }
+
+  return Array.from(weekdays).sort();
+}
+
+// Función para construir el horario de temporada con datos reales
+function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
+  try {
+    const startDate = DateTime.fromISO(session.startdate, { zone: timezone });
+    const endDate = session.enddate 
+      ? DateTime.fromISO(session.enddate, { zone: timezone })
+      : startDate;
+
+    const weekdays = parseDaysOfWeek(session.daysofweek);
+    
+    if (weekdays.length === 0) {
+      const startDateTime = startDate.set({
+        hour: parseInt(session.starttime.split(':')[0]),
+        minute: parseInt(session.starttime.split(':')[1] || '0')
+      });
+      
+      const endDateTime = startDate.set({
+        hour: parseInt(session.endtime.split(':')[0]),
+        minute: parseInt(session.endtime.split(':')[1] || '0')
+      });
+
+      const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY, { locale: 'en-US' });
+      const formattedTime = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })}`;
+      
+      return `<li>${formattedDate.split(', ')[0]}, ${formattedDate.split(', ')[1]}, ${formattedTime}</li>`;
+    }
+
+    const scheduleItems = [];
+    let currentDate = startDate;
+
+    while (currentDate <= endDate && scheduleItems.length < 10) {
+      const currentWeekday = currentDate.weekday;
+      
+      if (weekdays.includes(currentWeekday)) {
+        const startDateTime = currentDate.set({
+          hour: parseInt(session.starttime.split(':')[0]),
+          minute: parseInt(session.starttime.split(':')[1] || '0')
+        });
+        
+        const endDateTime = currentDate.set({
+          hour: parseInt(session.endtime.split(':')[0]),
+          minute: parseInt(session.endtime.split(':')[1] || '0')
+        });
+
+        const formattedDate = startDateTime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY, { locale: 'en-US' });
+        const timeRange = `${startDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })} – ${endDateTime.toLocaleString(DateTime.TIME_SIMPLE, { locale: 'en-US' })}`;
+        
+        scheduleItems.push(`<li>${formattedDate.split(' at ')[0]}, ${timeRange}</li>`);
+      }
+      
+      currentDate = currentDate.plus({ days: 1 });
+    }
+
+    return scheduleItems.length > 0 ? scheduleItems.join('\n       ') : '<li>Schedule to be confirmed</li>';
+  } catch (error) {
+    console.error('Error building season schedule HTML:', error);
+    return '<li>Schedule to be confirmed</li>';
+  }
+}
+
 async function main() {
-  console.log('🚀 Generando preview de recordatorio de temporada con DATOS REALES...');
+  console.log('🚀 Generando preview de recordatorio para Friday, September 19, 2025...');
   
   const reminderData = await getActualSeasonReminderData();
   
@@ -349,14 +343,16 @@ async function main() {
     scheduleHtml
   };
 
+  // Usar el template correcto del email
   const htmlContent = createSeasonReminderEmailHtml(emailData);
   
   // Guardar el HTML
-  fs.writeFileSync('real-season-reminder-preview.html', htmlContent);
-  console.log('✅ Preview con datos reales generado: real-season-reminder-preview.html');
+  const filename = 'real-september-19-preview.html';
+  fs.writeFileSync(filename, htmlContent);
+  console.log(`✅ Preview generado: ${filename}`);
   
   // Mostrar resumen de datos reales
-  console.log('\n📊 === DATOS REALES UTILIZADOS ===');
+  console.log('\n📊 === PREVIEW PARA FRIDAY, SEPTEMBER 19, 2025 ===');
   console.log(`📧 Padre: ${reminderData.parent.firstname} ${reminderData.parent.lastname}`);
   console.log(`📩 Email: ${reminderData.parent.email}`);
   console.log(`👨‍🎓 Estudiante: ${reminderData.student.firstname} ${reminderData.student.lastname}`);
@@ -368,7 +364,3 @@ async function main() {
 }
 
 main().catch(console.error);
-
-
-
-
