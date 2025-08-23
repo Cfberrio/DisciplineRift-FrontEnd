@@ -2,27 +2,21 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Upload, Loader2, CheckCircle, AlertCircle, User, Mail, Phone, MapPin, FileText, Target } from "lucide-react"
+import { Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import AnimatedSection from "@/components/animated-section"
-import { supabase } from "@/lib/supabase"
 
 export default function JoinTeamSection() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
     email: "",
-    number: "",
-    currentAddress: "",
-    sport: "",
-    description: "",
+    subject: "",
+    message: "",
   })
 
-  const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
   const [submitError, setSubmitError] = useState("")
-  const [uploadProgress, setUploadProgress] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -30,54 +24,6 @@ export default function JoinTeamSection() {
     // Clear any previous messages when user starts typing
     if (submitMessage) setSubmitMessage("")
     if (submitError) setSubmitError("")
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      // Validate file type (PDF, DOC, DOCX)
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-      if (!allowedTypes.includes(file.type)) {
-        setSubmitError("Please upload a PDF, DOC, or DOCX file.")
-        return
-      }
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setSubmitError("File size must be less than 5MB.")
-        return
-      }
-      
-      setResumeFile(file)
-      setSubmitError("")
-    }
-  }
-
-  const uploadResume = async (file: File): Promise<string> => {
-    setUploadProgress(true)
-    
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/upload-resume', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Upload failed')
-      }
-
-      return result.fileUrl
-    } catch (error) {
-      console.error('Resume upload error:', error)
-      throw error
-    } finally {
-      setUploadProgress(false)
-    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,136 +36,41 @@ export default function JoinTeamSection() {
     setSubmitError("")
 
     try {
-      // Validate required fields
-      const requiredFields = ['firstName', 'lastName', 'email', 'number', 'currentAddress', 'sport', 'description']
-      for (const field of requiredFields) {
-        if (!formData[field as keyof typeof formData].trim()) {
-          throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required.`)
-        }
-      }
-
-      if (!resumeFile) {
-        throw new Error("Please upload your resume.")
-      }
-
-      console.log("Submitting team application:", formData)
+      console.log("Submitting contact form:", formData)
       
-      // Store resume info and convert to base64 if small enough
-      console.log('Processing resume file:', resumeFile.name, 'Size:', resumeFile.size)
-      
-      let resumeUrl = ""
-      
-      if (resumeFile.size <= 1024 * 1024) { // 1MB o menos, convertir a base64
-        try {
-          console.log('Converting to base64 (file <= 1MB)...')
-          const arrayBuffer = await resumeFile.arrayBuffer()
-          const buffer = new Uint8Array(arrayBuffer)
-          const base64 = btoa(String.fromCharCode(...buffer))
-          const base64WithMime = `data:${resumeFile.type};base64,${base64}`
-          
-          resumeUrl = base64WithMime
-          console.log('✅ File converted to base64, length:', base64.length)
-        } catch (conversionError) {
-          console.error('❌ Base64 conversion failed:', conversionError)
-          resumeUrl = `large_file_${resumeFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}_${Date.now()}`
-        }
-      } else {
-        // Archivo muy grande, solo guardar referencia
-        console.log('File too large for base64, storing reference only')
-        resumeUrl = `large_file_${resumeFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}_${Date.now()}_${resumeFile.size}bytes`
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send message")
       }
 
-      // Submit to Supabase database directly with error handling
-      console.log("Submitting to Supabase database...")
-      
-      const applicationData = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim(),
-        number: formData.number.trim(),
-        currentAddre: formData.currentAddress.trim(),
-        sport: formData.sport,
-        description: formData.description.trim(),
-        resume: resumeUrl
-      }
-
-      // Try to insert into Drteam table (capital D)
-      const { data, error } = await supabase
-        .from('Drteam')
-        .insert([applicationData])
-        .select()
-
-      if (error) {
-        console.error('Database insertion error:', error)
-        
-        // If table doesn't exist, save to a generic table or handle gracefully
-        if (error.message && (error.message.includes('relation') || error.message.includes('does not exist'))) {
-          console.warn('Drteam table not found, using alternative storage method')
-          
-          // Try to save to a contact table or create a simple log
-          try {
-            const fallbackData = {
-              name: `${formData.firstName} ${formData.lastName}`,
-              email: formData.email.trim(),
-              subject: `Team Application - ${formData.sport}`,
-              message: `Application for ${formData.sport} coaching position.\n\nAddress: ${formData.currentAddress}\nPhone: ${formData.number}\n\nDescription: ${formData.description}\n\nResume: ${resumeUrl}`
-            }
-            
-            // Try contact table as fallback
-            const { data: fallbackResult, error: fallbackError } = await supabase
-              .from('contact')
-              .insert([fallbackData])
-              .select()
-              
-            if (fallbackError) {
-              console.error('Fallback insertion also failed:', fallbackError)
-              throw new Error('Database configuration issue. Please contact support with your application details.')
-            }
-            
-            console.log('Application saved to contact table as fallback')
-          } catch (fallbackErr) {
-            throw new Error('Unable to save application. Please try again or contact support.')
-          }
-        } else {
-          throw new Error(`Database error: ${error.message}`)
-        }
-      }
-
-      console.log('Application submitted successfully:', data)
-
-      console.log("Team application submitted successfully")
+      console.log("Contact form submitted successfully")
       
       // Reset form on success
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        number: "",
-        currentAddress: "",
-        sport: "",
-        description: "",
-      })
-      setResumeFile(null)
+      setFormData({ name: "", email: "", subject: "", message: "" })
+      setSubmitMessage(data.message || "Thank you for your message! We'll get back to you soon.")
       
-      // Reset file input
-      const fileInput = document.getElementById('resume') as HTMLInputElement
-      if (fileInput) fileInput.value = ''
-      
-      setSubmitMessage("Thank you for your application! We'll review your submission and get back to you soon.")
-      
-      // Clear success message after 8 seconds
-      setTimeout(() => setSubmitMessage(""), 8000)
+      // Clear success message after 5 seconds
+      setTimeout(() => setSubmitMessage(""), 5000)
 
     } catch (error) {
-      console.error("Team application submission error:", error)
+      console.error("Contact form submission error:", error)
       setSubmitError(
         error instanceof Error 
           ? error.message 
-          : "An error occurred while submitting your application. Please try again."
+          : "An error occurred while sending your message. Please try again."
       )
       
-      // Clear error message after 8 seconds
-      setTimeout(() => setSubmitError(""), 8000)
+      // Clear error message after 5 seconds
+      setTimeout(() => setSubmitError(""), 5000)
     } finally {
       setIsSubmitting(false)
     }
@@ -243,11 +94,12 @@ export default function JoinTeamSection() {
               textShadow: "2px 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.8)" 
             }}
           >
-            JOIN OUR DR TEAM
+            CONTACT FORM
           </h2>
           <div className="max-w-4xl mx-auto">
             <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-800 px-4 sm:px-6 md:px-8 leading-relaxed bg-white/70 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">
-            We’re always building a team of passionate coaches to bring energy and skill to every practice. Make a real impact on the next generation of athletes! 
+            Have questions about our programs or want to learn more about how we can help you improve your game?
+                Reach out to us using any of the methods below, and our team will get back to you as soon as possible.
 
             </p>
           </div>
@@ -255,203 +107,100 @@ export default function JoinTeamSection() {
 
         <div className="max-w-4xl mx-auto">
           <AnimatedSection animation="fade-up">
-            <div className="bg-white/90 backdrop-blur-md p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg shadow-xl">
-              <h3 className="text-lg sm:text-xl md:text-2xl ethnocentric-title-blue mb-6 sm:mb-8 text-center">Application Form</h3>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Name Fields - Mobile: stacked, Tablet+: side by side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div>
-                    <label htmlFor="firstName" className="block text-gray-700 font-medium mb-2">
-                      <User className="inline h-4 w-4 mr-2" />
-                      First Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
-                      placeholder="Enter your first name"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="lastName" className="block text-gray-700 font-medium mb-2">
-                      <User className="inline h-4 w-4 mr-2" />
-                      Last Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
-                      placeholder="Enter your last name"
-                    />
-                  </div>
-                </div>
-
-                {/* Email and Phone - Mobile: stacked, Tablet+: side by side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div>
-                    <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
-                      <Mail className="inline h-4 w-4 mr-2" />
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="number" className="block text-gray-700 font-medium mb-2">
-                      <Phone className="inline h-4 w-4 mr-2" />
-                      Phone Number <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      id="number"
-                      name="number"
-                      value={formData.number}
-                      onChange={handleChange}
-                      required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-                </div>
-
-                {/* Address - Full width */}
+            <div className="bg-white/90 backdrop-blur-md p-3 xs:p-4 sm:p-6 lg:p-8 rounded-lg shadow-xl">
+              <h3 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-blue mb-3 xs:mb-4 sm:mb-6">Send Us a Message</h3>
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="currentAddress" className="block text-gray-700 font-medium mb-2">
-                    <MapPin className="inline h-4 w-4 mr-2" />
-                    Current Address <span className="text-red-500">*</span>
+                  <label htmlFor="name" className="block text-gray-700 font-medium mb-1">
+                    Your Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    id="currentAddress"
-                    name="currentAddress"
-                    value={formData.currentAddress}
+                    id="name"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
-                    placeholder="Enter your full address"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80"
                   />
                 </div>
 
-                {/* Sport Selection */}
                 <div>
-                  <label htmlFor="sport" className="block text-gray-700 font-medium mb-2">
-                    <Target className="inline h-4 w-4 mr-2" />
-                    Sport of Interest <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
+                    Email Address <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    id="sport"
-                    name="sport"
-                    value={formData.sport}
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="subject" className="block text-gray-700 font-medium mb-1">
+                    Subject
+                  </label>
+                  <select
+                    id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80"
                   >
-                    <option value="">Select a sport</option>
-                    <option value="Volleyball">Volleyball</option>
-                    <option value="Tennis">Tennis</option>
-                    <option value="Pickleball">Pickleball</option>
+                    <option value="">Select a subject</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Program Information">Program Information</option>
+                    <option value="Registration">Registration</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
-                {/* Resume Upload */}
                 <div>
-                  <label htmlFor="resume" className="block text-gray-700 font-medium mb-2">
-                    <FileText className="inline h-4 w-4 mr-2" />
-                    Upload Resume <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      id="resume"
-                      name="resume"
-                      onChange={handleFileChange}
-                      accept=".pdf,.doc,.docx"
-                      required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-dr-blue file:text-white hover:file:bg-blue-600"
-                    />
-                    {uploadProgress && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Loader2 className="h-5 w-5 animate-spin text-dr-blue" />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">Accepted formats: PDF, DOC, DOCX (Max 5MB)</p>
-                  {resumeFile && (
-                    <p className="text-sm text-green-600 mt-2 flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                      File selected: {resumeFile.name}
-                    </p>
-                  )}
-                </div>
-
-                {/* Inspiration Textarea */}
-                <div>
-                  <label htmlFor="description" className="block text-gray-700 font-medium mb-2">
-                    What inspires you to become a coach? <span className="text-red-500">*</span>
+                  <label htmlFor="message" className="block text-gray-700 font-medium mb-1">
+                    Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
+                    id="message"
+                    name="message"
+                    value={formData.message}
                     onChange={handleChange}
                     required
-                    rows={4}
-                    className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 resize-none"
-                    placeholder="Tell us what motivates you to coach and make a difference in young athletes' lives..."
+                    rows={5}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80"
                   ></textarea>
                 </div>
 
                 {/* Success/Error Messages */}
                 {submitMessage && (
-                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-start">
-                    <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base">{submitMessage}</span>
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span>{submitMessage}</span>
                   </div>
                 )}
                 
                 {submitError && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-start">
-                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base">{submitError}</span>
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center">
+                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span>{submitError}</span>
                   </div>
                 )}
 
                 <Button
                   type="submit"
-                  disabled={isSubmitting || uploadProgress}
-                  className="w-full bg-dr-blue hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 md:py-4 shadow-md transition-all duration-200 min-h-[44px] text-base md:text-lg font-semibold"
+                  disabled={isSubmitting}
+                  className="w-full bg-dr-blue hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting Application...
-                    </>
-                  ) : uploadProgress ? (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Uploading Resume...
+                      Sending Message...
                     </>
                   ) : (
-                    "APPLY NOW"
+                    "Send Message"
                   )}
                 </Button>
               </form>
