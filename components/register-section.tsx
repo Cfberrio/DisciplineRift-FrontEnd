@@ -135,6 +135,16 @@ export default function RegisterSection() {
   const [selectedExistingStudent, setSelectedExistingStudent] = useState<any>(null);
   const [isNewStudent, setIsNewStudent] = useState(true);
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount: number;
+    percentage: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
     parentLastName: "",
@@ -1053,8 +1063,9 @@ export default function RegisterSection() {
         body: JSON.stringify({
           teamId: selectedTeam.id,
           enrollmentId: registrationResult.enrollmentId,
-          amount: selectedTeam.price,
+          amount: calculateFinalPrice(),
           description: `${selectedTeam.name} - ${selectedTeam.schoolName}`,
+          couponCode: appliedCoupon?.code || null,
         }),
       });
 
@@ -1115,6 +1126,81 @@ export default function RegisterSection() {
   const formatDescription = (description: string) => {
     if (!description) return "";
     return description.split('.').filter(part => part.trim() !== '').join('\n');
+  };
+
+  // Coupon validation and application
+  const validateCoupon = (code: string): { isValid: boolean; percentage: number } => {
+    const normalizedCode = code.trim().toUpperCase();
+    
+    switch (normalizedCode) {
+      case 'FACULTY':
+        return { isValid: true, percentage: 15 };
+      case 'SIBLING':
+        return { isValid: true, percentage: 10 };
+      default:
+        return { isValid: false, percentage: 0 };
+    }
+  };
+
+  const applyCoupon = () => {
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code");
+      return;
+    }
+
+    if (appliedCoupon) {
+      setCouponError("Coupon already applied");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponError("");
+
+    try {
+      const validation = validateCoupon(couponCode);
+      
+      if (!validation.isValid) {
+        setCouponError("Invalid coupon code");
+        return;
+      }
+
+      if (!selectedTeam) {
+        setCouponError("Something went wrong. Please try again");
+        return;
+      }
+
+      const basePrice = selectedTeam.price;
+      const discountAmount = Math.round(basePrice * (validation.percentage / 100) * 100) / 100;
+
+      setAppliedCoupon({
+        code: couponCode.trim().toUpperCase(),
+        discount: discountAmount,
+        percentage: validation.percentage
+      });
+
+      setCouponCode("");
+      setCouponError("");
+    } catch (error) {
+      setCouponError("Something went wrong. Please try again");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+  };
+
+  const calculateFinalPrice = (): number => {
+    if (!selectedTeam) return 0;
+    
+    const basePrice = selectedTeam.price;
+    if (!appliedCoupon) return basePrice;
+    
+    const finalPrice = Math.max(0, basePrice - appliedCoupon.discount);
+    return Math.round(finalPrice * 100) / 100;
   };
 
   return (
@@ -2208,6 +2294,102 @@ export default function RegisterSection() {
                     </div>
                   </div>
 
+                  {/* Coupon Section */}
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h4 className="font-semibold text-dr-blue mb-3">
+                      Coupon Code
+                    </h4>
+                    
+                    {!appliedCoupon ? (
+                      <div className="space-y-3">
+                        <div className="flex gap-3">
+                          <div className="flex-1">
+                            <Input
+                              type="text"
+                              placeholder="Enter your coupon"
+                              value={couponCode}
+                              onChange={(e) => {
+                                setCouponCode(e.target.value);
+                                setCouponError("");
+                              }}
+                              className="w-full"
+                              disabled={isApplyingCoupon}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  applyCoupon();
+                                }
+                              }}
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            onClick={applyCoupon}
+                            disabled={isApplyingCoupon || !couponCode.trim()}
+                            className="bg-dr-blue hover:bg-blue-700 px-6"
+                          >
+                            {isApplyingCoupon ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              </>
+                            ) : (
+                              "Add"
+                            )}
+                          </Button>
+                        </div>
+                        
+                        {couponError && (
+                          <div className="text-red-600 text-sm flex items-center">
+                            <AlertCircle className="h-4 w-4 mr-2" />
+                            {couponError}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center text-green-700">
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            <span className="font-medium">{appliedCoupon.code}</span>
+                            <span className="ml-2 text-sm">({appliedCoupon.percentage}% off)</span>
+                          </div>
+                          <Button
+                            type="button"
+                            onClick={removeCoupon}
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 border-red-300 hover:bg-red-50"
+                          >
+                            Remove coupon
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Payment Summary */}
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h4 className="font-semibold text-dr-blue mb-3">
+                      Payment Summary
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Price</span>
+                        <span>${selectedTeam.price}</span>
+                      </div>
+                      {appliedCoupon && (
+                        <div className="flex justify-between text-green-600">
+                          <span>Discount ({appliedCoupon.percentage}%)</span>
+                          <span>-${appliedCoupon.discount}</span>
+                        </div>
+                      )}
+                      <div className="border-t pt-2 flex justify-between font-semibold text-lg">
+                        <span>Total</span>
+                        <span>${calculateFinalPrice()}</span>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Success Message */}
                   <div className={`border px-4 py-3 rounded ${
                     registrationResult.isExistingEnrollment 
@@ -2260,9 +2442,15 @@ export default function RegisterSection() {
                       </span>
                       <span>${selectedTeam.price}</span>
                     </div>
+                    {appliedCoupon && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Discount ({appliedCoupon.code} - {appliedCoupon.percentage}%)</span>
+                        <span>-${appliedCoupon.discount}</span>
+                      </div>
+                    )}
                     <div className="border-t pt-2 flex justify-between font-semibold">
                       <span>Total</span>
-                      <span>${selectedTeam.price}</span>
+                      <span>${calculateFinalPrice()}</span>
                     </div>
                   </div>
                 </div>
@@ -2283,7 +2471,7 @@ export default function RegisterSection() {
                     ) : (
                       <>
                         <CreditCard className="mr-2 h-4 w-4" />
-                        Pay ${selectedTeam.price}
+                        Pay ${calculateFinalPrice()}
                       </>
                     )}
                   </Button>

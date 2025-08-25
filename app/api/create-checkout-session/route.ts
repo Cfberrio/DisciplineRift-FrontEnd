@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
+import { supabaseAdmin } from "@/lib/supabase-admin"
 
 // Initialize Stripe only if secret key is available
 let stripe: Stripe | null = null
@@ -14,15 +15,80 @@ try {
   console.warn("Failed to initialize Stripe:", error)
 }
 
+// Server-side coupon validation
+const validateCouponServer = (code: string): { isValid: boolean; percentage: number } => {
+  if (!code) return { isValid: false, percentage: 0 };
+  
+  const normalizedCode = code.trim().toUpperCase();
+  
+  switch (normalizedCode) {
+    case 'FACULTY':
+      return { isValid: true, percentage: 15 };
+    case 'SIBLING':
+      return { isValid: true, percentage: 10 };
+    default:
+      return { isValid: false, percentage: 0 };
+  }
+};
+
 export async function POST(request: Request) {
   try {
-    const { teamId, enrollmentId, amount, description } = await request.json()
+    const { teamId, enrollmentId, amount, description, couponCode } = await request.json()
 
-    console.log("🔄 Creating checkout session:", { teamId, enrollmentId, amount, description })
+    console.log("🔄 Creating checkout session:", { teamId, enrollmentId, amount, description, couponCode })
 
     // Validate required fields
-    if (!teamId || !enrollmentId || !amount) {
+    if (!teamId || !enrollmentId) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
+    }
+
+    // Server-side price calculation with coupon validation
+    console.log("🔍 Fetching team price from database for team:", teamId)
+    
+    // Get team price from database (source of truth)
+    const { data: teamData, error: teamError } = await supabaseAdmin
+      .from('team')
+      .select('price')
+      .eq('teamid', teamId)
+      .single()
+
+    if (teamError || !teamData) {
+      console.error("❌ Error fetching team data:", teamError)
+      return NextResponse.json({ message: "Team not found" }, { status: 404 })
+    }
+
+    const basePrice = teamData.price
+    console.log("✅ Base price from database:", basePrice)
+
+    // Validate coupon and calculate final amount
+    let finalAmount = basePrice
+    let discountAmount = 0
+    let discountPercentage = 0
+    let validatedCouponCode = null
+
+    if (couponCode) {
+      const couponValidation = validateCouponServer(couponCode)
+      
+      if (!couponValidation.isValid) {
+        return NextResponse.json({ message: "Invalid coupon code" }, { status: 400 })
+      }
+
+      discountPercentage = couponValidation.percentage
+      discountAmount = Math.round(basePrice * (discountPercentage / 100) * 100) / 100
+      finalAmount = Math.max(0, basePrice - discountAmount)
+      validatedCouponCode = couponCode.trim().toUpperCase()
+
+      console.log("🎫 Coupon applied:", {
+        code: validatedCouponCode,
+        percentage: discountPercentage,
+        discount: discountAmount,
+        finalAmount
+      })
+    }
+
+    // Validate final amount
+    if (typeof finalAmount !== "number" || finalAmount < 0) {
+      return NextResponse.json({ message: "Invalid calculated amount" }, { status: 400 })
     }
 
     // Check if Stripe is properly configured
@@ -34,6 +100,12 @@ export async function POST(request: Request) {
         sessionId: `mock_${Date.now()}`,
         isDevelopment: true,
         message: "Development mode - no real payment required",
+        finalAmount,
+        appliedCoupon: validatedCouponCode ? {
+          code: validatedCouponCode,
+          discount: discountAmount,
+          percentage: discountPercentage
+        } : null
       })
     }
 
@@ -49,9 +121,11 @@ export async function POST(request: Request) {
             currency: "usd",
             product_data: {
               name: description || "Team Registration",
-              description: `Registration for team ${teamId}`,
+              description: validatedCouponCode 
+                ? `Registration for team ${teamId} (${validatedCouponCode} - ${discountPercentage}% off)`
+                : `Registration for team ${teamId}`,
             },
-            unit_amount: Math.round(amount * 100), // Convert to cents
+            unit_amount: Math.round(finalAmount * 100), // Convert to cents
           },
           quantity: 1,
         },
@@ -62,6 +136,11 @@ export async function POST(request: Request) {
       metadata: {
         teamId,
         enrollmentId,
+        coupon_code: validatedCouponCode || '',
+        discount_percentage: discountPercentage.toString(),
+        original_price: basePrice.toString(),
+        final_price: finalAmount.toString(),
+        discount_amount: discountAmount.toString(),
       },
     })
 
