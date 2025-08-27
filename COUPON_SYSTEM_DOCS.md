@@ -150,3 +150,5 @@ Potential improvements:
 - Usage limits per coupon
 - Dynamic coupon management via admin panel
 - Coupon history in user dashboard
+
+

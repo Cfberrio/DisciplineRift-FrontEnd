@@ -2302,7 +2302,7 @@ export default function RegisterSection() {
                     
                     {!appliedCoupon ? (
                       <div className="space-y-3">
-                        <div className="flex gap-3">
+                        <div className="flex flex-col md:flex-row gap-3">
                           <div className="flex-1">
                             <Input
                               type="text"
@@ -2326,7 +2326,7 @@ export default function RegisterSection() {
                             type="button"
                             onClick={applyCoupon}
                             disabled={isApplyingCoupon || !couponCode.trim()}
-                            className="bg-dr-blue hover:bg-blue-700 px-6"
+                            className="bg-dr-blue hover:bg-blue-700 px-4 py-2 text-sm md:px-3 md:py-1.5 md:text-sm w-full md:w-auto"
                           >
                             {isApplyingCoupon ? (
                               <>
