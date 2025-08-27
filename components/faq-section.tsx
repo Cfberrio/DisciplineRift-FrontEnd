@@ -70,6 +70,24 @@ export default function FAQSection() {
       answer:
         "Yes, we have designated viewing areas for parents at all our training facilities. We encourage parental support while maintaining a focused training environment for the participants.",
     },
+    {
+      category: "PRICING & DISCOUNTS",
+      question: "HOW MUCH DOES IT COST?",
+      answer:
+        "$129 per student per season (not per class).",
+    },
+    {
+      category: "PRICING & DISCOUNTS",
+      question: "HOW DO I PAY?",
+      answer:
+        "Payment is handled securely via Stripe Checkout.",
+    },
+    {
+      category: "WEATHER & CANCELLATIONS",
+      question: "WHAT IF IT RAINS OR THERE'S BAD WEATHER?",
+      answer:
+        "If outdoor practice isn't possible, we'll reschedule or move indoors when permitted by the school and notify families by email.",
+    },
   ]
 
   const filteredFAQs = searchQuery
