@@ -18,6 +18,8 @@
     "test-schedule": "npx tsx scripts/test-practice-schedule.ts",
     "test-date-problem": "npx tsx scripts/test-date-problem.ts",
     "test-payment-email": "npx tsx scripts/test-payment-email.ts",
+    "send-labor-day-campaign": "npx tsx scripts/send-labor-day-campaign.ts",
+    "manual-labor-day-campaign": "npx tsx scripts/manual-labor-day-campaign.ts",
     "debug-email-dates": "npx tsx scripts/debug-email-dates.ts",
     "test-end-date": "npx tsx scripts/test-end-date-issue.ts"
   },
