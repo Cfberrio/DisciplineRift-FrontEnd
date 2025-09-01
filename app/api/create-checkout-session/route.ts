@@ -26,6 +26,8 @@ const validateCouponServer = (code: string): { isValid: boolean; percentage: num
       return { isValid: true, percentage: 15 };
     case 'SIBLING':
       return { isValid: true, percentage: 10 };
+    case 'LABORDAY':
+      return { isValid: true, percentage: 10 };
     default:
       return { isValid: false, percentage: 0 };
   }
