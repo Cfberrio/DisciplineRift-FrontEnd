@@ -59,26 +59,26 @@ export default function Home() {
                 <div className="w-full max-w-3xl">
                   <AnimatedSection animation="fade-up" delay={400}>
                     <div className="mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg about-text-mobile leading-relaxed" style={{ textAlign: 'center', width: '100%' }}>
-                      Discipline Rift introduces sports to players in a developmental approach by 
+                      Discipline Rift introduces sports to players in a <strong>developmental approach</strong> by 
                       teaching the discipline of a sport and the value of discipline lived in 
-                      a lifestyle involved in sports.
+                      a <strong>lifestyle involved in sports</strong>.
                     </div>
                   </AnimatedSection>
 
                   <AnimatedSection animation="fade-up" delay={600}>
                     <div className="mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg about-text-mobile leading-relaxed" style={{ textAlign: 'center', width: '100%' }}>
-                      By teaching the sport, we create the conditions for something powerful to
+                      By teaching the sport, we <strong>create the conditions</strong> for something <strong>powerful</strong> to
                       happen: the breakthrough. 
                       The Rift. That moment when a player connects with the 
-                      sport and discovers their love and passion for it. 
+                      sport and <strong>discovers their love</strong> and <strong>passion</strong> for it. 
                     </div>
                   </AnimatedSection>
 
                   <AnimatedSection animation="fade-up" delay={800}>
                     <div className="mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg about-text-mobile leading-relaxed" style={{ textAlign: 'center', width: '100%' }}>
-                      Our programs provide all the equipment and coaches needed to support this journey and build a strong, lasting
+                      Our programs provide <strong>all the equipment</strong> and coaches <strong>needed to support</strong> this journey and build a strong, lasting
                       foundation for a 
-                      lifestyle in sports. 
+                      <strong>lifestyle in sports</strong>. 
                     </div>
                   </AnimatedSection>
                 </div>
@@ -126,27 +126,27 @@ export default function Home() {
                   </div>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={400}>
-                  <p className="mission-text-large text-gray-800 mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-center">
-                  Discipline Rift introduces sports to players in a developmental approach by 
+                  <p className="mission-text-large text-gray-800 mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-left">
+                  Discipline Rift introduces sports to players in a <strong>developmental approach</strong> by 
                   teaching the discipline of a sport and the value of discipline lived in 
-                  a lifestyle involved in sports.
+                  a <strong>lifestyle involved in sports</strong>.
                   </p>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={600}>
-                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-center">
-                  By teaching the sport, we create the conditions for something powerful to
+                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-left">
+                  By teaching the sport, we <strong>create the conditions</strong> for something <strong>powerful</strong> to
                    happen: the breakthrough. 
                    The Rift. That moment when a player connects with the 
-                   sport and discovers their love and passion for it. 
+                   sport and <strong>discovers their love</strong> and <strong>passion</strong> for it. 
                    
                   </p>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={600}>
-                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-center">
+                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-left">
       
-                   Our programs provide all the equipment and coaches needed to support this journey and build a strong, lasting
+                   Our programs provide <strong>all the equipment</strong> and coaches <strong>needed to support</strong> this journey and build a strong, lasting
                   foundation for a 
-                   lifestyle in sports. 
+                   <strong>lifestyle in sports</strong>. 
                   </p>
                 </AnimatedSection>
               </div>
