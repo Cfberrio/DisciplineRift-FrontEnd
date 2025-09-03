@@ -22,9 +22,22 @@
     transform: none !important; /* Sin escala, usar tamaño original */
   }
   
+  /* IMAGEN DE FONDO MÓVIL ESPECÍFICA - Sin espacios en blanco */
+  .hero-background-mobile {
+    object-fit: cover !important;
+    object-position: center center !important; /* Centrado perfecto */
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh !important; /* Asegurar que cubra toda la pantalla */
+    transform: scale(1.1) !important; /* Escalar ligeramente para evitar espacios */
+  }
+  
   /* Contenedor de imagen móvil */
   .hero-background-container {
-    height: 80vh !important;
+    height: 60vh !important; /* Altura ajustada para sección pequeña */
+    min-height: 60vh !important;
+    width: 100vw !important;
+    overflow: hidden !important; /* Evitar scroll por escala */
   }
   
   /* Títulos móvil - solo override tamaños muy grandes */
@@ -70,8 +83,21 @@
     transform: none !important;
   }
   
+  /* Imagen de fondo móvil para iPhone grandes */
+  .hero-background-mobile {
+    object-fit: cover !important;
+    object-position: center center !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh !important;
+    transform: scale(1.1) !important; /* Escalar para evitar espacios */
+  }
+  
   .hero-background-container {
-    height: 85vh !important;
+    height: 65vh !important; /* Altura ajustada para iPhone grandes */
+    min-height: 65vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
   }
   
   .hero-title-main {
@@ -88,12 +114,37 @@
   }
 }
 
-/* Tablets - mantener original */
+/* Tablets - mantener original y agregar logo */
 @media screen and (min-width: 641px) and (max-width: 1024px) {
   .hero-background-image {
     object-fit: cover !important;
     object-position: center center !important;
     transform: none !important;
+  }
+  
+  /* Logo para tablets - ajustado para escala 2x */
+  .hero-logo-main {
+    max-width: 50% !important; /* Reducido para compensar scale-[2] */
+    width: 50% !important;
+    height: auto !important;
+    z-index: 20 !important;
+    position: relative !important;
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3)) !important;
+    transform: scale(1.2) !important; /* Escala intermedia para tablets */
+  }
+}
+
+/* Desktop y pantallas grandes - mantener comportamiento original */
+@media screen and (min-width: 1025px) {
+  .hero-logo-main {
+    /* Reset mobile overrides para permitir que el scale-[2] del componente funcione */
+    max-width: none !important;
+    width: auto !important;
+    height: auto !important;
+    z-index: 20 !important;
+    position: relative !important;
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.3)) !important;
+    transform: none !important; /* Permitir que el scale-[2] del componente sea efectivo */
   }
 }
 
@@ -132,6 +183,48 @@
     margin: 0 auto !important;
     max-width: 90% !important;
     backdrop-filter: blur(8px) !important;
+  }
+  
+  /* Logo principal móvil - tamaño reducido para evitar cortes */
+  .hero-logo-main {
+    max-width: 80% !important; /* Reducido para evitar cortes en bordes */
+    width: 80% !important;
+    height: auto !important;
+    z-index: 20 !important; /* Asegurar que esté sobre otros elementos */
+    position: relative !important;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4)) !important;
+    transform: scale(1.1) !important; /* Escala reducida para móvil */
+  }
+  
+  /* Ajustar hero section para mejor distribución */
+  .hero-section-mobile {
+    min-height: 60vh !important; /* Sección mucho más pequeña */
+    height: 60vh !important;
+    overflow: hidden !important; /* Evitar overflow horizontal */
+  }
+  
+  .hero-mobile-container {
+    min-height: 60vh !important; /* Coincidir con la sección */
+    height: 60vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important; /* Permitir visibilidad controlada */
+    padding: 1rem !important; /* Espaciado interno para evitar tocar bordes */
+  }
+  
+  /* Texto hero mobile */
+  .hero-text-mobile {
+    font-size: 1rem !important; /* Tamaño adecuado para móvil */
+    line-height: 1.4 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Botón hero mobile */
+  .hero-button-mobile {
+    font-size: 0.875rem !important; /* 14px */
+    padding: 0.75rem 1.5rem !important;
+    min-height: 44px !important; /* Tamaño táctil mínimo */
   }
   
   /* Título About Us móvil */
@@ -188,6 +281,34 @@
     margin: 0 auto !important;
     max-width: 85% !important;
     backdrop-filter: blur(10px) !important;
+  }
+  
+  /* Logo principal para iPhone grandes - tamaño controlado */
+  .hero-logo-main {
+    max-width: 75% !important; /* Reducido para evitar cortes */
+    width: 75% !important;
+    height: auto !important;
+    z-index: 20 !important;
+    position: relative !important;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4)) !important;
+    transform: scale(1.2) !important; /* Escala controlada para iPhone grandes */
+  }
+  
+  /* Ajustar hero section para iPhone grandes */
+  .hero-section-mobile {
+    min-height: 65vh !important; /* Sección pequeña para iPhone grandes */
+    height: 65vh !important;
+    overflow: hidden !important; /* Evitar overflow horizontal */
+  }
+  
+  .hero-mobile-container {
+    min-height: 65vh !important; /* Coincidir con la sección */
+    height: 65vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important; /* Permitir visibilidad controlada */
+    padding: 1.5rem !important; /* Espaciado interno para iPhone grandes */
   }
   
   .about-title-mobile {

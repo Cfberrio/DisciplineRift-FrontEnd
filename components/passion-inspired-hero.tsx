@@ -18,12 +18,22 @@ export default function PassionInspiredHero() {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden hero-section-mobile">
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0 hero-background-container">
+        {/* Desktop background */}
         <Image
           src="/hero-halftone-background.png"
           alt="Dynamic halftone pattern background"
           fill
           priority
-          className="object-cover object-center w-full h-full hero-background-image"
+          className="object-cover object-center w-full h-full hero-background-image hidden lg:block"
+        />
+        
+        {/* Mobile background */}
+        <Image
+          src="/01.png"
+          alt="Mobile background"
+          fill
+          priority
+          className="object-cover object-center w-full h-full hero-background-mobile lg:hidden"
         />
 
         {/* Subtle overlay to ensure text readability */}
@@ -36,41 +46,86 @@ export default function PassionInspiredHero() {
       {/* Content container */}
       <div className="container relative z-10 px-3 xs:px-4 sm:px-6 md:px-8 py-6 xs:py-8 sm:py-12 md:py-16 lg:py-20 h-full hero-mobile-container">
         <div className="flex flex-col items-center justify-center text-center h-full min-h-screen">
-          {/* Main title with brushstroke effect */}
+          {/* Main DISCIPLINE RIFT Logo */}
           <div
             className={`relative transition-all duration-1000 transform ${
               isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
-            
-          </div>
-          {/* CTA Button */}
-          <div
-            className={`mt-16 xs:mt-20 sm:mt-24 md:mt-32 lg:mt-40 xl:mt-[32rem] hero-button-container transition-all duration-1000 delay-500 transform ${
-              isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-            }`}
-          >
-            <Button
-              size="lg"
-              className="bg-white hover:bg-blue-50 ethnocentric-title-blue font-bold rounded-full min-h-[44px] px-6 xs:px-8 sm:px-10 py-3 xs:py-4 sm:py-5 text-sm xs:text-base sm:text-lg shadow-lg mb-4"
-            >
-              <Link href="#register" className="flex items-center">
-                REGISTER NOW <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <div className="flex justify-center items-center px-4 sm:px-6 mb-4 xs:mb-6 sm:mb-8 md:mb-10 lg:mb-12 relative z-20 overflow-visible">
+              <Image
+                src="DISCIPLINE_RIFT_HEROIMAGE.png"
+                alt="Discipline Rift"
+                width={2200}              // 2x para servir imagen nítida
+                height={1329}
+                priority
+                sizes="(max-width: 1024px) 200vw, 200vw"  // indica que se mostrará al doble del viewport
+                className="w-full max-w-[100%] h-auto hero-logo-main drop-shadow-2xl
+                          origin-center scale-[2]"       // 2x en todos los breakpoints
+              />
+            </div>
+
           </div>
 
-                    {/* Date and location */}
-          <div
-            className={`mt-8 xs:mt-10 iphone16:mt-12 sm:mt-14 md:mt-16 lg:mt-18 text-white text-sm xs:text-base iphone16:text-lg sm:text-lg md:text-xl ethnocentric-text-white hero-date-text transition-all duration-1000 delay-700 transform ${
-              isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-            }`}
-          >
-            <div>
-              <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl wild-youth-text-white mb-2 xs:mb-3 sm:mb-4 md:mb-6 px-2 xs:px-3 sm:px-4">September 2025</p>
+          {/* Mobile Layout - Text and Button stacked */}
+          <div className="lg:hidden">
+            {/* Text content - Fall Season message */}
+            <div
+              className={`mt-6 xs:mt-8 sm:mt-10 md:mt-12 text-center text-white transition-all duration-1000 delay-500 transform relative z-20 ${
+                isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+              }`}
+            >
+              <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-medium wild-youth-text-white mb-8 xs:mb-10 sm:mb-12 md:mb-16 hero-text-mobile">
+                Fall Season is here! Join us this September 2025
+              </h2>
             </div>
-            <div>
-              <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl wild-youth-text-white mb-2 xs:mb-3 sm:mb-4 md:mb-6 px-2 xs:px-3 sm:px-4">Fall Season</p>
+
+            {/* CTA Button */}
+            <div
+              className={`transition-all duration-1000 delay-700 transform relative z-20 ${
+                isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+              }`}
+            >
+              <Button
+                size="lg"
+                className="bg-dr-blue hover:bg-blue-700 text-white font-bold rounded-full min-h-[50px] xs:min-h-[55px] sm:min-h-[60px] px-8 xs:px-10 sm:px-12 py-4 xs:py-5 sm:py-6 text-sm xs:text-base sm:text-lg shadow-lg hero-button-mobile"
+              >
+                <Link href="#register" className="flex items-center">
+                  REGISTER NOW <ArrowRight className="ml-2 h-5 w-5 xs:h-6 xs:w-6" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Desktop Layout - Button and Text side by side */}
+          <div className="hidden lg:block">
+            <div className="flex items-center justify-between w-full max-w-6xl mx-auto mt-16 xl:mt-20">
+              {/* CTA Button - Left side */}
+              <div
+                className={`transition-all duration-1000 delay-500 transform relative z-20 ${
+                  isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                }`}
+              >
+                <Button
+                  size="lg"
+                  className="bg-dr-blue hover:bg-blue-700 text-white font-bold rounded-full min-h-[60px] px-12 py-6 text-lg shadow-lg"
+                >
+                  <Link href="#register" className="flex items-center">
+                    REGISTER NOW <ArrowRight className="ml-3 h-6 w-6" />
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Text content - Right side */}
+              <div
+                className={`text-right text-white transition-all duration-1000 delay-700 transform relative z-20 ${
+                  isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                }`}
+              >
+                <h2 className="text-xl xl:text-2xl font-medium wild-youth-text-white">
+                  Fall Season is here! Join us this September 2025
+                </h2>
+              </div>
             </div>
           </div>
         </div>
