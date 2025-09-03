@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronDown, ChevronUp, LogIn, User } from "lucide-react"
+import Image from "next/image"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -64,68 +65,71 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link
-            href="/"
-            className={cn(
-              "text-xl font-bold transition-colors duration-300",
-              isScrolled ? "text-dr-blue" : "text-white",
-            )}
-          >
-            DISCIPLINE RIFT
+          <Link href="/" className="transition-opacity duration-300 hover:opacity-80">
+            <Image
+              src="/DR_LOGO_BLANCO.png"
+              alt="Discipline Rift"
+              width={120}
+              height={40}
+              className="h-8 w-auto"
+              priority
+            />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex items-center justify-center space-x-1 absolute left-1/2 transform -translate-x-1/2">
             {navItems.map((item) => (
               <button
                 key={item.name}
                 onClick={() => handleNavClick(item.href)}
                 className={cn(
-                  "font-bold italic transition-colors duration-300 px-3 py-2 rounded-md text-sm hover:bg-opacity-80 cursor-pointer",
+                  "font-bold transition-colors duration-300 px-3 py-2 rounded-md text-sm hover:bg-opacity-80 cursor-pointer",
                   isScrolled ? "text-gray-700 hover:bg-blue-50 hover:text-dr-blue" : "text-white hover:bg-white/10",
                 )}
               >
                 {item.name}
               </button>
             ))}
-
-            <div className="flex items-center space-x-2 pl-3">
-              <Button
-                size="sm"
-                onClick={() => handleNavClick("#register")}
-                className={cn(
-                  "rounded-full px-5 py-2 text-sm transition-colors duration-300 cursor-pointer",
-                  isScrolled ? "bg-sky-500 hover:bg-blue-600 text-white" : "bg-sky-500 hover:bg-blue-600 text-white",
-                )}
-              >
-                REGISTER NOW
-              </Button>
-
-              <Link
-                href="/dashboard"
-                aria-label="Parent Dashboard"
-                className={cn(
-                  "p-2 rounded-md transition-colors duration-300",
-                  isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
-                )}
-              >
-                <User className="h-5 w-5" />
-                <span className="sr-only">Dashboard</span>
-              </Link>
-
-              <Link
-                href="/login"
-                aria-label="Login"
-                className={cn(
-                  "p-2 rounded-md transition-colors duration-300",
-                  isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
-                )}
-              >
-                <LogIn className="h-5 w-5" />
-                <span className="sr-only">Log In</span>
-              </Link>
-            </div>
           </nav>
+
+          {/* Login/Dashboard Icons - Right */}
+          <div className="hidden md:flex items-center space-x-2">
+            <Link
+              href="/dashboard"
+              aria-label="Parent Dashboard"
+              className={cn(
+                "p-2 rounded-md transition-colors duration-300",
+                isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
+              )}
+            >
+              <Image
+                src="/PERSONA.png"
+                alt="Dashboard"
+                width={20}
+                height={20}
+                className="h-5 w-5 filter blur-[0.5px] opacity-90"
+              />
+              <span className="sr-only">Dashboard</span>
+            </Link>
+
+            <Link
+              href="/login"
+              aria-label="Login"
+              className={cn(
+                "p-2 rounded-md transition-colors duration-300",
+                isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
+              )}
+            >
+              <Image
+                src="/LOG OUT_BLANCO.png"
+                alt="Log In"
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
+              <span className="sr-only">Log In</span>
+            </Link>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -151,7 +155,7 @@ export default function Header() {
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
-                  className="text-gray-700 font-bold italic py-2 px-3 hover:bg-blue-50 hover:text-dr-blue rounded-md transition-colors text-left"
+                  className="text-gray-700 font-bold py-2 px-3 hover:bg-blue-50 hover:text-dr-blue rounded-md transition-colors text-left"
                 >
                   {item.name}
                 </button>
@@ -162,24 +166,38 @@ export default function Header() {
               >
                 REGISTER NOW
               </Button>
-              <div className="flex space-x-3 pt-3 border-t border-gray-200 mt-3">
-                <Link
-                  href="/dashboard"
-                  aria-label="Parent Dashboard"
-                  className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <User className="h-5 w-5 inline mr-1" /> Dashboard
-                </Link>
-                <Link
-                  href="/login"
-                  aria-label="Login"
-                  className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <LogIn className="h-5 w-5 inline mr-1" /> Log In
-                </Link>
-              </div>
+                             <div className="flex space-x-3 pt-3 border-t border-gray-200 mt-3">
+                 <Link
+                   href="/dashboard"
+                   aria-label="Parent Dashboard"
+                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors"
+                   onClick={() => setIsMenuOpen(false)}
+                 >
+                   <Image
+                     src="/PERSONA.png"
+                     alt="Dashboard"
+                     width={20}
+                     height={20}
+                     className="h-5 w-5 inline mr-1 filter blur-[0.5px] opacity-90"
+                   />
+                   Dashboard
+                 </Link>
+                 <Link
+                   href="/login"
+                   aria-label="Login"
+                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors"
+                   onClick={() => setIsMenuOpen(false)}
+                 >
+                   <Image
+                     src="/LOG OUT_BLANCO.png"
+                     alt="Log In"
+                     width={20}
+                     height={20}
+                     className="h-5 w-5 inline mr-1"
+                   />
+                   Log In
+                 </Link>
+               </div>
             </nav>
           </div>
         </div>

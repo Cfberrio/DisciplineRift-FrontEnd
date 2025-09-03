@@ -75,7 +75,7 @@ export default function PassionInspiredHero() {
                 isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
             >
-              <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-medium wild-youth-text-white mb-8 xs:mb-10 sm:mb-12 md:mb-16 hero-text-mobile">
+              <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl font-medium wild-youth-text-white mb-8 xs:mb-10 sm:mb-12 md:mb-16 hero-text-mobile">
                 Fall Season is here! Join us this September 2025
               </h2>
             </div>
@@ -88,7 +88,7 @@ export default function PassionInspiredHero() {
             >
               <Button
                 size="lg"
-                className="bg-dr-blue hover:bg-blue-700 text-white font-bold rounded-full min-h-[50px] xs:min-h-[55px] sm:min-h-[60px] px-8 xs:px-10 sm:px-12 py-4 xs:py-5 sm:py-6 text-sm xs:text-base sm:text-lg shadow-lg hero-button-mobile"
+                className="bg-dr-blue hover:bg-blue-700 ethnocentric-title-white rounded-full min-h-[50px] xs:min-h-[55px] sm:min-h-[60px] px-8 xs:px-10 sm:px-12 py-4 xs:py-5 sm:py-6 text-sm xs:text-base sm:text-lg shadow-lg hero-button-mobile"
               >
                 <Link href="#register" className="flex items-center">
                   REGISTER NOW <ArrowRight className="ml-2 h-5 w-5 xs:h-6 xs:w-6" />
@@ -108,7 +108,7 @@ export default function PassionInspiredHero() {
               >
                 <Button
                   size="lg"
-                  className="bg-dr-blue hover:bg-blue-700 text-white font-bold rounded-full min-h-[60px] px-12 py-6 text-lg shadow-lg"
+                  className="bg-dr-blue hover:bg-blue-700 ethnocentric-title-white rounded-full min-h-[60px] px-12 py-6 text-lg shadow-lg"
                 >
                   <Link href="#register" className="flex items-center">
                     REGISTER NOW <ArrowRight className="ml-3 h-6 w-6" />
@@ -122,7 +122,7 @@ export default function PassionInspiredHero() {
                   isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
                 }`}
               >
-                <h2 className="text-xl xl:text-2xl font-medium wild-youth-text-white">
+                <h2 className="text-lg xl:text-xl font-medium wild-youth-text-white">
                   Fall Season is here! Join us this September 2025
                 </h2>
               </div>

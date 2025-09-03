@@ -41,20 +41,99 @@ export default function Home() {
           style={{ backgroundImage: "url('/about-us-background.png')" }}
         >
           <div className="container px-4 relative z-10">
-            <div className="flex flex-col md:flex-row md:justify-end">
-              <div className="w-full md:w-1/2 lg:w-2/5 about-content-mobile">
+            {/* Mobile Layout */}
+            <div className="flex flex-col md:hidden">
+              {/* Title ABOUTUS at top for mobile */}
+              <AnimatedSection animation="fade-up" delay={200}>
+                <div className="mb-6 text-center">
+                  <img
+                    src="/ABOUTUS.png"
+                    alt="About Us"
+                    className="w-auto h-12 xs:h-14 sm:h-16 object-contain mx-auto"
+                  />
+                </div>
+              </AnimatedSection>
+
+              {/* Text content in center for mobile */}
+              <div className="mb-8 w-full flex flex-col items-center justify-center">
+                <div className="w-full max-w-3xl">
+                  <AnimatedSection animation="fade-up" delay={400}>
+                    <div className="mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg about-text-mobile leading-relaxed" style={{ textAlign: 'center', width: '100%' }}>
+                      Discipline Rift introduces sports to players in a developmental approach by 
+                      teaching the discipline of a sport and the value of discipline lived in 
+                      a lifestyle involved in sports.
+                    </div>
+                  </AnimatedSection>
+
+                  <AnimatedSection animation="fade-up" delay={600}>
+                    <div className="mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg about-text-mobile leading-relaxed" style={{ textAlign: 'center', width: '100%' }}>
+                      By teaching the sport, we create the conditions for something powerful to
+                      happen: the breakthrough. 
+                      The Rift. That moment when a player connects with the 
+                      sport and discovers their love and passion for it. 
+                    </div>
+                  </AnimatedSection>
+
+                  <AnimatedSection animation="fade-up" delay={800}>
+                    <div className="mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg about-text-mobile leading-relaxed" style={{ textAlign: 'center', width: '100%' }}>
+                      Our programs provide all the equipment and coaches needed to support this journey and build a strong, lasting
+                      foundation for a 
+                      lifestyle in sports. 
+                    </div>
+                  </AnimatedSection>
+                </div>
+              </div>
+
+
+              {/* Image at bottom for mobile */}
+              <AnimatedSection animation="fade-up" delay={1000}>
+                <div className="w-full">
+                  <img
+                    src="/Imagen-about-us.png"
+                    alt="About Us - Discipline Rift"
+                    className="w-full h-auto rounded-lg shadow-lg object-cover"
+                  />
+                </div>
+              </AnimatedSection>
+            </div>
+
+            {/* Desktop Layout */}
+            <div className="hidden md:flex flex-row items-center gap-8 md:gap-12">
+
+              
+              {/* Image on the left */}
+              <div className="w-full md:w-1/2 lg:w-3/5">
+                <AnimatedSection animation="fade-right" delay={200}>
+                  <div className="relative md:-ml-12 lg:-ml-16">
+                    <img
+                      src="/Imagen-about-us.png"
+                      alt="About Us - Discipline Rift"
+                      className="w-full h-auto rounded-lg shadow-lg object-cover"
+                    />
+                  </div>
+                </AnimatedSection>
+              </div>
+
+              {/* Text content on the right */}
+              <div className="w-full md:w-1/2 lg:w-2/5 about-content-mobile md:ml-6 lg:ml-12">
                 <AnimatedSection animation="fade-left" delay={200}>
-                  <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ethnocentric-title-blue mb-4 px-4 xs:px-0 about-title-mobile">ABOUT US</h2>
+                  <div className="mb-4 px-4 xs:px-0 about-title-mobile">
+                    <img
+                      src="/ABOUTUS.png"
+                      alt="About Us"
+                      className="w-auto h-12 xs:h-14 sm:h-16 md:h-18 lg:h-20 object-contain"
+                    />
+                  </div>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={400}>
-                  <p className="mission-text-large text-gray-800 mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile">
+                  <p className="mission-text-large text-gray-800 mb-4 xs:mb-6 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-center">
                   Discipline Rift introduces sports to players in a developmental approach by 
                   teaching the discipline of a sport and the value of discipline lived in 
                   a lifestyle involved in sports.
                   </p>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={600}>
-                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile">
+                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-center">
                   By teaching the sport, we create the conditions for something powerful to
                    happen: the breakthrough. 
                    The Rift. That moment when a player connects with the 
@@ -63,7 +142,7 @@ export default function Home() {
                   </p>
                 </AnimatedSection>
                 <AnimatedSection animation="fade-left" delay={600}>
-                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile">
+                  <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-center">
       
                    Our programs provide all the equipment and coaches needed to support this journey and build a strong, lasting
                   foundation for a 

@@ -159,17 +159,7 @@
     min-height: 80vh !important;
   }
   
-  /* Overlay oscuro para mejorar legibilidad */
-  .about-container-mobile::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(30, 64, 175, 0.6)) !important;
-    z-index: 1 !important;
-  }
+
   
   /* Contenido about móvil - Sobre el overlay */
   .about-content-mobile {
