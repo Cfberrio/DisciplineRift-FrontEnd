@@ -89,3 +89,4 @@ Write-Host "🕐 Hora de finalización: $(Get-Date)" -ForegroundColor Yellow
 Write-Host "🎉 === FIN DEL SCRIPT ===" -ForegroundColor Green
 
 
+
