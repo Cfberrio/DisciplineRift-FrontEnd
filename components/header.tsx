@@ -67,11 +67,11 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="transition-opacity duration-300 hover:opacity-80">
             <Image
-              src="/DR_LOGO_BLANCO.png"
+              src={isScrolled ? "/LOGO DR AZUL.png" : "/DR_LOGO_BLANCO.png"}
               alt="Discipline Rift"
               width={120}
               height={40}
-              className="h-8 w-auto"
+              className="h-8 w-auto transition-all duration-300"
               priority
             />
           </Link>
@@ -103,11 +103,11 @@ export default function Header() {
               )}
             >
               <Image
-                src="/PERSONA.png"
+                src={isScrolled ? "/CUENTA_ICONO_AZUL.png" : "/PERSONA.png"}
                 alt="Dashboard"
                 width={20}
                 height={20}
-                className="h-5 w-5 filter blur-[0.5px] opacity-90"
+                className="h-5 w-5 transition-all duration-300"
               />
               <span className="sr-only">Dashboard</span>
             </Link>
@@ -174,11 +174,11 @@ export default function Header() {
                    onClick={() => setIsMenuOpen(false)}
                  >
                    <Image
-                     src="/PERSONA.png"
+                     src="/CUENTA_ICONO_AZUL.png"
                      alt="Dashboard"
                      width={20}
                      height={20}
-                     className="h-5 w-5 inline mr-1 filter blur-[0.5px] opacity-90"
+                     className="h-5 w-5 inline mr-1 transition-all duration-300"
                    />
                    Dashboard
                  </Link>

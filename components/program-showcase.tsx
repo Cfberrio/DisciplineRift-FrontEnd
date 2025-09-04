@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import AnimatedSection from "@/components/animated-section"
 import "../styles/hero-mobile.css"
 
@@ -17,6 +16,9 @@ interface ProgramCard {
 }
 
 export default function ProgramShowcase() {
+  // State for mobile detection
+  const [isMobile, setIsMobile] = useState(false)
+
   // Update the programs array with the detailed information from the diagram
   const programs: ProgramCard[] = [
     {
@@ -81,31 +83,70 @@ export default function ProgramShowcase() {
     return () => clearInterval(interval)
   }, [currentIndex])
 
+  // Mobile detection effect
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Calculate previous and next indices
   const prevIndex = currentIndex === 0 ? maxIndex : currentIndex - 1
   const nextIndex = currentIndex === maxIndex ? 0 : currentIndex + 1
 
+  // Get color for each sport
+  const getSportColor = (sport: string) => {
+    switch (sport) {
+      case 'volleyball':
+        return '#66d43d'
+      case 'pickleball':
+        return '#f25f22'
+      case 'tennis':
+        return '#e6dd19'
+      default:
+        return '#66d43d'
+    }
+  }
+
   return (
     <section
-      className="py-8 xs:py-12 sm:py-16 md:py-0 relative overflow-hidden bg-center programs-section-mobile xl:[background-position:center_30%] xl:[background-size:cover] 2xl:[background-position:center_25%] 2xl:[background-size:100%_auto]"
+      className="py-8 xs:py-12 sm:py-16 md:py-0 relative overflow-hidden programs-section-mobile"
       id="programs"
       style={{ 
-        backgroundImage: "url('/programs-background.png')", 
-        backgroundPosition: "center 25%",
-        backgroundSize: "100% auto",
+        backgroundImage: isMobile ? "url('/06.png')" : "url('/programs-background.png')", 
+        backgroundPosition: "center center",
+        backgroundSize: "100% 100%",
         backgroundRepeat: "no-repeat",
-        minHeight: "100vh"
+        backgroundAttachment: "local",
+        minHeight: "100vh",
+        width: "100%",
+        height: "100%"
       }}
     >
       {/* Decorative elements - can be adjusted or removed if background is sufficient */}
       <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400/30 rounded-full filter blur-3xl opacity-20"></div>
       <div className="absolute bottom-10 right-10 w-40 h-40 bg-orange-400/30 rounded-full filter blur-3xl opacity-20"></div>
 
-      {/* TÍTULO DEL BACKGROUND - SOLO MÓVIL */}
-  
+      {/* TÍTULO PROGRAMS - MUY ARRIBA EN LA SECCIÓN */}
+      <div className="absolute top-2 xs:top-3 sm:top-4 md:top-5 lg:top-6 xl:top-8 left-1/2 transform -translate-x-1/2 z-20">
+        <AnimatedSection animation="fade-up" delay={200}>
+          <div className="text-center">
+            <img
+              src="/PROGRAMS.png"
+              alt="Programs"
+              className="w-auto h-20 xs:h-24 sm:h-28 md:h-24 lg:h-28 xl:h-32 object-contain mx-auto scale-150 xs:scale-[1.75] sm:scale-[2] md:scale-100"
+            />
+          </div>
+        </AnimatedSection>
+      </div>
 
-      {/* CONTAINER DEL CARRUSEL - AJUSTADO PARA MAC M1 14" */}
-      <div className="container relative z-10 px-4 pt-[70vh] xs:pt-[75vh] sm:pt-[80vh] md:pt-40 xl:pt-[25vh] 2xl:pt-40 programs-container-mobile">
+      {/* CONTAINER DEL CARRUSEL - MITAD DE LA SECCIÓN PARA MÓVILES */}
+      <div className="container absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 md:relative md:top-auto md:left-auto md:transform-none z-10 px-4 pt-0 md:pt-60 lg:pt-72 xl:pt-80 2xl:pt-96 programs-container-mobile">
         
         {/* TÍTULO DESKTOP - MANTENER COMO ESTÁ */}
       
@@ -120,109 +161,150 @@ export default function ProgramShowcase() {
             {/* Left arrow */}
             <button
               onClick={prevSlide}
-              className="absolute left-0 xs:left-1 sm:left-2 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 xs:p-2 sm:p-2.5 md:p-3 transform -translate-y-1/2 top-1/2 shadow-lg transition-all duration-200 programs-nav-mobile"
+              className="absolute left-2 xs:left-3 sm:left-4 md:left-0 z-20 transform -translate-y-1/2 top-1/2 transition-all duration-200 programs-nav-mobile hover:scale-110"
               aria-label="Previous program"
             >
-              <ChevronLeft className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+              <Image
+                src="/FLECHAIZQUIERDA.png"
+                alt="Previous"
+                width={40}
+                height={40}
+                className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16"
+              />
             </button>
 
-            {/* Cards container - reducido para mejor layout */}
-            <div className="flex justify-center items-center w-full max-w-6xl xl:max-w-4xl 2xl:max-w-5xl mx-auto px-2 xs:px-4 sm:px-6 md:px-8">
-              {/* Previous card (smaller) - más reducido */}
-              <div className="hidden lg:block w-1/8 xl:w-1/6 transform scale-55 opacity-60 transition-all duration-500 mr-1 xl:mr-2 programs-card-side-mobile">
-                <div className="relative rounded-lg overflow-hidden shadow-lg">
-                  <div className="aspect-[3/4] sm:aspect-[3/4] relative">
-                    <Image
-                      src={programs[prevIndex].image || "/placeholder.svg"}
-                      alt={programs[prevIndex].alt}
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width: 768px) 0px, (max-width: 1024px) 0px, (max-width: 1280px) 150px, 200px"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 xl:p-4">
-                      <h3 className="text-lg xl:text-2xl wild-youth-text-white text-center">{programs[prevIndex].title}</h3>
-                    </div>
-                  </div>
-                </div>
+            {/* Cards container - Móvil: 3 cards / Desktop: mantener original */}
+            {/* Layout para móvil - mostrar 3 cards */}
+            <div className="block md:hidden flex justify-center items-center w-full max-w-3xl mx-auto px-2 xs:px-4 sm:px-6">
+              {/* Previous card móvil */}
+              <div className="w-1/4 transform scale-65 opacity-75 transition-all duration-500 -mr-8 z-5 aspect-[4/5] relative overflow-hidden">
+                <Image
+                  src={programs[prevIndex].image || "/placeholder.svg"}
+                  alt={programs[prevIndex].alt}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 768px) 25vw"
+                />
+              </div>
+              
+              {/* Current card móvil */}
+              <div className="w-full max-w-48 transition-all duration-500 z-20 mx-auto aspect-[4/5] relative overflow-hidden">
+                <Image
+                  src={programs[currentIndex].image || "/placeholder.svg"}
+                  alt={programs[currentIndex].alt}
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  sizes="(max-width: 768px) 50vw"
+                />
+              </div>
+              
+              {/* Next card móvil */}
+              <div className="w-1/4 transform scale-65 opacity-75 transition-all duration-500 -ml-8 z-5 aspect-[4/5] relative overflow-hidden">
+                <Image
+                  src={programs[nextIndex].image || "/placeholder.svg"}
+                  alt={programs[nextIndex].alt}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 768px) 25vw"
+                />
+              </div>
+            </div>
+
+            {/* Layout para desktop - mantener original */}
+            <div className="hidden md:flex justify-center items-center w-full max-w-3xl mx-auto px-8">
+              {/* Previous card desktop */}
+              <div className="w-1/4 lg:w-1/3 transform scale-65 opacity-85 transition-all duration-500 -mr-12 lg:-mr-14 xl:-mr-16 z-5 aspect-[4/5] relative overflow-hidden">
+                <Image
+                  src={programs[prevIndex].image || "/placeholder.svg"}
+                  alt={programs[prevIndex].alt}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 150px, 180px"
+                />
               </div>
 
-              {/* Current card (larger) - reducido para mejor layout */}
-              <div className="w-full max-w-xs xs:max-w-sm sm:max-w-sm md:max-w-md lg:w-2/5 xl:w-1/3 xl:max-w-xs 2xl:w-1/3 2xl:max-w-md transition-all duration-500 z-10 programs-card-main-mobile mx-auto">
-                <div className="relative rounded-lg overflow-hidden transform rotate-1 shadow-2xl">
-                  <div className="aspect-[3/4] sm:aspect-[3/4] relative">
-                    <Image
-                      src={programs[currentIndex].image || "/placeholder.svg"}
-                      alt={programs[currentIndex].alt}
-                      fill
-                      className="object-cover object-center"
-                      priority
-                      sizes="(max-width: 640px) 70vw, (max-width: 768px) 60vw, (max-width: 1024px) 50vw, (max-width: 1280px) 300px, (max-width: 1600px) 250px, 300px"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 p-3 xs:p-4 sm:p-6">
-                      <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl wild-youth-text-white text-center mb-1 xs:mb-2">
-                        {programs[currentIndex].title}
-                      </h3>
-                    </div>
-
-                    {/* Decorative elements */}
-                  </div>
-                </div>
+              {/* Current card desktop */}
+              <div className="w-full max-w-80 lg:max-w-96 transition-all duration-500 z-20 mx-auto aspect-[4/5] relative overflow-hidden">
+                <Image
+                  src={programs[currentIndex].image || "/placeholder.svg"}
+                  alt={programs[currentIndex].alt}
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  sizes="(max-width: 1024px) 40vw, (max-width: 1280px) 280px, 350px"
+                />
               </div>
 
-              {/* Next card (smaller) - más reducido */}
-              <div className="hidden lg:block w-1/8 xl:w-1/6 transform scale-55 opacity-60 transition-all duration-500 ml-1 xl:ml-2 programs-card-side-mobile">
-                <div className="relative rounded-lg overflow-hidden shadow-lg">
-                  <div className="aspect-[3/4] sm:aspect-[3/4] relative">
-                    <Image
-                      src={programs[nextIndex].image || "/placeholder.svg"}
-                      alt={programs[nextIndex].alt}
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width: 768px) 0px, (max-width: 1024px) 0px, (max-width: 1280px) 150px, 200px"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 xl:p-4">
-                      <h3 className="text-lg xl:text-2xl wild-youth-text-white text-center">{programs[nextIndex].title}</h3>
-                    </div>
-                  </div>
-                </div>
+              {/* Next card desktop */}
+              <div className="w-1/4 lg:w-1/3 transform scale-65 opacity-85 transition-all duration-500 -ml-12 lg:-ml-14 xl:-ml-16 z-5 aspect-[4/5] relative overflow-hidden">
+                <Image
+                  src={programs[nextIndex].image || "/placeholder.svg"}
+                  alt={programs[nextIndex].alt}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 150px, 180px"
+                />
               </div>
             </div>
 
             {/* Right arrow */}
             <button
               onClick={nextSlide}
-              className="absolute right-0 xs:right-1 sm:right-2 z-20 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 xs:p-2 sm:p-2.5 md:p-3 transform -translate-y-1/2 top-1/2 shadow-lg transition-all duration-200 programs-nav-mobile"
+              className="absolute right-2 xs:right-3 sm:right-4 md:right-0 z-20 transform -translate-y-1/2 top-1/2 transition-all duration-200 programs-nav-mobile hover:scale-110"
               aria-label="Next program"
             >
-              <ChevronRight className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+              <Image
+                src="/FLECHADERECHA.png"
+                alt="Next"
+                width={40}
+                height={40}
+                className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16"
+              />
             </button>
           </div>
 
           {/* Dots indicator - responsive sizing */}
-          <div className="flex justify-center mt-2 xs:mt-3 sm:mt-4 space-x-1 xs:space-x-1.5 sm:space-x-2 programs-dots-mobile">
+          <div className="flex justify-center mt-4 xs:mt-5 sm:mt-6 space-x-1.5 xs:space-x-2 sm:space-x-2.5 programs-dots-mobile">
             {programs.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 programs-dot-mobile ${
+                className={`w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2 sm:h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 programs-dot-mobile ${
                   index === currentIndex 
-                    ? "bg-yellow-400 scale-125" 
+                    ? "scale-125" 
                     : "bg-white/40 hover:bg-white/60"
                 }`}
+                style={index === currentIndex ? {
+                  backgroundColor: getSportColor(programs[index].sport),
+                  boxShadow: `0 0 10px ${getSportColor(programs[index].sport)}80`
+                } : {}}
                 aria-label={`Go to program ${index + 1}`}
               />
             ))}
           </div>
 
-          {/* Description - responsive spacing and typography */}
-          <div className="text-center mt-4 xs:mt-6 sm:mt-8 text-white/90 px-4 xs:px-6 sm:px-8 md:px-12 programs-description-mobile">
-            <h4 className="text-base xs:text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4 programs-subtitle-mobile">
-              {programs[currentIndex].sport.toUpperCase()}
-            </h4>
-            <p className="max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto whitespace-pre-line text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed programs-text-mobile">
-              {programs[currentIndex].description}
-            </p>
-          </div>
+                     {/* Description - solo para desktop */}
+           <div className="hidden md:block text-center mt-4 xs:mt-6 sm:mt-8 text-white/90 px-4 xs:px-6 sm:px-8 md:px-12 programs-description-mobile">
+             <h4 className="text-base xs:text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-2 xs:mb-3 sm:mb-4 programs-subtitle-mobile">
+               {programs[currentIndex].sport.toUpperCase()}
+             </h4>
+             <p className="max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto whitespace-pre-line text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed programs-text-mobile">
+               {programs[currentIndex].description}
+             </p>
+           </div>
+        </div>
+      </div>
+
+      {/* Description para móviles - posicionada en la parte inferior */}
+      <div className="block md:hidden absolute bottom-6 xs:bottom-8 sm:bottom-10 left-1/2 transform -translate-x-1/2 w-full z-30">
+        <div className="text-center text-white/90 px-4 xs:px-6 sm:px-8">
+          <h4 className="text-sm xs:text-base sm:text-lg ethnocentric-title-white mb-1 xs:mb-2 sm:mb-3">
+            {programs[currentIndex].sport.toUpperCase()}
+          </h4>
+          <p className="max-w-xs xs:max-w-sm sm:max-w-md mx-auto text-xs xs:text-sm sm:text-sm leading-relaxed">
+            {programs[currentIndex].description}
+          </p>
         </div>
       </div>
     </section>
