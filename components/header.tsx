@@ -121,7 +121,7 @@ export default function Header() {
               )}
             >
               <Image
-                src="/LOG OUT_BLANCO.png"
+                src={isScrolled ? "/Logout_desktop_azul.png" : "/LOG OUT_BLANCO.png"}
                 alt="Log In"
                 width={20}
                 height={20}
