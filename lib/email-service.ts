@@ -1,6 +1,21 @@
 import nodemailer from 'nodemailer'
 import { buildPracticeOccurrences, formatTimeES, type PracticeOccurrence } from './schedule/buildPracticeOccurrences'
 
+// Local interface for email service session data
+interface EmailSessionData {
+  startdate: string;
+  enddate: string;
+  starttime: string;
+  endtime: string;
+  daysofweek: string;
+  cancel?: string;
+  staff?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+}
+
 // Configurar el transportador de Gmail
 const createTransporter = () => {
   return nodemailer.createTransport({
@@ -36,18 +51,7 @@ interface TeamData {
     name: string
     location: string
   }
-  session?: Array<{
-    startdate: string
-    enddate: string
-    starttime: string
-    endtime: string
-    daysofweek: string
-    staff?: {
-      name: string
-      email: string
-      phone: string
-    }
-  }>
+  session?: EmailSessionData[]
   practiceOccurrences?: Array<PracticeOccurrence & {
     timeFormatted: string
   }>
@@ -424,6 +428,29 @@ export async function sendPaymentConfirmationEmail(
         daysOfWeek = ["Monday", "Wednesday", "Friday"];
       }
 
+      // Parse canceled dates from the cancel field
+      let canceledDates: string[] = [];
+      try {
+        if (session.cancel && typeof session.cancel === 'string' && session.cancel.trim()) {
+          // Handle different formats: JSON array, comma-separated, or single date
+          const cancelString = session.cancel.trim();
+          if (cancelString.startsWith('[') && cancelString.endsWith(']')) {
+            // JSON array format: ["2024-01-15", "2024-01-22"]
+            canceledDates = JSON.parse(cancelString);
+          } else if (cancelString.includes(',')) {
+            // Comma-separated format: "2024-01-15,2024-01-22"
+            canceledDates = cancelString.split(',').map((date: string) => date.trim()).filter((date: string) => date.length > 0);
+          } else {
+            // Single date format: "2024-01-15"
+            canceledDates = [cancelString];
+          }
+          console.log(`[EMAIL] ✅ Found ${canceledDates.length} canceled dates for email generation:`, canceledDates);
+        }
+      } catch (parseError) {
+        console.warn(`[EMAIL] ⚠️ Error parsing canceled dates for email:`, parseError);
+        canceledDates = [];
+      }
+
       // Calculate practice occurrences
       // Ensure times are in HH:MM format (remove seconds if present)
       const cleanStartTime = session.starttime?.includes(':') 
@@ -441,7 +468,8 @@ export async function sendPaymentConfirmationEmail(
         endTime: cleanEndTime,
         location: teamData.school.location,
         coachName: session.staff?.name || 'TBD',
-        timezone: teamData.timezone || 'America/New_York'
+        timezone: teamData.timezone || 'America/New_York',
+        canceledDates: canceledDates
       });
 
       // Format times in Spanish and add to team data

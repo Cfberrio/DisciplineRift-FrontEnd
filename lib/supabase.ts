@@ -148,6 +148,7 @@ export interface Session {
   daysofweek: string;
   repeat: string;
   coachid: string;
+  cancel?: string;
   staff?: Staff;
 }
 

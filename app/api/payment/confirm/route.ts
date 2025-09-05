@@ -218,6 +218,7 @@ export async function GET(request: Request) {
                 starttime,
                 endtime,
                 daysofweek,
+                cancel,
                 staff:coachid (
                   name,
                   email,
@@ -522,6 +523,7 @@ export async function POST(request: Request) {
             starttime,
             endtime,
             daysofweek,
+            cancel,
             staff:coachid (
               name,
               email,

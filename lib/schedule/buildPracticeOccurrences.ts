@@ -23,6 +23,7 @@ export interface PracticeScheduleParams {
   coachName: string;
   timezone?: string;
   exceptions?: string[]; // ISO date strings to exclude
+  canceledDates?: string[]; // Array of ISO date strings for canceled sessions
 }
 
 // Default timezone for Miami, FL (Eastern Time Zone)
@@ -68,7 +69,8 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
       location,
       coachName,
       timezone = DEFAULT_TIMEZONE,
-      exceptions = []
+      exceptions = [],
+      canceledDates = []
     } = params;
 
     if (
@@ -119,6 +121,7 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
     end.setFullYear(endYear, endMonth - 1, endDay);
     end.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
     const exceptionsSet = new Set(exceptions);
+    const canceledDatesSet = new Set(canceledDates);
     
     // NEW LOGIC: Find the first occurrence that matches the desired days
     // If startDate doesn't match the target day, look backward first
@@ -177,7 +180,7 @@ export function buildPracticeOccurrences(params: PracticeScheduleParams): Practi
       const day = String(currentDate.getDate()).padStart(2, '0');
       const currentDateISO = `${year}-${month}-${day}`;
 
-      if (targetDays.includes(dayOfWeek) && !exceptionsSet.has(currentDateISO)) {
+      if (targetDays.includes(dayOfWeek) && !exceptionsSet.has(currentDateISO) && !canceledDatesSet.has(currentDateISO)) {
         const dayName =
           Object.keys(dayMap).find((key) => dayMap[key] === dayOfWeek) ||
           "Unknown";
