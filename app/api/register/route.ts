@@ -242,7 +242,36 @@ export async function POST(request: Request) {
       }
     }
 
-    console.log("Checking for existing enrollment...")
+    console.log("Checking team capacity and existing enrollment...")
+
+    // First, check team capacity
+    const { data: teamData, error: teamError } = await supabaseAdmin
+      .from("team")
+      .select("participants")
+      .eq("teamid", formData.selectedTeam.id)
+      .single()
+
+    if (teamError) {
+      console.error("Error fetching team data:", teamError)
+      return NextResponse.json({ message: "Error validating team capacity" }, { status: 500 })
+    }
+
+    // Count current active enrollments for this team
+    const { data: currentEnrollments, error: countError } = await supabaseAdmin
+      .from("enrollment")
+      .select("enrollmentid", { count: "exact", head: false })
+      .eq("teamid", formData.selectedTeam.id)
+      .eq("isactive", true)
+
+    if (countError) {
+      console.error("Error counting enrollments:", countError)
+      return NextResponse.json({ message: "Error validating team capacity" }, { status: 500 })
+    }
+
+    const currentEnrollmentCount = currentEnrollments?.length || 0
+    const maxParticipants = teamData.participants || 0
+
+    console.log(`Team capacity check: ${currentEnrollmentCount}/${maxParticipants} spots filled`)
 
     // Check if enrollment already exists for this student and team
     const { data: existingEnrollment, error: enrollmentCheckError } = await supabaseAdmin
@@ -288,6 +317,20 @@ export async function POST(request: Request) {
 
       console.log("Enrollment exists but no payment found, allowing retry...")
     } else {
+      // Check team capacity before creating new enrollment
+      if (currentEnrollmentCount >= maxParticipants) {
+        console.log(`❌ Team is full: ${currentEnrollmentCount}/${maxParticipants} spots`)
+        return NextResponse.json(
+          { 
+            message: "This team is currently full. Please select a different team or check back later for availability.",
+            teamFull: true,
+            currentEnrollments: currentEnrollmentCount,
+            maxParticipants: maxParticipants
+          }, 
+          { status: 400 }
+        )
+      }
+
       console.log("Creating new enrollment record...")
 
       // Create new enrollment record

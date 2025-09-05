@@ -130,6 +130,7 @@ export interface Team {
   description: string;
   price: number;
   participants: number;
+  currentEnrollments?: number;
   isactive: boolean;
   created_at: string;
   updated_at: string;

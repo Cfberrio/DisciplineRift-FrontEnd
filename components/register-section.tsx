@@ -51,6 +51,8 @@ interface Team {
   };
   price: number;
   description: string;
+  participants: number;
+  currentEnrollments: number;
 }
 
 interface Session {
@@ -394,6 +396,8 @@ export default function RegisterSection() {
           skillLevel: "All Levels",
           price: team.price || 299,
           description: team.description || "Elite training program",
+          participants: team.participants || 20,
+          currentEnrollments: team.currentEnrollments || 0,
           coach: {
             name: team.session?.[0]?.staff?.name || "TBD",
             email: team.session?.[0]?.staff?.email || "",
@@ -501,6 +505,8 @@ export default function RegisterSection() {
                 skillLevel: "Advanced",
                 price: 299,
                 description: "Elite high school volleyball training program",
+                participants: 20,
+                currentEnrollments: 5,
                 coach: {
                   name: "Coach Johnson",
                   email: "coach.johnson@lincoln.edu",
@@ -1021,6 +1027,21 @@ export default function RegisterSection() {
           );
           return;
         }
+
+        // If team is full, show special message and go back to team selection
+        if (errorData.teamFull) {
+          setSubmissionError(
+            `This team is currently full (${errorData.currentEnrollments}/${errorData.maxParticipants} spots). Please go back and select a different team.`
+          );
+          // Optionally go back to step 2 to select a different team
+          setTimeout(() => {
+            setStep(2);
+            document
+              .getElementById("register")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 3000);
+          return;
+        }
         
         throw new Error(errorData.message || "Registration failed.");
       }
@@ -1413,7 +1434,31 @@ export default function RegisterSection() {
                       <span className="font-semibold">Coach:</span>{" "}
                       {selectedTeam.coach.name}
                     </div>
+                    <div>
+                      <span className="font-semibold">Status:</span>{" "}
+                      <span className={`${
+                        selectedTeam.currentEnrollments >= selectedTeam.participants
+                          ? "text-red-600 font-medium"
+                          : "text-green-600"
+                      }`}>
+                        {selectedTeam.currentEnrollments >= selectedTeam.participants
+                          ? "Registration Full"
+                          : "Available"
+                        }
+                      </span>
+                    </div>
                   </div>
+                  {selectedTeam.currentEnrollments >= selectedTeam.participants && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-center text-red-700">
+                        <AlertCircle className="h-4 w-4 mr-2" />
+                        <span className="font-medium">Team is Full</span>
+                      </div>
+                      <p className="text-sm text-red-600 mt-1">
+                        This team has reached its maximum capacity. Please select a different team or check back later for availability.
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="mb-6">
                   <h5 className="font-semibold text-dr-blue mb-3">
@@ -1483,9 +1528,17 @@ export default function RegisterSection() {
                   </Button>
                   <Button
                     onClick={nextStep}
-                    className="flex-1 bg-dr-blue hover:bg-blue-700"
+                    disabled={selectedTeam.currentEnrollments >= selectedTeam.participants}
+                    className={`flex-1 ${
+                      selectedTeam.currentEnrollments >= selectedTeam.participants
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-dr-blue hover:bg-blue-700"
+                    }`}
                   >
-                    Continue
+                    {selectedTeam.currentEnrollments >= selectedTeam.participants 
+                      ? "Team Full - Cannot Continue" 
+                      : "Continue"
+                    }
                   </Button>
                 </div>
               </div>

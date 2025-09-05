@@ -181,8 +181,28 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
 
     console.log(`[QUERY] ✅ Found ${teams?.length || 0} active teams`);
 
-    // Step 3: Get sessions for active teams only
+    // Step 2.5: Get enrollment counts for all teams
     const teamIds = teams?.map((team) => team.teamid) || [];
+    let enrollmentCounts: Map<string, number> = new Map();
+
+    if (teamIds.length > 0) {
+      const { data: enrollments, error: enrollmentError } = await supabase
+        .from("enrollment")
+        .select("teamid")
+        .in("teamid", teamIds)
+        .eq("isactive", true);
+
+      if (!enrollmentError && enrollments) {
+        // Count enrollments per team
+        enrollments.forEach((enrollment) => {
+          const currentCount = enrollmentCounts.get(enrollment.teamid) || 0;
+          enrollmentCounts.set(enrollment.teamid, currentCount + 1);
+        });
+        console.log(`[QUERY] ✅ Counted enrollments for ${enrollmentCounts.size} teams`);
+      }
+    }
+
+    // Step 3: Get sessions for active teams only
     let sessions: any[] = [];
 
     if (teamIds.length > 0) {
@@ -315,6 +335,7 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
           return {
             ...team,
             session: sessionsWithCoachInfo,
+            currentEnrollments: enrollmentCounts.get(team.teamid) || 0,
           };
         });
 
