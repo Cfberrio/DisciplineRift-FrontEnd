@@ -2,21 +2,29 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendIncompletePaymentReminderEmail } from "@/lib/email-service";
 
-// Crear cliente Supabase con variables de entorno
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+// Función para crear cliente Supabase de forma segura
+function createSupabaseAdmin() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Missing required Supabase environment variables");
   }
-);
+  
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
+}
 
 export async function GET() {
   try {
     console.log("🔄 Fetching incomplete payment enrollments...");
+
+    const supabaseAdmin = createSupabaseAdmin();
 
     // Get enrollments where isactive = false (completed registration but no payment)
     const { data: incompleteEnrollments, error: enrollmentError } = await supabaseAdmin
@@ -121,6 +129,8 @@ export async function GET() {
 export async function POST() {
   try {
     console.log("🔄 Starting incomplete payment reminder email campaign...");
+
+    const supabaseAdmin = createSupabaseAdmin();
 
     // Get incomplete enrollments (same query as GET)
     const { data: incompleteEnrollments, error: enrollmentError } = await supabaseAdmin
