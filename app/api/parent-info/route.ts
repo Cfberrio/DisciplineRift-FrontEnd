@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAdmin, validateAdminClientAccess } from "@/lib/supabase-admin";
 
 // GET: Verificar si existe un registro de padre
 export async function GET(request: Request) {
@@ -85,13 +85,13 @@ export async function POST(request: Request) {
     // Crear nuevo registro de padre
     const { data: newParent, error: createError } = await supabaseAdmin
       .from("parent")
-      .insert({
+      .upsert({
         parentid: userId,
         firstname: firstName || "",
         lastname: lastName || "",
         email: email || "",
         phone: phone || "",
-      })
+      }, { onConflict: 'parentid' })
       .select()
       .single();
 
@@ -130,6 +130,24 @@ export async function PUT(request: Request) {
     }
 
     console.log("🔄 Actualizando registro de padre para usuario:", userId);
+    console.log("🔍 Datos recibidos:", { firstName, lastName, email, phone });
+
+    // Verificar configuración de Supabase Admin
+    const adminAccess = validateAdminClientAccess();
+    if (!adminAccess.isValid) {
+      console.error("❌ Supabase Admin no configurado:", adminAccess.error);
+      return NextResponse.json(
+        { error: "Database service not available" },
+        { status: 503 }
+      );
+    }
+
+    // Verificar variables de entorno críticas
+    console.log("🔍 Variables de entorno:", {
+      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    });
 
     // Verificar si existe el registro
     const { data: existingParent, error: checkError } = await supabaseAdmin
@@ -142,22 +160,52 @@ export async function PUT(request: Request) {
       if (checkError.code === "PGRST116") {
         // No existe el registro, crearlo
         console.log("🔄 Registro no existe, creando nuevo registro de padre");
+        
+        const insertData = {
+          parentid: userId,
+          firstname: firstName || "",
+          lastname: lastName || "",
+          email: email || "",
+          phone: phone || "",
+        };
+        
+        console.log("🔍 Datos para inserción:", insertData);
+        
+        // Test de conexión simple
+        try {
+          const { data: testConnection } = await supabaseAdmin
+            .from("parent")
+            .select("parentid")
+            .limit(1);
+          console.log("✅ Conexión a tabla parent exitosa");
+        } catch (connectionError) {
+          console.error("❌ Error de conexión a tabla parent:", connectionError);
+          return NextResponse.json(
+            { error: "Database connection failed" },
+            { status: 503 }
+          );
+        }
+        
         const { data: newParent, error: createError } = await supabaseAdmin
           .from("parent")
-          .insert({
-            parentid: userId,
-            firstname: firstName || "",
-            lastname: lastName || "",
-            email: email || "",
-            phone: phone || "",
-          })
+          .upsert(insertData, { onConflict: 'parentid' })
           .select()
           .single();
 
         if (createError) {
           console.error("❌ Error creando registro de padre:", createError);
+          console.error("❌ Detalles del error:", {
+            message: createError.message,
+            details: createError.details,
+            hint: createError.hint,
+            code: createError.code
+          });
           return NextResponse.json(
-            { error: "Failed to create parent record" },
+            { 
+              error: "Failed to create parent record",
+              details: createError.message,
+              code: createError.code
+            },
             { status: 500 }
           );
         }

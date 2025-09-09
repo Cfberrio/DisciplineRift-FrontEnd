@@ -884,75 +884,16 @@ export default function RegisterSection() {
 
   const nextStep = async () => {
     if (validateStep(step)) {
-      // Si estamos pasando al paso 4 (información de padre e hijo), verificar/crear registro de padre
+      // Si estamos pasando al paso 4 (información de padre e hijo), autocompletar información del usuario
       if (step === 3 && currentUser) {
-        try {
-          console.log(
-            "🔄 Verificando registro de padre para usuario:",
-            currentUser.id
-          );
-
-          // Verificar si existe registro de padre
-          const response = await fetch(
-            `/api/parent-info?userId=${currentUser.id}`
-          );
-
-          if (response.ok) {
-            const parentData = await response.json();
-
-            if (parentData.exists) {
-              // Autocompletar información del padre
-              console.log(
-                "✅ Registro de padre encontrado, autocompletando información"
-              );
-              setFormData((prev) => ({
-                ...prev,
-                parentFirstName: parentData.parent.firstname || "",
-                parentLastName: parentData.parent.lastname || "",
-                parentEmail: parentData.parent.email || "",
-                parentPhone: parentData.parent.phone || "",
-              }));
-            } else {
-              // Crear registro de padre con información del usuario autenticado
-              console.log("🔄 Creando nuevo registro de padre");
-              const createResponse = await fetch("/api/parent-info", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  userId: currentUser.id,
-                  firstName: currentUser.firstName || "",
-                  lastName: currentUser.lastName || "",
-                  email: currentUser.email || "",
-                  phone: currentUser.phone || "",
-                }),
-              });
-
-              if (createResponse.ok) {
-                console.log("✅ Registro de padre creado exitosamente");
-                // Autocompletar con la información del usuario
-                setFormData((prev) => ({
-                  ...prev,
-                  parentFirstName: currentUser.firstName || "",
-                  parentLastName: currentUser.lastName || "",
-                  parentEmail: currentUser.email || "",
-                  parentPhone: currentUser.phone || "",
-                }));
-              } else {
-                const errorText = await createResponse.text();
-                console.warn("⚠️ No se pudo crear registro de padre:", errorText);
-              }
-            }
-          } else {
-            const errorText = await response.text();
-            console.warn("⚠️ No se pudo verificar registro de padre:", errorText);
-          }
-        } catch (error) {
-          console.warn(
-            "⚠️ Error en verificación/creación de registro de padre:",
-            error instanceof Error ? error.message : "Error desconocido"
-          );
-          // Continuar con el flujo normal incluso si hay error en parent-info
-        }
+        // Autocompletar información del padre con los datos del usuario autenticado
+        setFormData((prev) => ({
+          ...prev,
+          parentFirstName: currentUser.firstName || "",
+          parentLastName: currentUser.lastName || "",
+          parentEmail: currentUser.email || "",
+          parentPhone: currentUser.phone || "",
+        }));
       }
 
       setStep((prev) => prev + 1);
@@ -981,28 +922,7 @@ export default function RegisterSection() {
       setIsSubmitting(true);
       setSubmissionError(null);
 
-      // Si hay un usuario autenticado, actualizar el registro de padre con la información final
-      if (currentUser) {
-        console.log("🔄 Actualizando registro de padre con información final");
-
-        const updateResponse = await fetch("/api/parent-info", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: currentUser.id,
-            firstName: formData.parentFirstName,
-            lastName: formData.parentLastName,
-            email: formData.parentEmail,
-            phone: formData.parentPhone,
-          }),
-        });
-
-        if (!updateResponse.ok) {
-          console.error("❌ Error actualizando registro de padre");
-        } else {
-          console.log("✅ Registro de padre actualizado exitosamente");
-        }
-      }
+      // El registro de padre se maneja automáticamente en el endpoint /api/register
 
       const submissionData = {
         ...formData,
@@ -1160,6 +1080,8 @@ export default function RegisterSection() {
         return { isValid: true, percentage: 10 };
       case 'LABORDAY':
         return { isValid: true, percentage: 10 };
+      case 'DRRIDE':
+        return { isValid: true, percentage: 100 };
       default:
         return { isValid: false, percentage: 0 };
     }

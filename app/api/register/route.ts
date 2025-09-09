@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase-admin"
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: Request) {
   try {
@@ -42,9 +43,53 @@ export async function POST(request: Request) {
     // Use admin client from lib
     console.log("Using Supabase admin client for registration operations...")
 
+    // Check environment variables
+    console.log("🔍 Environment check:", {
+      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      serviceKeyLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0,
+      usingServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    })
+
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.warn("⚠️ No SUPABASE_SERVICE_ROLE_KEY found - may have permission issues")
+    }
+
+    // Test basic database connectivity first
+    console.log("🔍 Testing database connectivity...")
+    try {
+      const { data: testQuery, error: testError } = await supabaseAdmin
+        .from("parent")
+        .select("parentid")
+        .limit(1)
+      
+      if (testError) {
+        console.error("❌ Database connection test failed:", testError)
+        return NextResponse.json(
+          {
+            message: "Database connection failed",
+            error: testError.message,
+            code: testError.code
+          },
+          { status: 503 }
+        )
+      }
+      console.log("✅ Database connection test successful")
+    } catch (connectionError) {
+      console.error("❌ Database connection exception:", connectionError)
+      return NextResponse.json(
+        {
+          message: "Database service unavailable",
+          error: "Connection failed"
+        },
+        { status: 503 }
+      )
+    }
+
     console.log("Checking/updating parent record...")
 
-    // First, ensure parent record exists and update it
+    // Check if parent record exists for this user
     const { data: existingParent, error: parentCheckError } = await supabaseAdmin
       .from("parent")
       .select("*")
@@ -55,8 +100,13 @@ export async function POST(request: Request) {
       console.error("Error checking parent:", parentCheckError)
     }
 
-    // Always update/create parent record with latest information
+    console.log("🔍 User ID:", formData.userId)
+    console.log("🔍 Existing parent found:", !!existingParent)
+    
+    let parentError = null;
+    
     if (existingParent) {
+      // Update existing parent record
       console.log("Updating existing parent record...")
       const { error: updateError } = await supabaseAdmin
         .from("parent")
@@ -67,21 +117,27 @@ export async function POST(request: Request) {
           phone: formData.parentPhone,
         })
         .eq("parentid", formData.userId)
-
-      if (updateError) {
-        console.error("Parent update error:", updateError)
-        return NextResponse.json(
-          {
-            message: "Failed to update parent record",
-            error: updateError.message,
-          },
-          { status: 500 },
-        )
+      
+      parentError = updateError
+      if (!updateError) {
+        console.log("✅ Parent record updated successfully")
       }
-      console.log("Parent updated successfully")
     } else {
-      console.log("Creating parent record...")
-      const { error: parentError } = await supabaseAdmin
+      // Create new parent record with error handling for email conflict
+      console.log("Creating new parent record...")
+      console.log("🔍 Parent data to insert:", {
+        parentid: formData.userId,
+        firstname: formData.parentFirstName,
+        lastname: formData.parentLastName,
+        email: formData.parentEmail,
+        phone: formData.parentPhone,
+      })
+      
+      let insertError = null;
+      
+      // Try with admin client first
+      console.log("🔍 Attempting insert with admin client...")
+      const { error: adminError } = await supabaseAdmin
         .from("parent")
         .insert({
           parentid: formData.userId,
@@ -90,35 +146,94 @@ export async function POST(request: Request) {
           email: formData.parentEmail,
           phone: formData.parentPhone,
         })
+      
+      if (adminError) {
+        console.error("❌ Admin client insert failed:", adminError)
+        
+        // Fallback: try with service key client directly
+        console.log("🔄 Trying fallback with direct service key client...")
+        
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+          const fallbackClient = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY,
+            {
+              auth: { autoRefreshToken: false, persistSession: false }
+            }
+          )
+          
+          const { error: fallbackError } = await fallbackClient
+            .from("parent")
+            .insert({
+              parentid: formData.userId,
+              firstname: formData.parentFirstName,
+              lastname: formData.parentLastName,
+              email: formData.parentEmail,
+              phone: formData.parentPhone,
+            })
+          
+          insertError = fallbackError
+          if (!fallbackError) {
+            console.log("✅ Parent record created with fallback client")
+          }
+        } else {
+          insertError = adminError
+        }
+      } else {
+        console.log("✅ Parent record created successfully with admin client")
+      }
+      
+      parentError = insertError
+      if (insertError) {
+        console.error("❌ All insert attempts failed:", {
+          message: insertError.message,
+          code: insertError.code,
+          details: insertError.details,
+          hint: insertError.hint
+        })
+      }
+    }
 
-      if (parentError) {
-        console.error("❌ Parent creation error - FULL DETAILS:", {
-          message: parentError.message,
-          code: parentError.code,
-          details: parentError.details,
-          hint: parentError.hint,
-          statusCode: parentError.statusCode
-        })
-        console.error("❌ Parent data being inserted:", {
-          parentid: formData.userId,
-          firstname: formData.parentFirstName,
-          lastname: formData.parentLastName,
-          email: formData.parentEmail,
-          phone: formData.parentPhone,
-        })
+    if (parentError) {
+      console.error("❌ Parent save error - FULL DETAILS:", {
+        message: parentError.message,
+        code: parentError.code,
+        details: parentError.details,
+        hint: parentError.hint,
+        statusCode: parentError.statusCode
+      })
+      console.error("❌ Parent data being saved:", {
+        parentid: formData.userId,
+        firstname: formData.parentFirstName,
+        lastname: formData.parentLastName,
+        email: formData.parentEmail,
+        phone: formData.parentPhone,
+      })
+      
+      // Handle specific error cases
+      if (parentError.code === "23505" && parentError.message.includes("parent_email_key")) {
         return NextResponse.json(
           {
-            message: "Failed to create parent record",
-            error: parentError.message,
-            code: parentError.code,
-            details: parentError.details,
-            hint: parentError.hint
+            message: "This email is already associated with another parent account. Please use a different email or log in with the existing account.",
+            error: "Email already in use",
+            code: parentError.code
           },
-          { status: 500 },
+          { status: 400 },
         )
       }
-      console.log("Parent created successfully")
+      
+      return NextResponse.json(
+        {
+          message: "Failed to save parent record",
+          error: parentError.message,
+          code: parentError.code,
+          details: parentError.details,
+          hint: parentError.hint
+        },
+        { status: 500 },
+      )
     }
+    console.log("Parent record saved successfully")
 
     let studentId: string;
 

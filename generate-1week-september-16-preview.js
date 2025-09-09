@@ -1,28 +1,26 @@
-#!/usr/bin/env node
-
-// Script para generar preview de recordatorios para Wednesday, September 17, 2025
-const { createClient } = require('@supabase/supabase-js');
-const { DateTime } = require('luxon');
-const fs = require('fs');
+// Script para generar preview del correo de recordatorio de 1 semana para sesiones del Tuesday 16 September 2025
 require('dotenv').config({ path: '.env.local' });
 
+const { createClient } = require('@supabase/supabase-js');
+const { DateTime } = require('luxon');
+
+// Cliente de Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Missing Supabase credentials');
+  console.error('Error: Configuración de Supabase faltante');
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Timezone
 const TIMEZONE = 'America/New_York';
 
-// Fecha específica: Wednesday, September 17, 2025
-const targetDate = '2025-09-17';
-
-console.log(`🎯 Buscando sesiones que inician exactamente el: ${targetDate} (Wednesday, September 17, 2025)`);
-
-// Función para parsear días de la semana
+/**
+ * Función robusta para parsear días de la semana
+ */
 function parseDaysOfWeek(daysOfWeek) {
   if (!daysOfWeek || typeof daysOfWeek !== 'string') {
     return [];
@@ -34,6 +32,8 @@ function parseDaysOfWeek(daysOfWeek) {
     'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4,
     'fri': 5, 'sat': 6, 'sun': 7,
     'm': 1, 't': 2, 'w': 3, 'r': 4, 'f': 5, 's': 6, 'u': 7,
+    'lunes': 1, 'martes': 2, 'miércoles': 3, 'jueves': 4,
+    'viernes': 5, 'sábado': 6, 'domingo': 7
   };
 
   const cleanDays = daysOfWeek
@@ -54,7 +54,9 @@ function parseDaysOfWeek(daysOfWeek) {
   return Array.from(weekdays).sort();
 }
 
-// Función para construir el horario de temporada
+/**
+ * Construye el HTML del horario de temporada
+ */
 function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
   try {
     const startDate = DateTime.fromISO(session.startdate, { zone: timezone });
@@ -84,7 +86,7 @@ function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
     const scheduleItems = [];
     let currentDate = startDate;
 
-    while (currentDate <= endDate && scheduleItems.length < 10) {
+    while (currentDate <= endDate && scheduleItems.length < 100) {
       const currentWeekday = currentDate.weekday;
       
       if (weekdays.includes(currentWeekday)) {
@@ -114,7 +116,9 @@ function buildSeasonScheduleHtml(session, timezone = TIMEZONE) {
   }
 }
 
-// Template del email
+/**
+ * Genera el HTML del email de recordatorio de 1 semana
+ */
 function createSeasonReminderEmailHtml(emailData) {
   return `<!doctype html>
 <html>
@@ -143,10 +147,10 @@ function createSeasonReminderEmailHtml(emailData) {
                   <span style="color:#ffffff;font-size:24px;font-weight:bold;letter-spacing:1px;">🏐 DISCIPLINE RIFT</span>
                 </div>
                 <h1 style="color:#ffffff;font-size:28px;font-weight:bold;margin:0;text-shadow:0 2px 4px rgba(0,0,0,0.2);">
-                  Your Season Starts Soon!
+                  Just 1 Week Until ${emailData.teamName} Season Kickoff!
                 </h1>
                 <p style="color:rgba(255,255,255,0.9);font-size:16px;margin:8px 0 0 0;">
-                  30-Day Reminder
+                  1-Week Reminder
                 </p>
               </td>
             </tr>
@@ -155,8 +159,8 @@ function createSeasonReminderEmailHtml(emailData) {
             <tr>
               <td class="content" style="padding:40px;">
                 <div style="text-align:center;margin-bottom:32px;">
-                  <div style="background:linear-gradient(135deg, #f59e0b 0%, #f97316 100%);color:#ffffff;padding:16px 24px;border-radius:50px;display:inline-block;font-weight:bold;font-size:18px;box-shadow:0 4px 12px rgba(245,158,11,0.3);">
-                    📅 30 Days to Go
+                  <div style="background:linear-gradient(135deg, #dc2626 0%, #ef4444 100%);color:#ffffff;padding:16px 24px;border-radius:50px;display:inline-block;font-weight:bold;font-size:18px;box-shadow:0 4px 12px rgba(220,38,38,0.3);">
+                    ⏰ Just 1 Week to Go!
                   </div>
                 </div>
 
@@ -166,11 +170,10 @@ function createSeasonReminderEmailHtml(emailData) {
                 
                 <div style="background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);border-radius:12px;padding:24px;margin:0 0 32px 0;border-left:4px solid #3b82f6;">
                   <p style="margin:0 0 16px 0;font-size:16px;line-height:26px;color:#475569;">
-                    This is your reminder that the <strong style="color:#1e40af;">${emailData.teamName}</strong> 
-                    season begins in exactly one month on <strong style="color:#dc2626;">${emailData.startDate}</strong>.
+                    We're just one week away from the start of our Discipline Rift season for <strong style="color:#1e40af;">${emailData.teamName}</strong> on <strong style="color:#dc2626;">${emailData.startDate}</strong>!
                   </p>
                   <p style="margin:0;font-size:16px;line-height:26px;color:#475569;">
-                    Get ready for another great season filled with skill development, growth, and fun!
+                    Make sure to remind their teacher about the season and have everything ready for an exciting season ahead.
                   </p>
                 </div>
 
@@ -182,15 +185,15 @@ function createSeasonReminderEmailHtml(emailData) {
                   <div style="background:#f8fafc;border-radius:8px;padding:20px;">
                     <ul style="margin:0;padding:0;list-style:none;font-size:15px;line-height:24px;color:#475569;">
                       ${emailData.scheduleHtml.replace(/<li>/g, '<li style="margin:0 0 8px 0;padding:8px 12px;background:#ffffff;border-radius:6px;border-left:3px solid #3b82f6;">').replace(/<\/li>/g, '</li>')}
-                    </ul>
+                </ul>
                   </div>
                 </div>
 
                 <div style="text-align:center;margin:32px 0;">
                   <div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#ffffff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
-                    <h4 style="margin:0 0 8px 0;font-size:18px;font-weight:bold;">We're Excited!</h4>
+                    <h4 style="margin:0 0 8px 0;font-size:18px;font-weight:bold;">See you on the court!</h4>
                     <p style="margin:0;font-size:16px;opacity:0.9;">
-                      See you on the courts soon
+                      Discipline Rift Team
                     </p>
                   </div>
                 </div>
@@ -224,180 +227,120 @@ function createSeasonReminderEmailHtml(emailData) {
 </html>`;
 }
 
-async function getSeptember17SessionData() {
+// Función principal
+async function generatePreview() {
   try {
-    console.log('🔍 Consultando sesiones que empiezan el Wednesday, September 17, 2025...');
+    console.log('🔍 Generando preview del correo de recordatorio de 1 semana para September 16, 2025...');
+
+    // Fecha objetivo: Tuesday, September 16, 2025
+    const targetDate = '2025-09-16';
     
-    // Buscar sesiones que inician exactamente el 17 de septiembre
+    console.log(`🎯 Buscando sesiones que inician en: ${targetDate}`);
+
+    // Buscar sesiones que inician en esa fecha
     const { data: sessions, error: sessionsError } = await supabase
       .from('session')
       .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
-      .eq('startdate', targetDate)
-      .limit(1000);
+      .eq('startdate', targetDate);
 
     if (sessionsError) {
       throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
     }
 
-    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones para el 17 de septiembre`);
+    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
 
     if (!sessions || sessions.length === 0) {
-      console.log('❌ No hay sesiones que empiecen el 17 de septiembre de 2025');
-      return { sessions: [], enrollmentData: [] };
+      console.log('❌ No hay sesiones para esa fecha');
+      return;
     }
 
-    // Para cada sesión, buscar inscripciones activas
-    const allEnrollmentData = [];
-    
-    for (const session of sessions) {
-      console.log(`🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
+    // Tomar la primera sesión
+    const session = sessions[0];
+    console.log(`\n🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
 
-      // Buscar inscripciones activas para este equipo
-      const { data: enrollments, error: enrollmentsError } = await supabase
-        .from('enrollment')
-        .select('enrollmentid, studentid')
+    // Buscar inscripciones activas
+    const { data: enrollments, error: enrollmentsError } = await supabase
+      .from('enrollment')
+      .select('enrollmentid, studentid')
+      .eq('teamid', session.teamid)
+      .eq('isactive', true)
+      .limit(1);
+
+    if (enrollmentsError || !enrollments || enrollments.length === 0) {
+      console.log('❌ No hay inscripciones activas para este equipo');
+      return;
+    }
+
+    // Buscar estudiante
+    const { data: students, error: studentsError } = await supabase
+      .from('student')
+      .select('studentid, parentid, firstname, lastname')
+      .eq('studentid', enrollments[0].studentid)
+      .single();
+
+    if (studentsError || !students) {
+      console.log('❌ No se encontró el estudiante');
+      return;
+    }
+
+    // Buscar padre
+    const { data: parent, error: parentsError } = await supabase
+      .from('parent')
+      .select('parentid, firstname, lastname, email')
+      .eq('parentid', students.parentid)
+      .single();
+
+    if (parentsError || !parent) {
+      console.log('❌ No se encontró el padre');
+      return;
+    }
+
+    // Buscar nombre del equipo
+    let teamName = `Team ${session.teamid.slice(-8)}`;
+    try {
+      const { data: teamData, error: teamError } = await supabase
+        .from('team')
+        .select('name')
         .eq('teamid', session.teamid)
-        .eq('isactive', true);
-
-      if (enrollmentsError || !enrollments || enrollments.length === 0) {
-        console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);
-        continue;
+        .single();
+      
+      if (teamData && teamData.name) {
+        teamName = teamData.name;
       }
-
-      console.log(`👥 Encontradas ${enrollments.length} inscripciones activas para ${session.teamid}`);
-
-      // Buscar estudiantes
-      const studentIds = enrollments.map(e => e.studentid);
-      const { data: students, error: studentsError } = await supabase
-        .from('student')
-        .select('studentid, parentid, firstname, lastname')
-        .in('studentid', studentIds);
-
-      if (studentsError || !students) {
-        console.log(`ℹ️ No se encontraron estudiantes para el equipo ${session.teamid}`);
-        continue;
-      }
-
-      // Buscar padres únicos
-      const parentIds = [...new Set(students.map(s => s.parentid))];
-      const { data: parents, error: parentsError } = await supabase
-        .from('parent')
-        .select('parentid, firstname, lastname, email')
-        .in('parentid', parentIds);
-
-      if (parentsError || !parents) {
-        console.log(`ℹ️ No se encontraron padres para el equipo ${session.teamid}`);
-        continue;
-      }
-
-      // Buscar nombre del equipo
-      let teamName = `Team ${session.teamid.slice(-8)}`;
-      try {
-        const { data: teamData } = await supabase
-          .from('team')
-          .select('name')
-          .eq('teamid', session.teamid)
-          .single();
-        
-        if (teamData) {
-          teamName = teamData.name || teamName;
-        }
-      } catch (error) {
-        console.log(`ℹ️ No se pudo obtener nombre del equipo ${session.teamid}`);
-      }
-
-      // Agregar datos de esta sesión
-      allEnrollmentData.push({
-        session,
-        teamName,
-        students,
-        parents,
-        enrollmentCount: enrollments.length
-      });
+    } catch (error) {
+      console.log(`ℹ️ Usando nombre de equipo fallback: ${teamName}`);
     }
 
-    return { sessions, enrollmentData: allEnrollmentData };
+    // Construir el horario de temporada
+    const scheduleHtml = buildSeasonScheduleHtml(session);
+
+    // Formatear fecha de inicio
+    const startDate = DateTime.fromISO(session.startdate, { zone: TIMEZONE })
+      .toLocaleString(DateTime.DATE_FULL, { locale: 'en-US' });
+
+    const emailData = {
+      parentName: parent.firstname,
+      teamName,
+      startDate,
+      scheduleHtml
+    };
+
+    // Generar HTML
+    const htmlContent = createSeasonReminderEmailHtml(emailData);
+
+    // Guardar el preview
+    const fs = require('fs');
+    const fileName = 'real-1week-september-16-preview.html';
+    fs.writeFileSync(fileName, htmlContent);
+
+    console.log(`\n✅ Preview generado exitosamente: ${fileName}`);
+    console.log(`📧 Email sería enviado a: ${parent.email} (${parent.firstname})`);
+    console.log(`🏐 Equipo: ${teamName}`);
+    console.log(`📅 Fecha de inicio: ${startDate}`);
 
   } catch (error) {
-    console.error('💥 Error en getSeptember17SessionData:', error);
-    return { sessions: [], enrollmentData: [] };
+    console.error('❌ Error:', error.message);
   }
 }
 
-async function main() {
-  console.log('🚀 Generando preview para recordatorios del Wednesday, September 17, 2025...');
-  
-  const { sessions, enrollmentData } = await getSeptember17SessionData();
-  
-  if (enrollmentData.length === 0) {
-    console.log('❌ No se encontraron datos para generar preview');
-    return;
-  }
-
-  // Tomar el primer equipo con inscripciones para el preview
-  const firstTeamData = enrollmentData[0];
-  const firstParent = firstTeamData.parents[0];
-
-  // Construir el horario de temporada
-  const scheduleHtml = buildSeasonScheduleHtml(firstTeamData.session);
-
-  // Formatear fecha de inicio
-  const startDate = DateTime.fromISO(firstTeamData.session.startdate, { zone: TIMEZONE })
-    .toLocaleString(DateTime.DATE_FULL, { locale: 'en-US' });
-
-  const emailData = {
-    parentName: firstParent.firstname,
-    teamName: firstTeamData.teamName,
-    startDate,
-    scheduleHtml
-  };
-
-  const htmlContent = createSeasonReminderEmailHtml(emailData);
-  
-  // Guardar el HTML
-  fs.writeFileSync('real-september-17-preview.html', htmlContent);
-  console.log('✅ Preview generado: real-september-17-preview.html');
-  
-  // Mostrar resumen completo
-  console.log('\n📊 === RESUMEN COMPLETO DE SESIONES DEL 17 DE SEPTIEMBRE ===');
-  
-  let totalEmails = 0;
-  enrollmentData.forEach((data, index) => {
-    console.log(`\n🏐 ${index + 1}. Equipo: ${data.teamName}`);
-    console.log(`   📧 Padres que recibirán email: ${data.parents.length}`);
-    console.log(`   👨‍🎓 Estudiantes inscritos: ${data.enrollmentCount}`);
-    console.log(`   ⏰ Horario: ${data.session.starttime} - ${data.session.endtime}`);
-    console.log(`   📆 Días: ${data.session.daysofweek}`);
-    totalEmails += data.parents.length;
-  });
-
-  console.log(`\n📊 === TOTALES ===`);
-  console.log(`🎯 Total de sesiones: ${sessions.length}`);
-  console.log(`🏐 Equipos con inscripciones activas: ${enrollmentData.length}`);
-  console.log(`📧 Total de emails que se enviarían: ${totalEmails}`);
-  
-  console.log(`\n📧 === DATOS DEL PREVIEW ===`);
-  console.log(`Padre: ${firstParent.firstname} ${firstParent.lastname}`);
-  console.log(`Email: ${firstParent.email}`);
-  console.log(`Equipo: ${firstTeamData.teamName}`);
-  console.log(`Fecha: ${startDate}`);
-}
-
-main().catch(console.error);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+generatePreview();
