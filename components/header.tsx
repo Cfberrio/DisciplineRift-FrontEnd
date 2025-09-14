@@ -94,13 +94,13 @@ export default function Header() {
 
           {/* Login/Dashboard Icons - Right */}
           <div className="hidden md:flex items-center space-x-2">
-            <Link
-              href="/dashboard"
+            <button
               aria-label="Parent Dashboard"
               className={cn(
-                "p-2 rounded-md transition-colors duration-300",
+                "p-2 rounded-md transition-colors duration-300 cursor-default",
                 isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
               )}
+              onClick={() => {}} // No hace nada
             >
               <Image
                 src={isScrolled ? "/CUENTA_ICONO_AZUL.png" : "/PERSONA.png"}
@@ -110,15 +110,15 @@ export default function Header() {
                 className="h-5 w-5 transition-all duration-300"
               />
               <span className="sr-only">Dashboard</span>
-            </Link>
+            </button>
 
-            <Link
-              href="/login"
+            <button
               aria-label="Login"
               className={cn(
-                "p-2 rounded-md transition-colors duration-300",
+                "p-2 rounded-md transition-colors duration-300 cursor-default",
                 isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
               )}
+              onClick={() => {}} // No hace nada
             >
               <Image
                 src={isScrolled ? "/Logout_desktop_azul.png" : "/LOG OUT_BLANCO.png"}
@@ -128,7 +128,7 @@ export default function Header() {
                 className="h-5 w-5"
               />
               <span className="sr-only">Log In</span>
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -167,11 +167,10 @@ export default function Header() {
                 REGISTER NOW
               </Button>
                              <div className="flex space-x-3 pt-3 border-t border-gray-200 mt-3">
-                 <Link
-                   href="/dashboard"
+                 <button
                    aria-label="Parent Dashboard"
-                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors"
-                   onClick={() => setIsMenuOpen(false)}
+                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors cursor-default"
+                   onClick={() => {}} // No hace nada
                  >
                    <Image
                      src="/CUENTA_ICONO_AZUL.png"
@@ -181,12 +180,11 @@ export default function Header() {
                      className="h-5 w-5 inline mr-1 transition-all duration-300"
                    />
                    Dashboard
-                 </Link>
-                 <Link
-                   href="/login"
+                 </button>
+                 <button
                    aria-label="Login"
-                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors"
-                   onClick={() => setIsMenuOpen(false)}
+                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors cursor-default"
+                   onClick={() => {}} // No hace nada
                  >
                    <Image
                      src="/LOG OUT_BLANCO.png"
@@ -196,7 +194,7 @@ export default function Header() {
                      className="h-5 w-5 inline mr-1"
                    />
                    Log In
-                 </Link>
+                 </button>
                </div>
             </nav>
           </div>

@@ -103,8 +103,8 @@ export default function FAQSection() {
       )
     : faqItems
 
-  const visibleFAQs = searchQuery || isExpanded ? filteredFAQs : filteredFAQs.slice(0, 3)
-  const hasMoreQuestions = !searchQuery && filteredFAQs.length > 3
+  const visibleFAQs = searchQuery || isExpanded ? filteredFAQs : filteredFAQs.slice(0, isMobile ? 2 : 3)
+  const hasMoreQuestions = !searchQuery && filteredFAQs.length > (isMobile ? 2 : 3)
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
@@ -120,43 +120,93 @@ export default function FAQSection() {
 
   return (
     <section
-      className="py-20 relative overflow-hidden bg-no-repeat bg-center"
+      className="py-20 relative overflow-hidden bg-no-repeat bg-center min-h-screen"
       id="faq"
       style={{ 
         backgroundImage: "url('/faq-background.png')",
-        backgroundSize: isMobile ? "200% auto" : "150% auto",
-        backgroundPosition: "center top"
+        backgroundSize: isMobile ? "100% 100%" : "cover",
+        backgroundPosition: "center center"
       }}
     >
-      <div className="container px-4 relative z-10">
-        <AnimatedSection animation="fade-down" className="text-center mb-16 mt-32 md:mt-32 lg:mt-32">
-          <div className="max-w-md mx-auto relative mt-16 md:mt-0">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/80" />
-              <input
-                type="text"
-                placeholder="SEARCH"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-black/50 backdrop-blur-md text-white placeholder-white/60 border border-white/30 rounded-full py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
-              />
-            </div>
-          </div>
-        </AnimatedSection>
+      {/* FAQS.png - esquina superior izquierda solo en desktop */}
+      <AnimatedSection animation="fade-down" className="hidden sm:block absolute top-6 left-0 z-30">
+        <img 
+          src="/FAQS.png" 
+          alt="FAQs" 
+          className="h-20 lg:h-24 w-auto object-contain"
+        />
+      </AnimatedSection>
 
-        <div className="max-w-4xl mx-auto space-y-10">
+      {/* Search bar en la esquina superior derecha - solo desktop */}
+      <AnimatedSection animation="fade-down" className="hidden sm:block absolute top-24 right-8 z-30">
+        <div className="w-96 max-w-md relative">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/80" />
+            <input
+              type="text"
+              placeholder="SEARCH"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-black/50 backdrop-blur-md text-white placeholder-white/60 border border-white/30 rounded-full py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
+            />
+          </div>
+        </div>
+      </AnimatedSection>
+
+      <div className="container px-4 relative z-10 pt-8 sm:pt-80">
+
+        {/* Layout móvil: FAQ imagen centrada, searchbar centrado, items */}
+        <div className="block sm:hidden">
+          {/* FAQ imagen centrada en móvil */}
+          <AnimatedSection animation="fade-down" className="text-center mb-0.5">
+            <img 
+              src="/FAQS.png" 
+              alt="FAQs" 
+              className="h-6 w-auto object-contain mx-auto"
+            />
+          </AnimatedSection>
+
+          {/* Search bar centrado en móvil */}
+          <AnimatedSection animation="fade-down" className="text-center mb-4">
+            <div className="w-72 mx-auto relative">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-white/80 h-3 w-3" />
+                <input
+                  type="text"
+                  placeholder="SEARCH"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-black/50 backdrop-blur-md text-white placeholder-white/60 border border-white/30 rounded-full py-1.5 pl-8 pr-2 text-xs focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
+                />
+              </div>
+            </div>
+          </AnimatedSection>
+        </div>
+
+        <div className="max-w-72 sm:max-w-4xl mx-auto space-y-4 sm:space-y-10">
           {visibleFAQs.map((faq, index) => (
             <AnimatedSection
               key={index}
               animation="fade-up"
               delay={index * 100}
-              className="text-white bg-black/20 p-6 rounded-lg shadow-lg backdrop-blur-sm"
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg"
             >
-              <div className="mb-1 text-sm font-medium text-white">{faq.category}</div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-3" style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.3)" }}>
-                {faq.question}
-              </h3>
-              <p className="text-white/95">{faq.answer}</p>
+              <div 
+                className="w-full h-full p-1 sm:p-6"
+                style={{
+                  backgroundColor: '#0085B7',
+                  backgroundImage: 'linear-gradient(135deg, #0085B7 0%, #006B96 100%)',
+                  color: '#FFFFFF'
+                }}
+              >
+                <div className="relative z-10">
+                  <div className="mb-0.5 sm:mb-1 text-xs sm:text-sm font-medium text-white opacity-90">{faq.category}</div>
+                  <h3 className="text-xs sm:text-3xl font-bold mb-0.5 sm:mb-3 leading-tight text-white" style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.3)" }}>
+                    {faq.question}
+                  </h3>
+                  <p className="text-xs sm:text-base text-white opacity-95 leading-tight sm:leading-normal">{faq.answer}</p>
+                </div>
+              </div>
             </AnimatedSection>
           ))}
         </div>
@@ -165,7 +215,12 @@ export default function FAQSection() {
           <AnimatedSection animation="fade-up" delay={400} className="text-center mt-12">
             <Button
               onClick={toggleExpanded}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full px-10 py-6 text-lg flex items-center mx-auto shadow-md"
+              className="text-white font-semibold rounded-full flex items-center mx-auto shadow-md hover:opacity-90 transition-opacity ethnocentric-title-white not-italic"
+              style={{ 
+                backgroundColor: '#0085B7',
+                padding: isMobile ? '1px 2px' : '8px 16px',
+                fontSize: '14px'
+              }}
             >
               {isExpanded ? (
                 <>
@@ -189,7 +244,12 @@ export default function FAQSection() {
               No FAQs match your search. Try different keywords or browse all questions.
             </p>
             <Button
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-full px-10 py-6 text-lg shadow-md"
+              className="text-white font-semibold rounded-full shadow-md hover:opacity-90 transition-opacity ethnocentric-title-white"
+              style={{ 
+                backgroundColor: '#0085B7',
+                padding: isMobile ? '1px 2px' : '8px 16px',
+                fontSize: '14px'
+              }}
               onClick={() => setSearchQuery("")}
             >
               VIEW ALL FAQS

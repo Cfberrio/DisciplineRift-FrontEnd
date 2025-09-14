@@ -34,6 +34,7 @@ import {
 import AdminLogin from "./admin-login"
 import StudentManagement from "./student-management"
 import EmailTestPanel from "./email-test-panel"
+import CancellationManager from "./cancellation-manager"
 import { getAdminSession, logoutAdmin, type AdminUser } from "@/lib/admin-auth"
 
 // Mock data for demonstration
@@ -379,7 +380,7 @@ export default function ParentDashboard() {
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-7">
+              <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="overview">Resumen</TabsTrigger>
                 <TabsTrigger value="students">Estudiantes</TabsTrigger>
                 <TabsTrigger value="programs">Programas</TabsTrigger>
@@ -387,6 +388,7 @@ export default function ParentDashboard() {
                 <TabsTrigger value="reports">Reportes</TabsTrigger>
                 <TabsTrigger value="medical">Médico</TabsTrigger>
                 <TabsTrigger value="email">Email</TabsTrigger>
+                <TabsTrigger value="cancellations">Cancelaciones</TabsTrigger>
               </TabsList>
 
               {/* Overview Tab */}
@@ -870,6 +872,11 @@ export default function ParentDashboard() {
                     <EmailTestPanel />
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Cancellations Tab */}
+              <TabsContent value="cancellations" className="space-y-6">
+                <CancellationManager />
               </TabsContent>
             </Tabs>
           </div>
