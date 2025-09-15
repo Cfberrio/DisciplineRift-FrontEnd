@@ -112,14 +112,11 @@ Para acceder al panel de administración:
 ├── components/            # Componentes React
 │   ├── ui/               # Componentes de UI base
 │   └── ...               # Componentes específicos
-├── docs/                  # 📚 Documentación técnica del proyecto
-├── tools/                 # 🔧 Herramientas y scripts de desarrollo
-├── email-templates/       # 📧 Templates HTML para emails
 ├── jobs/                  # Jobs programados y tareas automáticas
 ├── lib/                   # Utilidades y configuraciones
 ├── hooks/                 # Custom React Hooks
 ├── scripts/               # Scripts CLI para mantenimiento
-└── public/               # Archivos estáticos e imágenes
+└── public/               # Archivos estáticos
 ```
 
 ## 🔧 Scripts Disponibles
