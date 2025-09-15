@@ -76,7 +76,7 @@ export default function PassionInspiredHero() {
               }`}
             >
               <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl font-medium wild-youth-text-white mb-8 xs:mb-10 sm:mb-12 md:mb-16 hero-text-mobile">
-                Fall Season is here! Join us this September 2025
+                September<br />2025, Fall Season
               </h2>
             </div>
 
@@ -123,7 +123,7 @@ export default function PassionInspiredHero() {
                 }`}
               >
                 <h2 className="text-lg xl:text-xl font-medium wild-youth-text-white">
-                  Fall Season is here! Join us this September 2025
+                  <span className="invisible">Fall Season </span>September 2025<span className="invisible">, </span>Fall Season<span className="invisible"> is here! Join us this</span>
                 </h2>
               </div>
             </div>

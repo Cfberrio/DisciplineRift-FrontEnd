@@ -233,10 +233,10 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
                   <span style="color:#ffffff;font-size:24px;font-weight:bold;letter-spacing:1px;">🏐 DISCIPLINE RIFT</span>
                 </div>
                 <h1 style="color:#ffffff;font-size:28px;font-weight:bold;margin:0;text-shadow:0 2px 4px rgba(0,0,0,0.2);">
-                  Just 1 Week Until ${emailData.teamName} Season Kickoff!
+                  Tomorrow's the Big Day! ${emailData.teamName} Season Begins
                 </h1>
                 <p style="color:rgba(255,255,255,0.9);font-size:16px;margin:8px 0 0 0;">
-                  1-Week Reminder
+                  Day Before Reminder
                 </p>
               </td>
             </tr>
@@ -246,7 +246,7 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
               <td class="content" style="padding:40px;">
                 <div style="text-align:center;margin-bottom:32px;">
                   <div style="background:linear-gradient(135deg, #dc2626 0%, #ef4444 100%);color:#ffffff;padding:16px 24px;border-radius:50px;display:inline-block;font-weight:bold;font-size:18px;box-shadow:0 4px 12px rgba(220,38,38,0.3);">
-                    ⏰ Just 1 Week to Go!
+                    🎉 Tomorrow's the Big Day!
                   </div>
                 </div>
 
@@ -256,10 +256,10 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
                 
                 <div style="background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);border-radius:12px;padding:24px;margin:0 0 32px 0;border-left:4px solid #3b82f6;">
                   <p style="margin:0 0 16px 0;font-size:16px;line-height:26px;color:#475569;">
-                    We're just one week away from the start of our Discipline Rift season for <strong style="color:#1e40af;">${emailData.teamName}</strong> on <strong style="color:#dc2626;">${emailData.startDate}</strong>!
+                    The wait is almost over — tomorrow we kick off the Discipline Rift season for <strong style="color:#1e40af;">${emailData.teamName}</strong>!
                   </p>
                   <p style="margin:0;font-size:16px;line-height:26px;color:#475569;">
-                    Make sure to remind their teacher about the season and have everything ready for an exciting season ahead.
+                    We can't wait to see the players in action.
                   </p>
                 </div>
 
@@ -276,12 +276,12 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
                 </div>
 
                 <div style="text-align:center;margin:32px 0;">
-                  <div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#ffffff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
-                    <h4 style="margin:0 0 8px 0;font-size:18px;font-weight:bold;">See you on the court!</h4>
-                    <p style="margin:0;font-size:16px;opacity:0.9;">
-                      Discipline Rift Team
-                    </p>
-                  </div>
+                        <div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#ffffff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
+                          <h4 style="margin:0 0 8px 0;font-size:18px;font-weight:bold;">See you tomorrow!</h4>
+                          <p style="margin:0;font-size:16px;opacity:0.9;">
+                            Discipline Rift Team
+                          </p>
+                        </div>
                 </div>
               </td>
             </tr>
@@ -320,12 +320,12 @@ export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {
   console.log('🚀 === INICIANDO JOB DE RECORDATORIOS DE TEMPORADA ===');
   
   try {
-    // Calcular fecha objetivo (hoy + 7 días en zona horaria de Nueva York)
+    // Calcular fecha objetivo (hoy + 1 día en zona horaria de Nueva York)
     const nowNY = opts?.now 
       ? DateTime.fromJSDate(opts.now).setZone(TIMEZONE)
       : DateTime.now().setZone(TIMEZONE);
     
-    const targetDateNY = nowNY.plus({ days: 7 }).toISODate();
+    const targetDateNY = nowNY.plus({ days: 1 }).toISODate();
     
     console.log(`📅 Fecha actual (NY): ${nowNY.toISODate()}`);
     console.log(`🎯 Buscando sesiones que inician en: ${targetDateNY}`);
@@ -485,7 +485,7 @@ export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {
                 address: process.env.GMAIL_USER!,
               },
               to: parent.email,
-              subject: `Just 1 Week Until ${teamName} Season Kickoff!`,
+              subject: `Tomorrow's the Big Day! ${teamName} Season Begins`,
               html: htmlContent,
               text: textContent
             };

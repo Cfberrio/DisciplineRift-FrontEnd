@@ -40,7 +40,7 @@ export default function ClubSection() {
         {/* Volleyball Club */}
         <AnimatedSection animation="fade-up" className="mb-8 xs:mb-10 sm:mb-12">
           <div className="bg-white/20 backdrop-blur-md p-4 xs:p-6 sm:p-8 rounded-lg shadow-xl border border-white/30 max-w-4xl mx-auto">
-            <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl ethnocentric-title-white mb-4 xs:mb-6 text-left">VOLLEYBALL CLUB</h3>
+            <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl ethnocentric-title-white mb-4 xs:mb-6 text-left">OUR VOLLEYBALL CLUB</h3>
             <p className="text-sm xs:text-base sm:text-lg text-white mb-4 xs:mb-6 text-left">
               Starting players are developed into high-performance athletes through advanced coaching, values, and a strong club family to build a lasting passion for the game.
             </p>

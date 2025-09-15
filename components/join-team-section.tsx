@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
+import Image from "next/image"
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import AnimatedSection from "@/components/animated-section"
@@ -87,17 +88,20 @@ export default function JoinTeamSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2
-            className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-blue-600 mb-4 sm:mb-6 md:mb-8 font-bold px-4 xs:px-0"
-            style={{ 
-              fontFamily: 'Ethnocentric, sans-serif',
-              textShadow: "2px 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.8)" 
-            }}
-          >
-            CONTACT FORM
-          </h2>
+          <div className="mb-4 sm:mb-6 md:mb-8 px-4 xs:px-0 flex justify-center">
+            <Image
+              src="/CONTACTFORM.png"
+              alt="Contact Form"
+              width={500}
+              height={150}
+              className="w-auto h-auto max-w-full max-h-20 xs:max-h-24 sm:max-h-28 md:max-h-32 lg:max-h-36"
+              style={{ 
+                filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 15px rgba(255,255,255,0.8))"
+              }}
+            />
+          </div>
           <div className="max-w-4xl mx-auto">
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-800 px-4 sm:px-6 md:px-8 leading-relaxed bg-white/70 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white px-4 sm:px-6 md:px-8 leading-relaxed bg-white/30 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">
             Have questions about our programs or want to learn more about how we can help you improve your game?
                 Reach out to us using any of the methods below, and our team will get back to you as soon as possible.
 
@@ -107,8 +111,8 @@ export default function JoinTeamSection() {
 
         <div className="max-w-4xl mx-auto">
           <AnimatedSection animation="fade-up">
-            <div className="bg-white/90 backdrop-blur-md p-3 xs:p-4 sm:p-6 lg:p-8 rounded-lg shadow-xl">
-              <h3 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-blue mb-3 xs:mb-4 sm:mb-6">Send Us a Message</h3>
+            <div className="bg-white/70 backdrop-blur-md p-3 xs:p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg">
+              <h3 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-blue mb-3 xs:mb-4 sm:mb-6" style={{ color: '#0085B7' }}>Send Us a Message</h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-gray-700 font-medium mb-1">
@@ -192,7 +196,8 @@ export default function JoinTeamSection() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-dr-blue hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 shadow-md transition-all duration-200"
+                  className="w-full disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 shadow-md transition-all duration-200 ethnocentric-title-white"
+                  style={{ backgroundColor: '#0085B7' }}
                 >
                   {isSubmitting ? (
                     <>

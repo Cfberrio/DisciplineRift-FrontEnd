@@ -1152,9 +1152,15 @@ export default function RegisterSection() {
     <section className="py-20 bg-white" id="register">
       <div className="container px-4">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2 className="text-4xl md:text-5xl ethnocentric-title-blue mb-4">
-            REGISTER NOW
-          </h2>
+          <div className="mb-4 flex justify-center">
+            <Image
+              src="/REGISTERNOW.png"
+              alt="Register Now"
+              width={1000}
+              height={300}
+              className="w-auto h-auto max-w-full max-h-40 xs:max-h-48 sm:max-h-56 md:max-h-64 lg:max-h-72"
+            />
+          </div>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-16">
             Find your school and team to get started with registration.
           </p>
@@ -1162,20 +1168,22 @@ export default function RegisterSection() {
 
         <div className="max-w-4xl mx-auto">
           {/* Progress Steps */}
-          <div className="flex justify-between mb-12">
+          <div className="flex justify-between mb-12 px-2 sm:px-0">
             {[1, 2, 3, 4, 5, 6, 7].map((s) => (
-              <div key={s} className="flex flex-col items-center flex-1">
+              <div key={s} className="flex flex-col items-center flex-1 min-w-0">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
-                    step >= s ? "bg-dr-blue" : "bg-gray-300"
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-base ${
+                    step >= s ? "" : "bg-gray-300"
                   }`}
+                  style={{ backgroundColor: step >= s ? '#0085B7' : undefined }}
                 >
                   {s}
                 </div>
                 <span
-                  className={`mt-2 text-sm text-center ${
-                    step >= s ? "text-dr-blue font-medium" : "text-gray-500"
+                  className={`mt-1 sm:mt-2 text-xs sm:text-sm text-center leading-tight px-1 ${
+                    step >= s ? "font-medium" : "text-gray-500"
                   }`}
+                  style={{ color: step >= s ? '#0085B7' : undefined }}
                 >
                   {s === 1
                     ? "Search"
@@ -1199,7 +1207,7 @@ export default function RegisterSection() {
           {step === 1 && (
             <AnimatedSection animation="fade-up">
               <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h3 className="text-2xl ethnocentric-title-blue mb-6">
+                <h3 className="text-2xl ethnocentric-title-blue mb-6" style={{ color: '#0085B7' }}>
                   Find Your School or Team
                 </h3>
                 <div className="relative mb-6">

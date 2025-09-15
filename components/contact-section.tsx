@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import Image from "next/image"
 import { MapPin, User, Mail, Calendar, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import AnimatedSection from "@/components/animated-section"
@@ -248,15 +249,11 @@ export default function ContactSection() {
 
     try {
       // Validate required fields
-      const requiredFields = ['firstName', 'lastName', 'email', 'number', 'currentAddress', 'sport', 'description']
+      const requiredFields = ['firstName', 'lastName', 'email', 'number', 'currentAddress', 'description']
       for (const field of requiredFields) {
         if (!formData[field as keyof typeof formData].trim()) {
           throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required.`)
         }
-      }
-
-      if (!resumeFile) {
-        throw new Error("Please upload your resume.")
       }
 
       console.log("Submitting team application:", formData)
@@ -270,11 +267,7 @@ export default function ContactSection() {
       submitFormData.append('email', formData.email.trim())
       submitFormData.append('number', formData.number.trim())
       submitFormData.append('currentAddre', formData.currentAddress.trim()) // Mantener typo como en BD
-      submitFormData.append('sport', formData.sport)
       submitFormData.append('description', formData.description.trim())
-      
-      // Agregar archivo PDF
-      submitFormData.append('resume', resumeFile)
       
       console.log('📤 Submitting to /api/apply endpoint...')
       
@@ -309,11 +302,6 @@ export default function ContactSection() {
         sport: "",
         description: "",
       })
-      setResumeFile(null)
-      
-      // Reset file input
-      const fileInput = document.getElementById('resume') as HTMLInputElement
-      if (fileInput) fileInput.value = ''
       
       // Personalizar mensaje según el resultado del email
       if (emailResult.success) {
@@ -351,55 +339,61 @@ export default function ContactSection() {
 
       <div className="container px-4 relative z-10">
         <AnimatedSection animation="fade-down" className="text-center">
-          <h2
-            className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-blue-600 mb-4 xs:mb-8 sm:mb-12 md:mb-16 font-bold px-4 xs:px-0"
-            style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(255,255,255,0.8)" }}
-          >
-            CONTACT US
-          </h2>
+          <div className="mb-4 xs:mb-8 sm:mb-12 md:mb-16 px-4 xs:px-0 flex justify-center">
+            <Image
+              src="/CONTACTUS.png"
+              alt="Contact Us"
+              width={400}
+              height={120}
+              className="w-auto h-auto max-w-full max-h-24 xs:max-h-28 sm:max-h-32 md:max-h-36 lg:max-h-40"
+              style={{ 
+                filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 15px rgba(255,255,255,0.8))"
+              }}
+            />
+          </div>
         </AnimatedSection>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xs:gap-6 sm:gap-8 lg:gap-12">
           {/* Contact Information */}
           <AnimatedSection
             animation="fade-right"
-            className="space-y-4 xs:space-y-6 sm:space-y-8 bg-white/70 backdrop-blur-md p-3 xs:p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg"
+            className="space-y-4 xs:space-y-6 sm:space-y-8 bg-white/20 backdrop-blur-md p-3 xs:p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg"
           >
             <div>
-              <h3 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-blue mb-3 xs:mb-4 sm:mb-6">Get In Touch</h3>
+              <h3 className="text-lg xs:text-xl sm:text-2xl ethnocentric-title-white mb-3 xs:mb-4 sm:mb-6">Get In Touch</h3>
              
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start">
-                <MapPin className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
+                <MapPin className="h-6 w-6 text-white mt-1 mr-4 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-gray-900">Our Location</h4>
-                  <p className="text-gray-700">713 W YALE ST ORLANDO, FL, 32804</p>
+                  <h4 className="font-extrabold text-white" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Our Location</h4>
+                  <p className="text-white font-normal" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>713 W YALE ST ORLANDO, FL, 32804</p>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <User className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
+                <User className="h-6 w-6 text-white mt-1 mr-4 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-gray-900">Phone Number</h4>
-                  <p className="text-gray-700"> (407) 614-7454</p>
+                  <h4 className="font-extrabold text-white" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Phone Number</h4>
+                  <p className="text-white font-normal" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}> (407) 614-7454</p>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <Mail className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
+                <Mail className="h-6 w-6 text-white mt-1 mr-4 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-gray-900">Email Address</h4>
-                  <p className="text-gray-700">info@disciplinerift.com</p>
+                  <h4 className="font-extrabold text-white" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Email Address</h4>
+                  <p className="text-white font-normal" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>info@disciplinerift.com</p>
                 </div>
               </div>
 
               <div className="flex items-start">
-                <Calendar className="h-6 w-6 text-dr-blue mt-1 mr-4 flex-shrink-0" />
+                <Calendar className="h-6 w-6 text-white mt-1 mr-4 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-gray-900">Office Hours</h4>
-                  <p className="text-gray-700">Monday - Friday: 9:00 AM - 5:00 PM</p>
+                  <h4 className="font-extrabold text-white" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Office Hours</h4>
+                  <p className="text-white font-normal" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Monday - Friday: 9:00 AM - 5:00 PM</p>
           
                 </div>
               </div>
@@ -408,8 +402,7 @@ export default function ContactSection() {
             {/* Social Media Section */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="text-center mb-4">
-                <p className="text-gray-800 font-medium">Stay connected with your players and see highlights</p>
-                <p className="text-dr-blue font-bold mt-2">🎯 Be part of the Rift. Be part of the movement.</p>
+                <p className="text-white font-bold mt-2">🤚🏼Join the Rift. Be part of the movement.</p>
               </div>
               
               <div className="flex justify-center items-center space-x-6">
@@ -420,12 +413,16 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="flex flex-col items-center group transition-transform hover:scale-105"
                 >
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-lg flex items-center justify-center mb-2 group-hover:shadow-lg transition-shadow">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
+                  <div className="w-16 h-16 mb-2 group-hover:shadow-lg transition-shadow">
+                    <Image
+                      src="/INSTAGRAM.png"
+                      alt="Instagram"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                  <span className="text-xs text-gray-600 group-hover:text-dr-blue transition-colors">@disciplinerift</span>
+                  <span className="text-sm text-white group-hover:text-dr-blue transition-colors"></span>
                 </a>
 
                 {/* TikTok */}
@@ -435,12 +432,16 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="flex flex-col items-center group transition-transform hover:scale-105"
                 >
-                  <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-2 group-hover:shadow-lg transition-shadow">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                    </svg>
+                  <div className="w-16 h-16 mb-2 group-hover:shadow-lg transition-shadow">
+                    <Image
+                      src="/TIKTOK.png"
+                      alt="TikTok"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                  <span className="text-xs text-gray-600 group-hover:text-dr-blue transition-colors">@disciplinerift</span>
+                  <span className="text-sm text-white group-hover:text-dr-blue transition-colors"></span>
                 </a>
 
                 {/* Facebook */}
@@ -450,12 +451,16 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="flex flex-col items-center group transition-transform hover:scale-105"
                 >
-                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mb-2 group-hover:shadow-lg transition-shadow">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
+                  <div className="w-16 h-16 mb-2 group-hover:shadow-lg transition-shadow">
+                    <Image
+                      src="/FACEBOOK.png"
+                      alt="Facebook"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                  <span className="text-xs text-gray-600 group-hover:text-dr-blue transition-colors">@disciplinerift</span>
+                  <span className="text-sm text-white group-hover:text-dr-blue transition-colors"></span>
                 </a>
               </div>
             </div>
@@ -463,8 +468,17 @@ export default function ContactSection() {
 
           {/* Team Application Form */}
           <AnimatedSection animation="fade-left">
-            <div className="bg-white/90 backdrop-blur-md p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg shadow-xl">
-              <h3 className="text-lg sm:text-xl md:text-2xl ethnocentric-title-blue mb-6 sm:mb-8 text-center">Application Form</h3>
+            <div className="bg-white/30 backdrop-blur-md p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg shadow-lg">
+              <h3 className="text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-4 sm:mb-6 text-center">JOIN OUR DR TEAM</h3>
+              
+              <div className="text-left mb-6 sm:mb-8 space-y-3">
+                <p className="text-white text-sm sm:text-base font-normal" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                  We're always building a team of passionate coaches to bring energy and skill to every practice. Make a real impact on the next generation of athletes!
+                </p>
+                <p className="text-white text-sm sm:text-base font-medium" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                  More than coaching; it's leadership and transformation through sports.
+                </p>
+              </div>
               
               <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
                 {/* Name Fields - Mobile: stacked, Tablet+: side by side */}
@@ -559,57 +573,6 @@ export default function ContactSection() {
                   />
                 </div>
 
-                {/* Sport Selection */}
-                <div>
-                  <label htmlFor="sport" className="block text-gray-700 font-medium mb-2">
-                    <Calendar className="inline h-4 w-4 mr-2" />
-                    Sport of Interest <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="sport"
-                    name="sport"
-                    value={formData.sport}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
-                  >
-                    <option value="">Select a sport</option>
-                    <option value="Volleyball">Volleyball</option>
-                    <option value="Tennis">Tennis</option>
-                    <option value="Pickleball">Pickleball</option>
-                  </select>
-                </div>
-
-                {/* Resume Upload */}
-                <div>
-                  <label htmlFor="resume" className="block text-gray-700 font-medium mb-2">
-                    <User className="inline h-4 w-4 mr-2" />
-                    Upload Resume <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      id="resume"
-                      name="resume"
-                      onChange={handleFileChange}
-                      accept=".pdf,.doc,.docx"
-                      required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-dr-blue file:text-white hover:file:bg-blue-600"
-                    />
-                    {uploadProgress && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Loader2 className="h-5 w-5 animate-spin text-dr-blue" />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">Accepted formats: PDF, DOC, DOCX (Max 5MB)</p>
-                  {resumeFile && (
-                    <p className="text-sm text-green-600 mt-2 flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                      File selected: {resumeFile.name}
-                    </p>
-                  )}
-                </div>
 
                 {/* Inspiration Textarea */}
                 <div>
@@ -646,7 +609,8 @@ export default function ContactSection() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || uploadProgress}
-                  className="w-full bg-dr-blue hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 md:py-4 shadow-md transition-all duration-200 min-h-[44px] text-base md:text-lg font-semibold"
+                  className="w-full disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 md:py-4 shadow-md transition-all duration-200 min-h-[44px] text-base md:text-lg font-semibold ethnocentric-title-white not-italic"
+                  style={{ backgroundColor: '#0085B7' }}
                 >
                   {isSubmitting ? (
                     <>
