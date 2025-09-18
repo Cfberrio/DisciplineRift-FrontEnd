@@ -1082,6 +1082,8 @@ export default function RegisterSection() {
         return { isValid: true, percentage: 10 };
       case 'DRRIDE':
         return { isValid: true, percentage: 100 };
+      case 'DRTEAM':
+        return { isValid: true, percentage: 50 };
       default:
         return { isValid: false, percentage: 0 };
     }
