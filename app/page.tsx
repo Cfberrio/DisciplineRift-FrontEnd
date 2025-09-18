@@ -47,8 +47,8 @@ export default function Home() {
               <AnimatedSection animation="fade-up" delay={200}>
                 <div className="mb-6 text-center">
                   <img
-                    src="/ABOUTUS.png"
-                    alt="About Us"
+                    src="/01_WHAT_IS_DR.png"
+                    alt="What is Discipline Rift"
                     className="w-auto h-12 xs:h-14 sm:h-16 object-contain mx-auto"
                   />
                 </div>
@@ -119,8 +119,8 @@ export default function Home() {
                 <AnimatedSection animation="fade-left" delay={200}>
                   <div className="mb-4 px-4 xs:px-0 about-title-mobile">
                     <img
-                      src="/ABOUTUS.png"
-                      alt="About Us"
+                      src="/01_WHAT_IS_DR.png"
+                      alt="What is Discipline Rift"
                       className="w-auto h-12 xs:h-14 sm:h-16 md:h-18 lg:h-20 object-contain"
                     />
                   </div>

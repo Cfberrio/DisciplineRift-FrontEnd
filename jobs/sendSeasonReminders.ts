@@ -232,12 +232,12 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
                 <div style="background:rgba(255,255,255,0.15);border-radius:50px;display:inline-block;padding:12px 24px;margin-bottom:16px;">
                   <span style="color:#ffffff;font-size:24px;font-weight:bold;letter-spacing:1px;">🏐 DISCIPLINE RIFT</span>
                 </div>
-                <h1 style="color:#ffffff;font-size:28px;font-weight:bold;margin:0;text-shadow:0 2px 4px rgba(0,0,0,0.2);">
-                  Tomorrow's the Big Day! ${emailData.teamName} Season Begins
-                </h1>
-                <p style="color:rgba(255,255,255,0.9);font-size:16px;margin:8px 0 0 0;">
-                  Day Before Reminder
-                </p>
+                 <h1 style="color:#ffffff;font-size:28px;font-weight:bold;margin:0;text-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                   Tomorrow's the Big Day! ${emailData.teamName} Season Begins
+                 </h1>
+                 <p style="color:rgba(255,255,255,0.9);font-size:16px;margin:8px 0 0 0;">
+                   Day Before Reminder
+                 </p>
               </td>
             </tr>
 
@@ -245,23 +245,23 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
             <tr>
               <td class="content" style="padding:40px;">
                 <div style="text-align:center;margin-bottom:32px;">
-                  <div style="background:linear-gradient(135deg, #dc2626 0%, #ef4444 100%);color:#ffffff;padding:16px 24px;border-radius:50px;display:inline-block;font-weight:bold;font-size:18px;box-shadow:0 4px 12px rgba(220,38,38,0.3);">
-                    🎉 Tomorrow's the Big Day!
-                  </div>
+                   <div style="background:linear-gradient(135deg, #dc2626 0%, #ef4444 100%);color:#ffffff;padding:16px 24px;border-radius:50px;display:inline-block;font-weight:bold;font-size:18px;box-shadow:0 4px 12px rgba(220,38,38,0.3);">
+                     🎉 Tomorrow's the Big Day!
+                   </div>
                 </div>
 
                 <p style="margin:0 0 24px 0;font-size:18px;line-height:28px;color:#374151;text-align:center;">
                   Hi <strong style="color:#1e40af;">${emailData.parentName}</strong>,
                 </p>
                 
-                <div style="background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);border-radius:12px;padding:24px;margin:0 0 32px 0;border-left:4px solid #3b82f6;">
-                  <p style="margin:0 0 16px 0;font-size:16px;line-height:26px;color:#475569;">
-                    The wait is almost over — tomorrow we kick off the Discipline Rift season for <strong style="color:#1e40af;">${emailData.teamName}</strong>!
-                  </p>
-                  <p style="margin:0;font-size:16px;line-height:26px;color:#475569;">
-                    We can't wait to see the players in action.
-                  </p>
-                </div>
+                 <div style="background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);border-radius:12px;padding:24px;margin:0 0 32px 0;border-left:4px solid #3b82f6;">
+                   <p style="margin:0 0 16px 0;font-size:16px;line-height:26px;color:#475569;">
+                     The wait is almost over — tomorrow we kick off the Discipline Rift season for <strong style="color:#1e40af;">${emailData.teamName}</strong>!
+                   </p>
+                   <p style="margin:0;font-size:16px;line-height:26px;color:#475569;">
+                     We can't wait to see the players in action.
+                   </p>
+                 </div>
 
                 <div style="background:#ffffff;border:2px solid #e5e7eb;border-radius:12px;padding:24px;margin:0 0 32px 0;">
                   <h3 style="margin:0 0 20px 0;font-size:20px;font-weight:bold;color:#1f2937;text-align:center;display:flex;align-items:center;justify-content:center;">
@@ -276,12 +276,12 @@ function createSeasonReminderEmailHtml(emailData: EmailData): string {
                 </div>
 
                 <div style="text-align:center;margin:32px 0;">
-                        <div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#ffffff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
-                          <h4 style="margin:0 0 8px 0;font-size:18px;font-weight:bold;">See you tomorrow!</h4>
-                          <p style="margin:0;font-size:16px;opacity:0.9;">
-                            Discipline Rift Team
-                          </p>
-                        </div>
+                   <div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#ffffff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
+                     <h4 style="margin:0 0 8px 0;font-size:18px;font-weight:bold;">See you tomorrow!</h4>
+                     <p style="margin:0;font-size:16px;opacity:0.9;">
+                       Discipline Rift Team
+                     </p>
+                   </div>
                 </div>
               </td>
             </tr>
@@ -320,12 +320,12 @@ export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {
   console.log('🚀 === INICIANDO JOB DE RECORDATORIOS DE TEMPORADA ===');
   
   try {
-    // Calcular fecha objetivo (hoy + 1 día en zona horaria de Nueva York)
-    const nowNY = opts?.now 
-      ? DateTime.fromJSDate(opts.now).setZone(TIMEZONE)
-      : DateTime.now().setZone(TIMEZONE);
-    
-    const targetDateNY = nowNY.plus({ days: 1 }).toISODate();
+     // Calcular fecha objetivo (hoy + 1 día en zona horaria de Nueva York)
+     const nowNY = opts?.now 
+       ? DateTime.fromJSDate(opts.now).setZone(TIMEZONE)
+       : DateTime.now().setZone(TIMEZONE);
+     
+     const targetDateNY = nowNY.plus({ days: 1 }).toISODate();
     
     console.log(`📅 Fecha actual (NY): ${nowNY.toISODate()}`);
     console.log(`🎯 Buscando sesiones que inician en: ${targetDateNY}`);
@@ -333,19 +333,30 @@ export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {
     const supabase = createSupabaseClient();
     const transporter = createEmailTransporter();
 
-    // 1. Buscar sesiones que inician exactamente en 7 días
-    console.log('🔍 Consultando sesiones...');
-    const { data: sessions, error: sessionsError } = await supabase
-      .from('session')
-      .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
-      .eq('startdate', targetDateNY)
-      .limit(1000);
+     // 1. Buscar sesiones que inician exactamente en 1 día y cuyos equipos estén activos
+     console.log('🔍 Consultando sesiones con equipos activos...');
+     const { data: sessions, error: sessionsError } = await supabase
+       .from('session')
+       .select(`
+         sessionid, 
+         teamid, 
+         startdate, 
+         enddate, 
+         starttime, 
+         endtime, 
+         daysofweek,
+         team!inner(teamid, isactive, name)
+       `)
+       .eq('startdate', targetDateNY)
+       .eq('team.isactive', true)
+       .neq('team.name', 'PICKLEBALL PINECREST LAKES')
+       .limit(1000);
 
     if (sessionsError) {
       throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
     }
 
-    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
+     console.log(`📊 Encontradas ${sessions?.length || 0} sesiones con equipos activos`);
 
     if (!sessions || sessions.length === 0) {
       console.log('✅ No hay sesiones para recordar hoy');
@@ -418,24 +429,9 @@ export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {
           continue;
         }
 
-        // 5. Buscar nombre del equipo (requerido)
-        let teamName = `Team ${session.teamid.slice(-8)}`;
-        try {
-          const { data: teamData, error: teamError } = await supabase
-            .from('team')
-            .select('name')
-            .eq('teamid', session.teamid)
-            .single();
-          
-          if (teamError) {
-            console.log(`⚠️ Error consultando equipo ${session.teamid}: ${teamError.message}`);
-          } else if (teamData) {
-            teamName = teamData.name || teamName;
-            console.log(`✅ Nombre del equipo obtenido: ${teamName}`);
-          }
-        } catch (error) {
-          console.log(`ℹ️ No se pudo obtener el nombre del equipo, usando fallback: ${teamName}`);
-        }
+         // 5. Obtener nombre del equipo (ya incluido en la consulta)
+         const teamName = session.team?.name || `Team ${session.teamid.slice(-8)}`;
+         console.log(`✅ Nombre del equipo obtenido: ${teamName}`);
 
         // 6. Construir el horario de temporada
         const scheduleHtml = buildSeasonScheduleHtml(session);
@@ -485,7 +481,7 @@ export async function runSeasonReminders(opts?: { now?: Date }): Promise<void> {
                 address: process.env.GMAIL_USER!,
               },
               to: parent.email,
-              subject: `Tomorrow's the Big Day! ${teamName} Season Begins`,
+               subject: `Tomorrow's the Big Day! ${teamName} Season Begins`,
               html: htmlContent,
               text: textContent
             };
@@ -568,3 +564,1383 @@ export async function checkSeasonRemindersConfig(): Promise<boolean> {
     return false;
   }
 }
+
+    // 1. Buscar sesiones que inician exactamente en 7 días
+    console.log('🔍 Consultando sesiones...');
+
+    const { data: sessions, error: sessionsError } = await supabase
+
+      .from('session')
+
+      .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
+
+      .eq('startdate', targetDateNY)
+
+      .limit(1000);
+
+
+
+    if (sessionsError) {
+
+      throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
+
+    }
+
+
+
+    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
+
+
+
+    if (!sessions || sessions.length === 0) {
+
+      console.log('✅ No hay sesiones para recordar hoy');
+
+      return;
+
+    }
+
+
+
+    const emailsSent = new Set<string>(); // Para deduplicar emails por (parentid|sessionid)
+
+    let totalEmailsSent = 0;
+
+    let totalErrors = 0;
+
+
+
+    // Procesar cada sesión
+
+    for (const session of sessions) {
+
+      console.log(`\n🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
+
+
+
+      try {
+
+        // 2. Buscar inscripciones activas para este equipo
+
+        const { data: enrollments, error: enrollmentsError } = await supabase
+
+          .from('enrollment')
+
+          .select('enrollmentid, studentid')
+
+          .eq('teamid', session.teamid)
+
+          .eq('isactive', true)
+
+          .limit(10000);
+
+
+
+        if (enrollmentsError) {
+
+          console.error(`❌ Error consultando inscripciones: ${enrollmentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!enrollments || enrollments.length === 0) {
+
+          console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);
+
+          continue;
+
+        }
+
+
+
+        console.log(`👥 Encontradas ${enrollments.length} inscripciones activas`);
+
+
+
+        // 3. Buscar estudiantes
+
+        const studentIds = enrollments.map(e => e.studentid);
+
+        const { data: students, error: studentsError } = await supabase
+
+          .from('student')
+
+          .select('studentid, parentid, firstname, lastname')
+
+          .in('studentid', studentIds);
+
+
+
+        if (studentsError) {
+
+          console.error(`❌ Error consultando estudiantes: ${studentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!students || students.length === 0) {
+
+          console.log(`ℹ️ No se encontraron estudiantes`);
+
+          continue;
+
+        }
+
+
+
+        // 4. Buscar padres
+
+        const parentIds = [...new Set(students.map(s => s.parentid))];
+
+        const { data: parents, error: parentsError } = await supabase
+
+          .from('parent')
+
+          .select('parentid, firstname, lastname, email')
+
+          .in('parentid', parentIds);
+
+
+
+        if (parentsError) {
+
+          console.error(`❌ Error consultando padres: ${parentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!parents || parents.length === 0) {
+
+          console.log(`ℹ️ No se encontraron padres`);
+
+          continue;
+
+        }
+
+
+
+        // 5. Buscar nombre del equipo (requerido)
+        let teamName = `Team ${session.teamid.slice(-8)}`;
+        try {
+
+          const { data: teamData, error: teamError } = await supabase
+            .from('team')
+
+            .select('name')
+            .eq('teamid', session.teamid)
+
+            .single();
+
+          
+
+          if (teamError) {
+            console.log(`⚠️ Error consultando equipo ${session.teamid}: ${teamError.message}`);
+          } else if (teamData) {
+            teamName = teamData.name || teamName;
+            console.log(`✅ Nombre del equipo obtenido: ${teamName}`);
+          }
+
+        } catch (error) {
+
+          console.log(`ℹ️ No se pudo obtener el nombre del equipo, usando fallback: ${teamName}`);
+
+        }
+
+
+
+        // 6. Construir el horario de temporada
+
+        const scheduleHtml = buildSeasonScheduleHtml(session);
+
+
+
+        // 7. Enviar emails (deduplicando por parent + session)
+
+        for (const parent of parents) {
+
+          if (!parent.email) {
+
+            console.log(`⚠️ Padre ${parent.parentid} sin email, saltando`);
+
+            continue;
+
+          }
+
+
+
+          const emailKey = `${parent.parentid}|${session.sessionid}`;
+
+          if (emailsSent.has(emailKey)) {
+
+            console.log(`🔄 Email ya enviado a padre ${parent.parentid} para sesión ${session.sessionid}`);
+
+            continue;
+
+          }
+
+
+
+          // Registrar intento antes de enviar
+
+          const scheduledTime = nowNY.toJSDate();
+
+          await registerReminderAttempt(
+
+            session.sessionid,
+
+            parent.parentid,
+
+            'season_reminder',
+
+            scheduledTime,
+
+            'pending'
+
+          );
+
+
+
+          try {
+
+            const startDate = DateTime.fromISO(session.startdate, { zone: TIMEZONE })
+
+              .toLocaleString(DateTime.DATE_FULL, { locale: 'en-US' });
+
+
+            const emailData: EmailData = {
+
+              parentName: parent.firstname,
+
+              teamName,
+
+              startDate,
+
+              scheduleHtml
+
+            };
+
+
+
+            const htmlContent = createSeasonReminderEmailHtml(emailData);
+
+            const textContent = htmlContent
+
+              .replace(/<[^>]*>/g, '') // Remover tags HTML
+
+              .replace(/{{scheduleHtml}}/g, scheduleHtml.replace(/<li>/g, '- ').replace(/<\/li>/g, '\n'));
+
+
+
+            const mailOptions = {
+
+              from: {
+
+                name: 'Discipline Rift',
+
+                address: process.env.GMAIL_USER!,
+
+              },
+
+              to: parent.email,
+
+              subject: `Just 1 Week Until ${teamName} Season Kickoff!`,
+              html: htmlContent,
+
+              text: textContent
+
+            };
+
+
+
+            const result = await transporter.sendMail(mailOptions);
+
+            console.log(`✅ Email enviado a ${parent.email} (${result.messageId})`);
+
+            
+
+            // Marcar intento como exitoso
+
+            await updateReminderAttemptStatus(
+
+              session.sessionid,
+
+              parent.parentid,
+
+              'season_reminder',
+
+              'sent',
+
+              undefined,
+
+              result.messageId
+
+            );
+
+            
+
+            emailsSent.add(emailKey);
+
+            totalEmailsSent++;
+
+
+
+          } catch (emailError) {
+
+            console.error(`❌ Error enviando email a ${parent.email}:`, emailError);
+
+            
+
+            // Marcar intento como fallido
+
+            await updateReminderAttemptStatus(
+
+              session.sessionid,
+
+              parent.parentid,
+
+              'season_reminder',
+
+              'failed',
+
+              emailError instanceof Error ? emailError.message : 'Unknown email error'
+
+            );
+
+            
+
+            totalErrors++;
+
+          }
+
+        }
+
+
+
+      } catch (sessionError) {
+
+        console.error(`❌ Error procesando sesión ${session.sessionid}:`, sessionError);
+
+        totalErrors++;
+
+      }
+
+    }
+
+
+
+    // Resumen final
+
+    console.log('\n📊 === RESUMEN DEL JOB ===');
+
+    console.log(`🎯 Sesiones procesadas: ${sessions.length}`);
+
+    console.log(`📧 Emails enviados: ${totalEmailsSent}`);
+
+    console.log(`❌ Errores: ${totalErrors}`);
+
+    console.log('✅ Job completado exitosamente');
+
+
+
+  } catch (error) {
+
+    console.error('💥 Error fatal en el job de recordatorios de temporada:', error);
+
+    throw error;
+
+  }
+
+}
+
+
+
+// Función para verificar la configuración antes de ejecutar
+
+export async function checkSeasonRemindersConfig(): Promise<boolean> {
+
+  try {
+
+    // Verificar Supabase
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    
+
+    if (!supabaseUrl || !supabaseKey) {
+
+      console.error('❌ Configuración de Supabase faltante');
+
+      console.error('  Requeridas: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY');
+
+      return false;
+
+    }
+
+
+
+    // Verificar Gmail
+
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+
+      console.error('❌ Configuración de Gmail faltante');
+
+      console.error('  Requeridas: GMAIL_USER, GMAIL_APP_PASSWORD');
+
+      return false;
+
+    }
+
+
+
+    console.log('✅ Configuración validada correctamente');
+
+    return true;
+
+  } catch (error) {
+
+    console.error('❌ Error verificando configuración:', error);
+
+    return false;
+
+  }
+
+}
+
+
+
+    // 1. Buscar sesiones que inician exactamente en 7 días
+    console.log('🔍 Consultando sesiones...');
+
+    const { data: sessions, error: sessionsError } = await supabase
+
+      .from('session')
+
+      .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
+
+      .eq('startdate', targetDateNY)
+
+      .limit(1000);
+
+
+
+    if (sessionsError) {
+
+      throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
+
+    }
+
+
+
+    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
+
+
+
+    if (!sessions || sessions.length === 0) {
+
+      console.log('✅ No hay sesiones para recordar hoy');
+
+      return;
+
+    }
+
+
+
+    const emailsSent = new Set<string>(); // Para deduplicar emails por (parentid|sessionid)
+
+    let totalEmailsSent = 0;
+
+    let totalErrors = 0;
+
+
+
+    // Procesar cada sesión
+
+    for (const session of sessions) {
+
+      console.log(`\n🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
+
+
+
+      try {
+
+        // 2. Buscar inscripciones activas para este equipo
+
+        const { data: enrollments, error: enrollmentsError } = await supabase
+
+          .from('enrollment')
+
+          .select('enrollmentid, studentid')
+
+          .eq('teamid', session.teamid)
+
+          .eq('isactive', true)
+
+          .limit(10000);
+
+
+
+        if (enrollmentsError) {
+
+          console.error(`❌ Error consultando inscripciones: ${enrollmentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!enrollments || enrollments.length === 0) {
+
+          console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);
+
+          continue;
+
+        }
+
+
+
+        console.log(`👥 Encontradas ${enrollments.length} inscripciones activas`);
+
+
+
+        // 3. Buscar estudiantes
+
+        const studentIds = enrollments.map(e => e.studentid);
+
+        const { data: students, error: studentsError } = await supabase
+
+          .from('student')
+
+          .select('studentid, parentid, firstname, lastname')
+
+          .in('studentid', studentIds);
+
+
+
+        if (studentsError) {
+
+          console.error(`❌ Error consultando estudiantes: ${studentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!students || students.length === 0) {
+
+          console.log(`ℹ️ No se encontraron estudiantes`);
+
+          continue;
+
+        }
+
+
+
+        // 4. Buscar padres
+
+        const parentIds = [...new Set(students.map(s => s.parentid))];
+
+        const { data: parents, error: parentsError } = await supabase
+
+          .from('parent')
+
+          .select('parentid, firstname, lastname, email')
+
+          .in('parentid', parentIds);
+
+
+
+        if (parentsError) {
+
+          console.error(`❌ Error consultando padres: ${parentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!parents || parents.length === 0) {
+
+          console.log(`ℹ️ No se encontraron padres`);
+
+          continue;
+
+        }
+
+
+
+        // 5. Buscar nombre del equipo (requerido)
+        let teamName = `Team ${session.teamid.slice(-8)}`;
+        try {
+
+          const { data: teamData, error: teamError } = await supabase
+            .from('team')
+
+            .select('name')
+            .eq('teamid', session.teamid)
+
+            .single();
+
+          
+
+          if (teamError) {
+            console.log(`⚠️ Error consultando equipo ${session.teamid}: ${teamError.message}`);
+          } else if (teamData) {
+            teamName = teamData.name || teamName;
+            console.log(`✅ Nombre del equipo obtenido: ${teamName}`);
+          }
+
+        } catch (error) {
+
+          console.log(`ℹ️ No se pudo obtener el nombre del equipo, usando fallback: ${teamName}`);
+
+        }
+
+
+
+        // 6. Construir el horario de temporada
+
+        const scheduleHtml = buildSeasonScheduleHtml(session);
+
+
+
+        // 7. Enviar emails (deduplicando por parent + session)
+
+        for (const parent of parents) {
+
+          if (!parent.email) {
+
+            console.log(`⚠️ Padre ${parent.parentid} sin email, saltando`);
+
+            continue;
+
+          }
+
+
+
+          const emailKey = `${parent.parentid}|${session.sessionid}`;
+
+          if (emailsSent.has(emailKey)) {
+
+            console.log(`🔄 Email ya enviado a padre ${parent.parentid} para sesión ${session.sessionid}`);
+
+            continue;
+
+          }
+
+
+
+          // Registrar intento antes de enviar
+
+          const scheduledTime = nowNY.toJSDate();
+
+          await registerReminderAttempt(
+
+            session.sessionid,
+
+            parent.parentid,
+
+            'season_reminder',
+
+            scheduledTime,
+
+            'pending'
+
+          );
+
+
+
+          try {
+
+            const startDate = DateTime.fromISO(session.startdate, { zone: TIMEZONE })
+
+              .toLocaleString(DateTime.DATE_FULL, { locale: 'en-US' });
+
+
+            const emailData: EmailData = {
+
+              parentName: parent.firstname,
+
+              teamName,
+
+              startDate,
+
+              scheduleHtml
+
+            };
+
+
+
+            const htmlContent = createSeasonReminderEmailHtml(emailData);
+
+            const textContent = htmlContent
+
+              .replace(/<[^>]*>/g, '') // Remover tags HTML
+
+              .replace(/{{scheduleHtml}}/g, scheduleHtml.replace(/<li>/g, '- ').replace(/<\/li>/g, '\n'));
+
+
+
+            const mailOptions = {
+
+              from: {
+
+                name: 'Discipline Rift',
+
+                address: process.env.GMAIL_USER!,
+
+              },
+
+              to: parent.email,
+
+              subject: `Just 1 Week Until ${teamName} Season Kickoff!`,
+              html: htmlContent,
+
+              text: textContent
+
+            };
+
+
+
+            const result = await transporter.sendMail(mailOptions);
+
+            console.log(`✅ Email enviado a ${parent.email} (${result.messageId})`);
+
+            
+
+            // Marcar intento como exitoso
+
+            await updateReminderAttemptStatus(
+
+              session.sessionid,
+
+              parent.parentid,
+
+              'season_reminder',
+
+              'sent',
+
+              undefined,
+
+              result.messageId
+
+            );
+
+            
+
+            emailsSent.add(emailKey);
+
+            totalEmailsSent++;
+
+
+
+          } catch (emailError) {
+
+            console.error(`❌ Error enviando email a ${parent.email}:`, emailError);
+
+            
+
+            // Marcar intento como fallido
+
+            await updateReminderAttemptStatus(
+
+              session.sessionid,
+
+              parent.parentid,
+
+              'season_reminder',
+
+              'failed',
+
+              emailError instanceof Error ? emailError.message : 'Unknown email error'
+
+            );
+
+            
+
+            totalErrors++;
+
+          }
+
+        }
+
+
+
+      } catch (sessionError) {
+
+        console.error(`❌ Error procesando sesión ${session.sessionid}:`, sessionError);
+
+        totalErrors++;
+
+      }
+
+    }
+
+
+
+    // Resumen final
+
+    console.log('\n📊 === RESUMEN DEL JOB ===');
+
+    console.log(`🎯 Sesiones procesadas: ${sessions.length}`);
+
+    console.log(`📧 Emails enviados: ${totalEmailsSent}`);
+
+    console.log(`❌ Errores: ${totalErrors}`);
+
+    console.log('✅ Job completado exitosamente');
+
+
+
+  } catch (error) {
+
+    console.error('💥 Error fatal en el job de recordatorios de temporada:', error);
+
+    throw error;
+
+  }
+
+}
+
+
+
+// Función para verificar la configuración antes de ejecutar
+
+export async function checkSeasonRemindersConfig(): Promise<boolean> {
+
+  try {
+
+    // Verificar Supabase
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    
+
+    if (!supabaseUrl || !supabaseKey) {
+
+      console.error('❌ Configuración de Supabase faltante');
+
+      console.error('  Requeridas: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY');
+
+      return false;
+
+    }
+
+
+
+    // Verificar Gmail
+
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+
+      console.error('❌ Configuración de Gmail faltante');
+
+      console.error('  Requeridas: GMAIL_USER, GMAIL_APP_PASSWORD');
+
+      return false;
+
+    }
+
+
+
+    console.log('✅ Configuración validada correctamente');
+
+    return true;
+
+  } catch (error) {
+
+    console.error('❌ Error verificando configuración:', error);
+
+    return false;
+
+  }
+
+}
+
+
+
+    // 1. Buscar sesiones que inician exactamente en 7 días
+    console.log('🔍 Consultando sesiones...');
+
+    const { data: sessions, error: sessionsError } = await supabase
+
+      .from('session')
+
+      .select('sessionid, teamid, startdate, enddate, starttime, endtime, daysofweek')
+
+      .eq('startdate', targetDateNY)
+
+      .limit(1000);
+
+
+
+    if (sessionsError) {
+
+      throw new Error(`Error consultando sesiones: ${sessionsError.message}`);
+
+    }
+
+
+
+    console.log(`📊 Encontradas ${sessions?.length || 0} sesiones`);
+
+
+
+    if (!sessions || sessions.length === 0) {
+
+      console.log('✅ No hay sesiones para recordar hoy');
+
+      return;
+
+    }
+
+
+
+    const emailsSent = new Set<string>(); // Para deduplicar emails por (parentid|sessionid)
+
+    let totalEmailsSent = 0;
+
+    let totalErrors = 0;
+
+
+
+    // Procesar cada sesión
+
+    for (const session of sessions) {
+
+      console.log(`\n🏐 Procesando sesión ${session.sessionid} del equipo ${session.teamid}`);
+
+
+
+      try {
+
+        // 2. Buscar inscripciones activas para este equipo
+
+        const { data: enrollments, error: enrollmentsError } = await supabase
+
+          .from('enrollment')
+
+          .select('enrollmentid, studentid')
+
+          .eq('teamid', session.teamid)
+
+          .eq('isactive', true)
+
+          .limit(10000);
+
+
+
+        if (enrollmentsError) {
+
+          console.error(`❌ Error consultando inscripciones: ${enrollmentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!enrollments || enrollments.length === 0) {
+
+          console.log(`ℹ️ No hay inscripciones activas para el equipo ${session.teamid}`);
+
+          continue;
+
+        }
+
+
+
+        console.log(`👥 Encontradas ${enrollments.length} inscripciones activas`);
+
+
+
+        // 3. Buscar estudiantes
+
+        const studentIds = enrollments.map(e => e.studentid);
+
+        const { data: students, error: studentsError } = await supabase
+
+          .from('student')
+
+          .select('studentid, parentid, firstname, lastname')
+
+          .in('studentid', studentIds);
+
+
+
+        if (studentsError) {
+
+          console.error(`❌ Error consultando estudiantes: ${studentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!students || students.length === 0) {
+
+          console.log(`ℹ️ No se encontraron estudiantes`);
+
+          continue;
+
+        }
+
+
+
+        // 4. Buscar padres
+
+        const parentIds = [...new Set(students.map(s => s.parentid))];
+
+        const { data: parents, error: parentsError } = await supabase
+
+          .from('parent')
+
+          .select('parentid, firstname, lastname, email')
+
+          .in('parentid', parentIds);
+
+
+
+        if (parentsError) {
+
+          console.error(`❌ Error consultando padres: ${parentsError.message}`);
+
+          totalErrors++;
+
+          continue;
+
+        }
+
+
+
+        if (!parents || parents.length === 0) {
+
+          console.log(`ℹ️ No se encontraron padres`);
+
+          continue;
+
+        }
+
+
+
+        // 5. Buscar nombre del equipo (requerido)
+        let teamName = `Team ${session.teamid.slice(-8)}`;
+        try {
+
+          const { data: teamData, error: teamError } = await supabase
+            .from('team')
+
+            .select('name')
+            .eq('teamid', session.teamid)
+
+            .single();
+
+          
+
+          if (teamError) {
+            console.log(`⚠️ Error consultando equipo ${session.teamid}: ${teamError.message}`);
+          } else if (teamData) {
+            teamName = teamData.name || teamName;
+            console.log(`✅ Nombre del equipo obtenido: ${teamName}`);
+          }
+
+        } catch (error) {
+
+          console.log(`ℹ️ No se pudo obtener el nombre del equipo, usando fallback: ${teamName}`);
+
+        }
+
+
+
+        // 6. Construir el horario de temporada
+
+        const scheduleHtml = buildSeasonScheduleHtml(session);
+
+
+
+        // 7. Enviar emails (deduplicando por parent + session)
+
+        for (const parent of parents) {
+
+          if (!parent.email) {
+
+            console.log(`⚠️ Padre ${parent.parentid} sin email, saltando`);
+
+            continue;
+
+          }
+
+
+
+          const emailKey = `${parent.parentid}|${session.sessionid}`;
+
+          if (emailsSent.has(emailKey)) {
+
+            console.log(`🔄 Email ya enviado a padre ${parent.parentid} para sesión ${session.sessionid}`);
+
+            continue;
+
+          }
+
+
+
+          // Registrar intento antes de enviar
+
+          const scheduledTime = nowNY.toJSDate();
+
+          await registerReminderAttempt(
+
+            session.sessionid,
+
+            parent.parentid,
+
+            'season_reminder',
+
+            scheduledTime,
+
+            'pending'
+
+          );
+
+
+
+          try {
+
+            const startDate = DateTime.fromISO(session.startdate, { zone: TIMEZONE })
+
+              .toLocaleString(DateTime.DATE_FULL, { locale: 'en-US' });
+
+
+            const emailData: EmailData = {
+
+              parentName: parent.firstname,
+
+              teamName,
+
+              startDate,
+
+              scheduleHtml
+
+            };
+
+
+
+            const htmlContent = createSeasonReminderEmailHtml(emailData);
+
+            const textContent = htmlContent
+
+              .replace(/<[^>]*>/g, '') // Remover tags HTML
+
+              .replace(/{{scheduleHtml}}/g, scheduleHtml.replace(/<li>/g, '- ').replace(/<\/li>/g, '\n'));
+
+
+
+            const mailOptions = {
+
+              from: {
+
+                name: 'Discipline Rift',
+
+                address: process.env.GMAIL_USER!,
+
+              },
+
+              to: parent.email,
+
+              subject: `Just 1 Week Until ${teamName} Season Kickoff!`,
+              html: htmlContent,
+
+              text: textContent
+
+            };
+
+
+
+            const result = await transporter.sendMail(mailOptions);
+
+            console.log(`✅ Email enviado a ${parent.email} (${result.messageId})`);
+
+            
+
+            // Marcar intento como exitoso
+
+            await updateReminderAttemptStatus(
+
+              session.sessionid,
+
+              parent.parentid,
+
+              'season_reminder',
+
+              'sent',
+
+              undefined,
+
+              result.messageId
+
+            );
+
+            
+
+            emailsSent.add(emailKey);
+
+            totalEmailsSent++;
+
+
+
+          } catch (emailError) {
+
+            console.error(`❌ Error enviando email a ${parent.email}:`, emailError);
+
+            
+
+            // Marcar intento como fallido
+
+            await updateReminderAttemptStatus(
+
+              session.sessionid,
+
+              parent.parentid,
+
+              'season_reminder',
+
+              'failed',
+
+              emailError instanceof Error ? emailError.message : 'Unknown email error'
+
+            );
+
+            
+
+            totalErrors++;
+
+          }
+
+        }
+
+
+
+      } catch (sessionError) {
+
+        console.error(`❌ Error procesando sesión ${session.sessionid}:`, sessionError);
+
+        totalErrors++;
+
+      }
+
+    }
+
+
+
+    // Resumen final
+
+    console.log('\n📊 === RESUMEN DEL JOB ===');
+
+    console.log(`🎯 Sesiones procesadas: ${sessions.length}`);
+
+    console.log(`📧 Emails enviados: ${totalEmailsSent}`);
+
+    console.log(`❌ Errores: ${totalErrors}`);
+
+    console.log('✅ Job completado exitosamente');
+
+
+
+  } catch (error) {
+
+    console.error('💥 Error fatal en el job de recordatorios de temporada:', error);
+
+    throw error;
+
+  }
+
+}
+
+
+
+// Función para verificar la configuración antes de ejecutar
+
+export async function checkSeasonRemindersConfig(): Promise<boolean> {
+
+  try {
+
+    // Verificar Supabase
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    
+
+    if (!supabaseUrl || !supabaseKey) {
+
+      console.error('❌ Configuración de Supabase faltante');
+
+      console.error('  Requeridas: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY');
+
+      return false;
+
+    }
+
+
+
+    // Verificar Gmail
+
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+
+      console.error('❌ Configuración de Gmail faltante');
+
+      console.error('  Requeridas: GMAIL_USER, GMAIL_APP_PASSWORD');
+
+      return false;
+
+    }
+
+
+
+    console.log('✅ Configuración validada correctamente');
+
+    return true;
+
+  } catch (error) {
+
+    console.error('❌ Error verificando configuración:', error);
+
+    return false;
+
+  }
+
+}
+
+
