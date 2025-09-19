@@ -15,15 +15,12 @@ export default function JoinTeamSection() {
     email: "",
     number: "",
     currentAddress: "",
-    sport: "",
     description: "",
   })
 
-  const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
   const [submitError, setSubmitError] = useState("")
-  const [uploadProgress, setUploadProgress] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -33,53 +30,6 @@ export default function JoinTeamSection() {
     if (submitError) setSubmitError("")
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      // Validate file type (PDF, DOC, DOCX)
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-      if (!allowedTypes.includes(file.type)) {
-        setSubmitError("Please upload a PDF, DOC, or DOCX file.")
-        return
-      }
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setSubmitError("File size must be less than 5MB.")
-        return
-      }
-      
-      setResumeFile(file)
-      setSubmitError("")
-    }
-  }
-
-  const uploadResume = async (file: File): Promise<string> => {
-    setUploadProgress(true)
-    
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/upload-resume', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Upload failed')
-      }
-
-      return result.fileUrl
-    } catch (error) {
-      console.error('Resume upload error:', error)
-      throw error
-    } finally {
-      setUploadProgress(false)
-    }
-  }
 
   const sendConfirmationEmail = async (firstName: string, email: string) => {
     try {
@@ -298,7 +248,6 @@ export default function JoinTeamSection() {
         email: "",
         number: "",
         currentAddress: "",
-        sport: "",
         description: "",
       })
       
@@ -351,7 +300,7 @@ export default function JoinTeamSection() {
             />
           </div>
           <div className="max-w-4xl mx-auto">
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white px-4 sm:px-6 md:px-8 leading-relaxed bg-white/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white px-4 sm:px-6 md:px-8 leading-relaxed bg-white/30 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">
             We’re always building a team of passionate coaches to bring energy and skill to every practice. Make a real impact on the next generation of athletes!
             
             </p>
@@ -360,7 +309,7 @@ export default function JoinTeamSection() {
 
         <div className="max-w-4xl mx-auto">
           <AnimatedSection animation="fade-up">
-            <div className="bg-white/30 backdrop-blur-md p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-lg">
+            <div className="bg-white/30 backdrop-blur-md p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg shadow-lg">
               <h3 className="text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-4 sm:mb-6 text-center">JOIN OUR DR TEAM</h3>
               
               
@@ -380,7 +329,7 @@ export default function JoinTeamSection() {
                       value={formData.firstName}
                       onChange={handleChange}
                       required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
+                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
                       placeholder="Enter your first name"
                     />
                   </div>
@@ -397,7 +346,7 @@ export default function JoinTeamSection() {
                       value={formData.lastName}
                       onChange={handleChange}
                       required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
+                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
                       placeholder="Enter your last name"
                     />
                   </div>
@@ -417,7 +366,7 @@ export default function JoinTeamSection() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
+                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -434,7 +383,7 @@ export default function JoinTeamSection() {
                       value={formData.number}
                       onChange={handleChange}
                       required
-                      className="w-full p-3 md:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
+                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
                       placeholder="(555) 123-4567"
                     />
                   </div>
@@ -471,21 +420,21 @@ export default function JoinTeamSection() {
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full p-3 md:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 resize-none"
+                    className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 resize-none"
                     placeholder="Tell us what motivates you to coach and make a difference in young athletes' lives..."
                   ></textarea>
                 </div>
 
                 {/* Success/Error Messages */}
                 {submitMessage && (
-                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl flex items-start">
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-start">
                     <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                     <span className="text-sm md:text-base">{submitMessage}</span>
                   </div>
                 )}
                 
                 {submitError && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl flex items-start">
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-start">
                     <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                     <span className="text-sm md:text-base">{submitError}</span>
                   </div>
@@ -493,19 +442,14 @@ export default function JoinTeamSection() {
 
                 <Button
                   type="submit"
-                  disabled={isSubmitting || uploadProgress}
-                  className="w-full disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl py-3 md:py-4 shadow-md transition-all duration-200 min-h-[44px] text-base md:text-lg font-semibold ethnocentric-title-white not-italic"
+                  disabled={isSubmitting}
+                  className="w-full disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg py-3 md:py-4 shadow-md transition-all duration-200 min-h-[44px] text-base md:text-lg font-semibold ethnocentric-title-white not-italic"
                   style={{ backgroundColor: '#0085B7' }}
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Submitting Application...
-                    </>
-                  ) : uploadProgress ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading Resume...
                     </>
                   ) : (
                     "APPLY NOW"

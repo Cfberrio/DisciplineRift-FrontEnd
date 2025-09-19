@@ -56,14 +56,13 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string
     const resumeFile = formData.get('resume') as File
     
-    // Validaciones obligatorias
+    // Validaciones obligatorias (sport es opcional)
     const requiredFields = {
       firstName,
       lastName,
       email,
       number,
       currentAddre,
-      sport,
       description
     }
     
@@ -76,21 +75,18 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Validar archivo PDF
-    if (!resumeFile || !(resumeFile instanceof File)) {
-      return NextResponse.json(
-        { ok: false, error: 'Resume PDF file is required' },
-        { status: 400 }
-      )
-    }
-    
-    const pdfValidation = validatePDF(resumeFile)
-    if (!pdfValidation.valid) {
-      const status = pdfValidation.error?.includes('size') ? 413 : 415
-      return NextResponse.json(
-        { ok: false, error: pdfValidation.error },
-        { status }
-      )
+    // Validar archivo PDF (opcional)
+    let hasValidResume = false
+    if (resumeFile && resumeFile instanceof File && resumeFile.size > 0) {
+      const pdfValidation = validatePDF(resumeFile)
+      if (!pdfValidation.valid) {
+        const status = pdfValidation.error?.includes('size') ? 413 : 415
+        return NextResponse.json(
+          { ok: false, error: pdfValidation.error },
+          { status }
+        )
+      }
+      hasValidResume = true
     }
     
     console.log(`✅ Validation passed for ${email}`)
@@ -102,7 +98,7 @@ export async function POST(request: NextRequest) {
       email: email.trim(),
       number: number.trim(),
       currentAddre: currentAddre.trim(),
-      sport: sport.trim(),
+      sport: sport && sport.trim() ? sport.trim() : null,
       description: description.trim(),
       resume: null
     }
@@ -133,66 +129,67 @@ export async function POST(request: NextRequest) {
     insertedId = insertedRow.id
     console.log(`✅ Application record created with ID: ${insertedId}`)
     
-    // PASO 2: Subir PDF a Supabase Storage
-    try {
-      const timestamp = Date.now()
-      const sanitizedFilename = sanitizeFilename(resumeFile.name)
-      const storagePath = `drteam/${insertedId}/${timestamp}-${sanitizedFilename}`
-      
-      console.log(`📤 Uploading PDF to: ${storagePath}`)
-      
-      // Convertir File a ArrayBuffer para la subida
-      const fileBuffer = await resumeFile.arrayBuffer()
-      
-      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-        .from('resume')
-        .upload(storagePath, fileBuffer, {
-          contentType: 'application/pdf',
-          upsert: true
+    // PASO 2: Subir PDF a Supabase Storage (solo si hay archivo)
+    if (hasValidResume) {
+      try {
+        const timestamp = Date.now()
+        const sanitizedFilename = sanitizeFilename(resumeFile.name)
+        const storagePath = `drteam/${insertedId}/${timestamp}-${sanitizedFilename}`
+        
+        console.log(`📤 Uploading PDF to: ${storagePath}`)
+        
+        // Convertir File a ArrayBuffer para la subida
+        const fileBuffer = await resumeFile.arrayBuffer()
+        
+        const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+          .from('resume')
+          .upload(storagePath, fileBuffer, {
+            contentType: 'application/pdf',
+            upsert: true
+          })
+        
+        if (uploadError) {
+          console.error('❌ Storage upload error:', uploadError)
+          throw new Error(`Failed to upload PDF: ${uploadError.message}`)
+        }
+        
+        console.log(`✅ PDF uploaded successfully: ${uploadData.path}`)
+        
+        // PASO 3: Actualizar la fila con la ruta del archivo
+        const { error: updateError } = await supabaseAdmin
+          .from('Drteam')
+          .update({
+            resume: uploadData.path
+          })
+          .eq('id', insertedId)
+        
+        if (updateError) {
+          console.error('❌ Database update error:', updateError)
+          throw new Error(`Failed to update resume path: ${updateError.message}`)
+        }
+        
+        console.log(`✅ Database updated with resume path`)
+        
+        // PASO 4: Generar URL pública
+        const { data: publicUrlData } = supabaseAdmin.storage
+          .from('resume')
+          .getPublicUrl(uploadData.path)
+        
+        const publicUrl = publicUrlData.publicUrl
+        
+        console.log(`🎉 Application submission completed successfully`)
+        console.log(`📄 Resume accessible at: ${publicUrl}`)
+        
+        // Respuesta de éxito con archivo
+        return NextResponse.json({
+          ok: true,
+          id: insertedId,
+          resume_path: uploadData.path,
+          publicUrl: publicUrl
         })
-      
-      if (uploadError) {
-        console.error('❌ Storage upload error:', uploadError)
-        throw new Error(`Failed to upload PDF: ${uploadError.message}`)
-      }
-      
-      console.log(`✅ PDF uploaded successfully: ${uploadData.path}`)
-      
-      // PASO 3: Actualizar la fila con la ruta del archivo
-      const { error: updateError } = await supabaseAdmin
-        .from('Drteam')
-        .update({
-          resume: uploadData.path
-        })
-        .eq('id', insertedId)
-      
-      if (updateError) {
-        console.error('❌ Database update error:', updateError)
-        throw new Error(`Failed to update resume path: ${updateError.message}`)
-      }
-      
-      console.log(`✅ Database updated with resume path`)
-      
-      // PASO 4: Generar URL pública
-      const { data: publicUrlData } = supabaseAdmin.storage
-        .from('resume')
-        .getPublicUrl(uploadData.path)
-      
-      const publicUrl = publicUrlData.publicUrl
-      
-      console.log(`🎉 Application submission completed successfully`)
-      console.log(`📄 Resume accessible at: ${publicUrl}`)
-      
-      // Respuesta de éxito
-      return NextResponse.json({
-        ok: true,
-        id: insertedId,
-        resume_path: uploadData.path,
-        publicUrl: publicUrl
-      })
-      
-    } catch (storageError) {
-      console.error('❌ Storage operation failed:', storageError)
+        
+      } catch (storageError) {
+        console.error('❌ Storage operation failed:', storageError)
       
       // ROLLBACK: Eliminar la fila insertada si la subida falló
       if (insertedId) {
@@ -208,13 +205,23 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: storageError instanceof Error ? storageError.message : 'File upload failed'
-        },
-        { status: 500 }
-      )
+        return NextResponse.json(
+          { 
+            ok: false, 
+            error: storageError instanceof Error ? storageError.message : 'File upload failed'
+          },
+          { status: 500 }
+        )
+      }
+    } else {
+      // No hay archivo de resume, aplicación completada sin archivo
+      console.log(`🎉 Application submission completed successfully (without resume)`)
+      return NextResponse.json({
+        ok: true,
+        id: insertedId,
+        resume_path: null,
+        publicUrl: null
+      })
     }
     
   } catch (error) {
@@ -248,7 +255,8 @@ export async function GET() {
   return NextResponse.json({
     message: 'Application submission endpoint is available',
     methods: ['POST'],
-    fields: ['firstName', 'lastName', 'email', 'number', 'currentAddre', 'sport', 'description', 'resume'],
+    requiredFields: ['firstName', 'lastName', 'email', 'number', 'currentAddre', 'description'],
+    optionalFields: ['sport', 'resume'],
     maxFileSize: '10MB',
     acceptedTypes: ['application/pdf']
   })
