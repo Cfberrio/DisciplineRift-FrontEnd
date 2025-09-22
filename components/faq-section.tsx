@@ -51,23 +51,12 @@ export default function FAQSection() {
         "Participants should bring appropriate athletic clothing, sport-specific shoes, a water bottle, and a small towel. For volleyball, knee pads are recommended. For tennis, players should bring their racquet if they have one (we can provide equipment if needed). For pickleball, we provide all necessary equipment.",
     },
     {
-      category: "COACHES",
-      question: "ARE YOUR COACHES CERTIFIED?",
-      answer:
-        "All our coaches are certified in their respective sports and have undergone background checks. Many of our coaches are former collegiate or professional athletes with years of coaching experience. They are trained in age-appropriate coaching techniques and safety protocols.",
-    },
-    {
       category: "PROGRAMS",
       question: "HOW ARE PLAYERS GROUPED DURING TRAINING?",
       answer:
         "Players are grouped primarily by age and skill level to ensure appropriate development and challenge. We conduct skill assessments at the beginning of each program to place participants in the most suitable group. Adjustments can be made throughout the program if needed.",
     },
-    {
-      category: "POLICIES",
-      question: "WHAT SAFETY MEASURES DO YOU HAVE IN PLACE?",
-      answer:
-        "Safety is our top priority. All coaches are First Aid and CPR certified. We maintain appropriate coach-to-player ratios, enforce proper warm-up protocols, and have emergency action plans in place. Our facilities are regularly inspected for safety hazards.",
-    },
+    
     {
       category: "PROGRAMS",
       question: "CAN PARENTS WATCH THE TRAINING SESSIONS?",
