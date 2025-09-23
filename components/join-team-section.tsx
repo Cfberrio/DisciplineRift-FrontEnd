@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Image from "next/image"
-import { MapPin, User, Mail, Calendar, Loader2, CheckCircle, AlertCircle } from "lucide-react"
+import { MapPin, User, Mail, Calendar, Loader2, CheckCircle, AlertCircle, Upload, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import AnimatedSection from "@/components/animated-section"
 
@@ -17,6 +17,8 @@ export default function JoinTeamSection() {
     currentAddress: "",
     description: "",
   })
+  
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
@@ -30,6 +32,371 @@ export default function JoinTeamSection() {
     if (submitError) setSubmitError("")
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    
+    if (file) {
+      // Validar tipo de archivo
+      if (file.type !== 'application/pdf') {
+        setSubmitError("Solo se permiten archivos PDF para el resume.")
+        setTimeout(() => setSubmitError(""), 5000)
+        return
+      }
+      
+      // Validar tamaño de archivo (10MB máximo)
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        setSubmitError("El archivo debe ser menor a 10MB.")
+        setTimeout(() => setSubmitError(""), 5000)
+        return
+      }
+      
+      setResumeFile(file)
+      console.log('Resume file selected:', file.name, file.size, 'bytes')
+    } else {
+      setResumeFile(null)
+    }
+    
+    // Clear any previous messages
+    if (submitMessage) setSubmitMessage("")
+    if (submitError) setSubmitError("")
+  }
+
+
+  const sendNotificationEmail = async (applicationData: any, hasResume: boolean) => {
+    try {
+      console.log('Sending notification email to admin...')
+      
+      const notificationTemplate = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🔥 NEW COACH APPLICATION - Discipline Rift</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+    
+    :root {
+      --bg: #0a0a0f;
+      --card: #1a1a2e;
+      --text: #ffffff;
+      --muted: #a0a9c0;
+      --border: #16213e;
+      --accent1: #ff6b35;
+      --accent2: #00d4ff;
+      --accent3: #f7931e;
+      --success: #00ff88;
+      --warning: #ffd700;
+      --danger: #ff3366;
+      --glow: 0 0 20px rgba(255, 107, 53, 0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+    body {
+      margin: 0; padding: 20px; 
+      background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0f 70%);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 800px; margin: 0 auto;
+      background: var(--card);
+      border-radius: 24px;
+      border: 2px solid var(--border);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4), var(--glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 8px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3), var(--success));
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .header {
+      text-align: center; padding: 40px 30px 20px;
+      background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(0,212,255,0.1));
+      position: relative;
+    }
+
+    .urgent-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--danger), #ff6b35);
+      color: white; padding: 12px 24px; border-radius: 30px;
+      font-weight: 700; font-size: 16px; margin-bottom: 20px;
+      text-transform: uppercase; letter-spacing: 1px;
+      box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-5px); }
+      60% { transform: translateY(-3px); }
+    }
+
+    .title {
+      font-family: 'Orbitron', monospace;
+      font-size: 48px; font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--accent2), var(--accent1), var(--success));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 10px;
+      text-shadow: 0 0 30px rgba(0,212,255,0.5);
+    }
+
+    .subtitle {
+      font-size: 20px; color: var(--accent2); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    .applicant-name {
+      font-size: 28px; font-weight: 700; color: var(--warning);
+      margin: 20px 0; text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, var(--bg), rgba(26,26,46,0.8));
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      border-color: var(--accent2);
+      box-shadow: 0 10px 25px rgba(0,212,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .info-label {
+      font-size: 11px; font-weight: 700; color: var(--accent2);
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+    }
+
+    .info-value {
+      font-size: 16px; font-weight: 600; color: var(--text);
+      word-break: break-word;
+    }
+
+    .inspiration-section {
+      background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(0,212,255,0.1));
+      border: 2px solid var(--accent1);
+      border-radius: 20px; padding: 25px; margin: 30px 0;
+      position: relative;
+    }
+
+    .inspiration-section::before {
+      content: "💭";
+      position: absolute;
+      top: -15px; left: 25px;
+      background: var(--card);
+      padding: 0 10px;
+      font-size: 24px;
+    }
+
+    .inspiration-title {
+      font-size: 16px; font-weight: 700; color: var(--accent1);
+      margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .inspiration-text {
+      font-size: 16px; line-height: 1.7; color: var(--text);
+      font-style: italic; padding: 15px 0;
+      border-left: 4px solid var(--accent2);
+      padding-left: 20px;
+    }
+
+    .resume-banner {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 20px; border-radius: 15px; font-weight: 700; font-size: 18px;
+      margin: 25px 0; text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .resume-yes {
+      background: linear-gradient(135deg, var(--success), #00cc6a);
+      color: #000; box-shadow: 0 10px 25px rgba(0,255,136,0.3);
+    }
+
+    .resume-no {
+      background: linear-gradient(135deg, var(--muted), #6b7280);
+      color: var(--text);
+    }
+
+    .action-section {
+      text-align: center; margin: 40px 0 20px;
+      padding: 30px; background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(255,107,53,0.1));
+      border-radius: 20px; border: 2px solid var(--accent2);
+    }
+
+    .action-text {
+      font-size: 18px; font-weight: 600; color: var(--accent2);
+      margin-bottom: 15px;
+    }
+
+    .dashboard-link {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: white; padding: 15px 30px; border-radius: 25px;
+      text-decoration: none; font-weight: 700; font-size: 16px;
+      text-transform: uppercase; letter-spacing: 1px;
+      box-shadow: 0 8px 25px rgba(255,107,53,0.4);
+      transition: all 0.3s ease;
+    }
+
+    .footer {
+      text-align: center; padding: 30px;
+      border-top: 2px solid var(--border);
+      background: var(--bg);
+    }
+
+    .timestamp {
+      font-size: 14px; color: var(--muted); font-family: 'Orbitron', monospace;
+      background: var(--card); padding: 12px 20px; border-radius: 10px;
+      display: inline-block; border: 1px solid var(--border);
+    }
+
+    .pulse-dot {
+      display: inline-block;
+      width: 8px; height: 8px; background: var(--success);
+      border-radius: 50%; margin-right: 8px;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .container { border-radius: 16px; }
+      .title { font-size: 32px; }
+      .info-grid { grid-template-columns: 1fr; gap: 15px; }
+      .header, .content { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="urgent-badge">
+        🔥 URGENT: NEW APPLICATION
+      </div>
+      <h1 class="title">DISCIPLINE RIFT</h1>
+      <p class="subtitle">Coach Recruitment Alert</p>
+      <div class="applicant-name">${applicationData.firstName} ${applicationData.lastName}</div>
+    </div>
+
+    <div class="content">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-label">📧 Email Address</div>
+          <div class="info-value">${applicationData.email}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-label">📱 Phone Number</div>
+          <div class="info-value">${applicationData.number}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-label">📍 Location</div>
+          <div class="info-value">${applicationData.currentAddress}</div>
+        </div>
+        <div class="info-card">
+          <div class="info-label">⏰ Application Time</div>
+          <div class="info-value">${new Date().toLocaleString('en-US', { 
+            timeZone: 'America/New_York',
+            year: 'numeric',
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          })}</div>
+        </div>
+      </div>
+
+      <div class="inspiration-section">
+        <div class="inspiration-title">🎯 Coaching Inspiration</div>
+        <p class="inspiration-text">"${applicationData.description}"</p>
+      </div>
+
+      <div class="resume-banner ${hasResume ? 'resume-yes' : 'resume-no'}">
+        ${hasResume ? '✅ Resume Attached - Ready for Review' : '📋 No Resume Attached'}
+      </div>
+
+      <div class="action-section">
+        <p class="action-text">
+          <span class="pulse-dot"></span>
+          New Coach Application Ready for Review
+        </p>
+        <a href="#" class="dashboard-link">View Full Application</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="timestamp">
+        Application received: ${new Date().toLocaleString('en-US', { 
+          timeZone: 'America/New_York',
+          year: 'numeric',
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        })}
+      </div>
+    </div>
+  </div>
+</body>
+</html>`
+
+      const response = await fetch('/api/send-confirmation-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: 'info@disciplinerift.com',
+          subject: `🔥 URGENT: New Coach Application - ${applicationData.firstName} ${applicationData.lastName}`,
+          htmlContent: notificationTemplate
+        })
+      })
+
+      const responseData = await response.json()
+      
+      if (!response.ok) {
+        console.error('Notification email failed:', responseData)
+        return { success: false, error: responseData.message }
+      }
+
+      console.log('✅ Notification email sent successfully to admin')
+      return { success: true }
+      
+    } catch (error) {
+      console.error('Error sending notification email:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
 
   const sendConfirmationEmail = async (firstName: string, email: string) => {
     try {
@@ -218,6 +585,12 @@ export default function JoinTeamSection() {
       submitFormData.append('currentAddre', formData.currentAddress.trim()) // Mantener typo como en BD
       submitFormData.append('description', formData.description.trim())
       
+      // Agregar archivo de resume si existe
+      if (resumeFile) {
+        submitFormData.append('resume', resumeFile)
+        console.log('📎 Resume file added to form data:', resumeFile.name)
+      }
+      
       console.log('📤 Submitting to /api/apply endpoint...')
       
       // Enviar a nuevo endpoint
@@ -238,6 +611,12 @@ export default function JoinTeamSection() {
       
       console.log('✅ Application submitted successfully:', result)
       
+      // Send notification email to admin
+      const notificationResult = await sendNotificationEmail(formData, !!resumeFile)
+      if (!notificationResult.success) {
+        console.warn('⚠️ Failed to send notification email to admin:', notificationResult.error)
+      }
+      
       // Send confirmation email after successful submission
       const emailResult = await sendConfirmationEmail(formData.firstName.trim(), formData.email.trim())
       
@@ -250,6 +629,13 @@ export default function JoinTeamSection() {
         currentAddress: "",
         description: "",
       })
+      setResumeFile(null)
+      
+      // Reset file input
+      const fileInput = document.getElementById('resume') as HTMLInputElement
+      if (fileInput) {
+        fileInput.value = ''
+      }
       
       // Personalizar mensaje según el resultado del email
       if (emailResult.success) {
@@ -423,6 +809,33 @@ export default function JoinTeamSection() {
                     className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 resize-none"
                     placeholder="Tell us what motivates you to coach and make a difference in young athletes' lives..."
                   ></textarea>
+                </div>
+
+                {/* Resume Upload */}
+                <div>
+                  <label htmlFor="resume" className="block text-gray-700 font-medium mb-2">
+                    <FileText className="inline h-4 w-4 mr-2" />
+                    Upload Resume (Optional)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id="resume"
+                      name="resume"
+                      accept=".pdf"
+                      onChange={handleFileChange}
+                      className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-dr-blue/10 file:text-dr-blue hover:file:bg-dr-blue/20 cursor-pointer min-h-[44px]"
+                    />
+                    {resumeFile && (
+                      <div className="mt-2 flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
+                        <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                        <span>Archivo seleccionado: {resumeFile.name} ({(resumeFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Solo archivos PDF. Tamaño máximo: 10MB.
+                  </p>
                 </div>
 
                 {/* Success/Error Messages */}
