@@ -34,10 +34,6 @@ const validateCouponServer = (code: string): { isValid: boolean; percentage: num
       return { isValid: true, percentage: 50 };
     case 'MONDAY':
       return { isValid: true, percentage: 20 };
-    case 'OCS':
-      return { isValid: true, percentage: 100 };
-    case 'OPA':
-      return { isValid: true, percentage: 100 };
     default:
       return { isValid: false, percentage: 0 };
   }
