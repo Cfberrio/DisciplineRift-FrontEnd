@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { CheckCircle, Loader2, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 export default function ConfirmedPage() {
   const router = useRouter()
@@ -75,9 +74,12 @@ export default function ConfirmedPage() {
           </div>
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Confirmation Failed</h1>
           <p className="text-gray-600 mb-6">{error}</p>
-          <Button onClick={() => router.push("/")} className="bg-blue-600 hover:bg-blue-700">
+          <button 
+            onClick={() => router.push("/")} 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition"
+          >
             Return Home
-          </Button>
+          </button>
         </div>
       </div>
     )
@@ -99,9 +101,12 @@ export default function ConfirmedPage() {
             Redirecting you to continue your registration...
           </p>
         </div>
-        <Button onClick={() => router.push("/#register")} className="bg-blue-600 hover:bg-blue-700">
+        <button 
+          onClick={() => router.push("/#register")} 
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition"
+        >
           Continue Registration Now
-        </Button>
+        </button>
       </div>
     </div>
   )
