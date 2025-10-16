@@ -14,6 +14,7 @@ export default function ContactSection() {
     email: "",
     subject: "",
     message: "",
+    company: "", // Honeypot field - should remain empty
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -57,7 +58,7 @@ export default function ContactSection() {
       console.log("Contact form submitted successfully")
       
       // Reset form on success
-      setFormData({ name: "", email: "", subject: "", message: "" })
+      setFormData({ name: "", email: "", subject: "", message: "", company: "" })
       setSubmitMessage(data.message || "Thank you for your message! We'll get back to you soon.")
       
       // Clear success message after 5 seconds
@@ -278,6 +279,20 @@ export default function ContactSection() {
                     rows={5}
                     className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80"
                   ></textarea>
+                </div>
+
+                {/* Honeypot field - hidden from users, but bots will fill it */}
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="company">Company (leave blank)</label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
                 </div>
 
                 {/* Success/Error Messages */}

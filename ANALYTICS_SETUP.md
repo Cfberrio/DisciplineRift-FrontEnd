@@ -190,3 +190,4 @@ Si tienes problemas con la configuración, revisa:
 3. Que el token de Vercel tenga permisos suficientes
 4. Los logs en la consola del navegador (F12)
 
+

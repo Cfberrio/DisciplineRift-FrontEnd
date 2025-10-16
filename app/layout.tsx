@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import V0SwFix from "@/components/v0-sw-fix"
 import { Analytics } from "@vercel/analytics/next"
+import BotIdProtection from "@/components/botid-client"
 
 export const metadata: Metadata = {
   title: "Discipline Rift - Youth Sports Development",
@@ -48,6 +49,7 @@ export default function RootLayout({
         className="antialiased"
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <BotIdProtection />
           {children}
           <V0SwFix />
           <Analytics />

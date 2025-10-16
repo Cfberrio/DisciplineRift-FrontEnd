@@ -1,6 +1,25 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from 'nodemailer';
+import { checkBotId } from 'botid/server';
+
+// List of disposable email domains to block (includes popular ones in US/Latin America)
+const DISPOSABLE_EMAIL_DOMAINS = [
+  // General disposable domains
+  'tempmail.com', 'throwaway.email', '10minutemail.com', 'guerrillamail.com',
+  'mailinator.com', 'maildrop.cc', 'trashmail.com', 'yopmail.com',
+  'temp-mail.org', 'getnada.com', 'fakeinbox.com', 'sharklasers.com',
+  'spam4.me', 'grr.la', 'dispostable.com',
+  // Popular in US
+  'guerrillamailblock.com', 'pokemail.net', 'spamgourmet.com', 'mintemail.com',
+  'emailondeck.com', 'throwawaymail.com', 'tempinbox.com', 'anonbox.net',
+  // Popular in Latin America
+  'correotemporal.org', 'emailtemporanea.com', 'emailtemporario.com.br',
+  'mohmal.com', 'mytemp.email', 'tempmail.io', 'inboxkitten.com',
+  // Other common ones
+  '10minutemail.net', '20minutemail.com', '33mail.com', 'bugmenot.com',
+  'getairmail.com', 'hidemail.de', 'incognitomail.com', 'jetable.org'
+];
 
 // Create Gmail SMTP transporter
 const createTransporter = () => {
@@ -13,31 +32,82 @@ const createTransporter = () => {
   });
 };
 
+// Validate email format and check for disposable domains
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return false;
+  
+  const domain = email.split('@')[1]?.toLowerCase();
+  return !DISPOSABLE_EMAIL_DOMAINS.includes(domain);
+};
+
+// Sanitize string to prevent injection attacks
+const sanitizeString = (str: string): string => {
+  return str.replace(/[<>]/g, '').trim();
+};
+
 export async function POST(request: Request) {
   try {
+    // STEP 1: Check BotID to detect bot traffic
+    const botResult = await checkBotId();
+    
+    // Block if it's a bot (but allow verified bots like search engines)
+    if (botResult.isBot && !botResult.isVerifiedBot) {
+      console.log("🚫 Bot detected by BotID, blocking request");
+      return NextResponse.json(
+        { message: "Request blocked" },
+        { status: 403 }
+      );
+    }
+
     const formData = await request.json();
     console.log("Contact form submission received:", formData);
 
-    // Validate required fields
-    const requiredFields = ["name", "email", "message"];
-    
-    for (const field of requiredFields) {
-      if (!formData[field] || !formData[field].trim()) {
-        return NextResponse.json(
-          { message: `${field} is required` },
-          { status: 400 }
-        );
-      }
+    // STEP 2: Check honeypot field
+    if (formData.company && formData.company.trim() !== '') {
+      console.log("🚫 Honeypot triggered - bot detected, silently ignoring");
+      // Return success to fool the bot, but don't process
+      return NextResponse.json({
+        message: "Thank you for your message! We'll get back to you soon.",
+        success: true,
+      });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    // STEP 3: Validate required fields with minimum lengths
+    if (!formData.name || formData.name.trim().length < 2) {
+      return NextResponse.json(
+        { message: "Name must be at least 2 characters long" },
+        { status: 400 }
+      );
+    }
+
+    if (!formData.email || !formData.email.trim()) {
+      return NextResponse.json(
+        { message: "Email is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!formData.message || formData.message.trim().length < 10) {
+      return NextResponse.json(
+        { message: "Message must be at least 10 characters long" },
+        { status: 400 }
+      );
+    }
+
+    // STEP 4: Validate email format and check for disposable domains
+    if (!isValidEmail(formData.email)) {
       return NextResponse.json(
         { message: "Please provide a valid email address" },
         { status: 400 }
       );
     }
+
+    // STEP 5: Sanitize inputs
+    const sanitizedName = sanitizeString(formData.name);
+    const sanitizedEmail = formData.email.trim().toLowerCase();
+    const sanitizedSubject = formData.subject ? sanitizeString(formData.subject) : "";
+    const sanitizedMessage = sanitizeString(formData.message);
 
     // Create admin client for Supabase
     const supabaseAdmin = createClient(
@@ -51,20 +121,20 @@ export async function POST(request: Request) {
       }
     );
 
-    // Prepare email content
-    const emailSubject = formData.subject 
-      ? `Contact Form: ${formData.subject}` 
+    // Prepare email content with sanitized data
+    const emailSubject = sanitizedSubject 
+      ? `Contact Form: ${sanitizedSubject}` 
       : "New Contact Form Submission";
 
     const emailBody = `
 New contact form submission from Discipline Rift website:
 
-Name: ${formData.name}
-Email: ${formData.email}
-Subject: ${formData.subject || "Not specified"}
+Name: ${sanitizedName}
+Email: ${sanitizedEmail}
+Subject: ${sanitizedSubject || "Not specified"}
 
 Message:
-${formData.message}
+${sanitizedMessage}
 
 ---
 This email was sent automatically from the Discipline Rift contact form.
@@ -88,14 +158,14 @@ Submission time: ${new Date().toLocaleString()}
 
       const transporter = createTransporter();
 
-      // Configure email options
+      // Configure email options with secure sender
       const mailOptions = {
         from: {
           name: 'Discipline Rift Contact Form',
-          address: process.env.GMAIL_USER!,
+          address: process.env.GMAIL_USER!, // Always use domain email as sender
         },
         to: 'info@disciplinerift.com',
-        replyTo: formData.email,
+        replyTo: sanitizedEmail, // User email goes in replyTo for safety
         subject: emailSubject,
         text: emailBody,
         html: `
@@ -110,15 +180,15 @@ Submission time: ${new Date().toLocaleString()}
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 120px;">Name:</td>
-                  <td style="padding: 8px 0; color: #1f2937;">${formData.name}</td>
+                  <td style="padding: 8px 0; color: #1f2937;">${sanitizedName}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; font-weight: bold; color: #374151;">Email:</td>
-                  <td style="padding: 8px 0; color: #1f2937;">${formData.email}</td>
+                  <td style="padding: 8px 0; color: #1f2937;">${sanitizedEmail}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; font-weight: bold; color: #374151;">Subject:</td>
-                  <td style="padding: 8px 0; color: #1f2937;">${formData.subject || "Not specified"}</td>
+                  <td style="padding: 8px 0; color: #1f2937;">${sanitizedSubject || "Not specified"}</td>
                 </tr>
               </table>
             </div>
@@ -126,7 +196,7 @@ Submission time: ${new Date().toLocaleString()}
             <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin-top: 20px;">
               <h3 style="color: #1f2937; margin-top: 0;">Message</h3>
               <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; border: 1px solid #e5e7eb;">
-                <p style="margin: 0; line-height: 1.6; color: #374151; white-space: pre-wrap;">${formData.message}</p>
+                <p style="margin: 0; line-height: 1.6; color: #374151; white-space: pre-wrap;">${sanitizedMessage}</p>
               </div>
             </div>
 
@@ -134,7 +204,7 @@ Submission time: ${new Date().toLocaleString()}
               <p style="margin: 0; font-size: 14px; color: #6b7280;">
                 📅 Submitted on: ${new Date().toLocaleString()}<br>
                 🌐 From: Discipline Rift Contact Form<br>
-                💬 Reply directly to this email to respond to ${formData.name}
+                💬 Reply directly to this email to respond to ${sanitizedName}
               </p>
             </div>
           </div>
@@ -146,7 +216,7 @@ Submission time: ${new Date().toLocaleString()}
       
       console.log('✅ Contact email sent successfully:', result.messageId);
       console.log('📧 Email sent to: info@disciplinerift.com');
-      console.log('👤 From user:', formData.name, '(' + formData.email + ')');
+      console.log('👤 From user:', sanitizedName, '(' + sanitizedEmail + ')');
       
       if (!result.messageId) {
         throw new Error("Email sent but no messageId received");
@@ -157,10 +227,10 @@ Submission time: ${new Date().toLocaleString()}
         await supabaseAdmin
           .from("contact_submissions")
           .insert({
-            name: formData.name,
-            email: formData.email,
-            subject: formData.subject || null,
-            message: formData.message,
+            name: sanitizedName,
+            email: sanitizedEmail,
+            subject: sanitizedSubject || null,
+            message: sanitizedMessage,
             submitted_at: new Date().toISOString(),
             status: 'sent'
           });
@@ -183,10 +253,10 @@ Submission time: ${new Date().toLocaleString()}
         await supabaseAdmin
           .from("contact_submissions")
           .insert({
-            name: formData.name,
-            email: formData.email,
-            subject: formData.subject || null,
-            message: formData.message,
+            name: sanitizedName,
+            email: sanitizedEmail,
+            subject: sanitizedSubject || null,
+            message: sanitizedMessage,
             submitted_at: new Date().toISOString(),
             status: 'failed'
           });
