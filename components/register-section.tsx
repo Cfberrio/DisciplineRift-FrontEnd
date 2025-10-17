@@ -1086,6 +1086,8 @@ export default function RegisterSection() {
         return { isValid: true, percentage: 50 };
       case 'MONDAY':
         return { isValid: true, percentage: 20 };
+      case 'THANKS':
+        return { isValid: true, percentage: 15 };
       case 'OCS':
         return { isValid: true, percentage: 100 };
       case 'OPA':

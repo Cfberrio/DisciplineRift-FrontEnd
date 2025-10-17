@@ -225,3 +225,4 @@ El formulario de aplicación ahora tiene:
 - API Handler: `app/api/apply/route.ts`
 - Protección BotID: `components/botid-client.tsx`
 
+
