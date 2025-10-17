@@ -1,8 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { checkBotId } from 'botid/server'
 
 // Configuración para el endpoint
 export const runtime = 'nodejs'
+
+// List of disposable email domains to block (includes popular ones in US/Latin America)
+const DISPOSABLE_EMAIL_DOMAINS = [
+  // General disposable domains
+  'tempmail.com', 'throwaway.email', '10minutemail.com', 'guerrillamail.com',
+  'mailinator.com', 'maildrop.cc', 'trashmail.com', 'yopmail.com',
+  'temp-mail.org', 'getnada.com', 'fakeinbox.com', 'sharklasers.com',
+  'spam4.me', 'grr.la', 'dispostable.com',
+  // Popular in US
+  'guerrillamailblock.com', 'pokemail.net', 'spamgourmet.com', 'mintemail.com',
+  'emailondeck.com', 'throwawaymail.com', 'tempinbox.com', 'anonbox.net',
+  // Popular in Latin America
+  'correotemporal.org', 'emailtemporanea.com', 'emailtemporario.com.br',
+  'mohmal.com', 'mytemp.email', 'tempmail.io', 'inboxkitten.com',
+  // Other common ones
+  '10minutemail.net', '20minutemail.com', '33mail.com', 'bugmenot.com',
+  'getairmail.com', 'hidemail.de', 'incognitomail.com', 'jetable.org'
+]
+
+// Validate email format and check for disposable domains
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) return false
+  
+  const domain = email.split('@')[1]?.toLowerCase()
+  return !DISPOSABLE_EMAIL_DOMAINS.includes(domain)
+}
+
+// Sanitize string to prevent injection attacks
+function sanitizeString(str: string): string {
+  return str.replace(/[<>]/g, '').trim()
+}
 
 // Función para sanitizar nombre de archivo
 function sanitizeFilename(filename: string): string {
@@ -41,6 +74,18 @@ export async function POST(request: NextRequest) {
   let insertedId: string | null = null
   
   try {
+    // STEP 1: Check BotID to detect bot traffic
+    const botResult = await checkBotId()
+    
+    // Block if it's a bot (but allow verified bots like search engines)
+    if (botResult.isBot && !botResult.isVerifiedBot) {
+      console.log('🚫 Bot detected by BotID, blocking application submission')
+      return NextResponse.json(
+        { ok: false, error: 'Request blocked' },
+        { status: 403 }
+      )
+    }
+
     console.log('📋 Starting application submission process...')
     
     // Parsear formulario multipart
@@ -55,25 +100,79 @@ export async function POST(request: NextRequest) {
     const sport = formData.get('sport') as string
     const description = formData.get('description') as string
     const resumeFile = formData.get('resume') as File
+    const company = formData.get('company') as string // Honeypot field
     
-    // Validaciones obligatorias (sport es opcional)
-    const requiredFields = {
-      firstName,
-      lastName,
-      email,
-      number,
-      currentAddre,
-      description
+    // STEP 2: Check honeypot field
+    if (company && company.trim() !== '') {
+      console.log('🚫 Honeypot triggered - bot detected, silently ignoring application')
+      // Return success to fool the bot, but don't process
+      return NextResponse.json({
+        ok: true,
+        id: 'ignored',
+        resume_path: null,
+        publicUrl: null
+      })
     }
     
-    for (const [field, value] of Object.entries(requiredFields)) {
-      if (!value || (typeof value === 'string' && !value.trim())) {
-        return NextResponse.json(
-          { ok: false, error: `${field} is required` },
-          { status: 400 }
-        )
-      }
+    // STEP 3: Validate required fields with minimum lengths
+    if (!firstName || firstName.trim().length < 2) {
+      return NextResponse.json(
+        { ok: false, error: 'First name must be at least 2 characters long' },
+        { status: 400 }
+      )
     }
+
+    if (!lastName || lastName.trim().length < 2) {
+      return NextResponse.json(
+        { ok: false, error: 'Last name must be at least 2 characters long' },
+        { status: 400 }
+      )
+    }
+
+    if (!email || !email.trim()) {
+      return NextResponse.json(
+        { ok: false, error: 'Email is required' },
+        { status: 400 }
+      )
+    }
+
+    // STEP 4: Validate email format and check for disposable domains
+    if (!isValidEmail(email)) {
+      return NextResponse.json(
+        { ok: false, error: 'Please provide a valid email address' },
+        { status: 400 }
+      )
+    }
+
+    if (!number || number.trim().length < 10) {
+      return NextResponse.json(
+        { ok: false, error: 'Please provide a valid phone number' },
+        { status: 400 }
+      )
+    }
+
+    if (!currentAddre || currentAddre.trim().length < 10) {
+      return NextResponse.json(
+        { ok: false, error: 'Please provide a complete address' },
+        { status: 400 }
+      )
+    }
+
+    if (!description || description.trim().length < 20) {
+      return NextResponse.json(
+        { ok: false, error: 'Description must be at least 20 characters long' },
+        { status: 400 }
+      )
+    }
+
+    // STEP 5: Sanitize inputs
+    const sanitizedFirstName = sanitizeString(firstName)
+    const sanitizedLastName = sanitizeString(lastName)
+    const sanitizedEmail = email.trim().toLowerCase()
+    const sanitizedNumber = sanitizeString(number)
+    const sanitizedCurrentAddre = sanitizeString(currentAddre)
+    const sanitizedSport = sport ? sanitizeString(sport) : null
+    const sanitizedDescription = sanitizeString(description)
     
     // Validar archivo PDF (opcional)
     let hasValidResume = false
@@ -89,17 +188,17 @@ export async function POST(request: NextRequest) {
       hasValidResume = true
     }
     
-    console.log(`✅ Validation passed for ${email}`)
+    console.log(`✅ Validation passed for ${sanitizedEmail}`)
     
-    // PASO 1: Insertar fila en Drteam con resume = null
+    // PASO 1: Insertar fila en Drteam con resume = null (using sanitized data)
     const applicationData = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim(),
-      number: number.trim(),
-      currentAddre: currentAddre.trim(),
-      sport: sport && sport.trim() ? sport.trim() : null,
-      description: description.trim(),
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
+      email: sanitizedEmail,
+      number: sanitizedNumber,
+      currentAddre: sanitizedCurrentAddre,
+      sport: sanitizedSport,
+      description: sanitizedDescription,
       resume: null
     }
     

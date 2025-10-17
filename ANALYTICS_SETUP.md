@@ -191,3 +191,4 @@ Si tienes problemas con la configuración, revisa:
 4. Los logs en la consola del navegador (F12)
 
 
+

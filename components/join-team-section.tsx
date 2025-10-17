@@ -16,6 +16,7 @@ export default function JoinTeamSection() {
     number: "",
     currentAddress: "",
     description: "",
+    company: "", // Honeypot field - should remain empty
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -217,6 +218,7 @@ export default function JoinTeamSection() {
       submitFormData.append('number', formData.number.trim())
       submitFormData.append('currentAddre', formData.currentAddress.trim()) // Mantener typo como en BD
       submitFormData.append('description', formData.description.trim())
+      submitFormData.append('company', formData.company) // Honeypot field
       
       console.log('📤 Submitting to /api/apply endpoint...')
       
@@ -249,6 +251,7 @@ export default function JoinTeamSection() {
         number: "",
         currentAddress: "",
         description: "",
+        company: "",
       })
       
       // Personalizar mensaje según el resultado del email
@@ -423,6 +426,20 @@ export default function JoinTeamSection() {
                     className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 resize-none"
                     placeholder="Tell us what motivates you to coach and make a difference in young athletes' lives..."
                   ></textarea>
+                </div>
+
+                {/* Honeypot field - hidden from users, but bots will fill it */}
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="company">Company (leave blank)</label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
                 </div>
 
                 {/* Success/Error Messages */}
