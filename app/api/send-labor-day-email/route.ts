@@ -121,13 +121,13 @@ const createLaborDayEmailTemplate = () => {
                   <tr>
                     <td>
                       <!--[if mso]>
-                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://www.disciplinerift.com/#register" style="height:50px;v-text-anchor:middle;width:230px;" arcsize="14%" stroke="f" fillcolor="#ef4444">
+                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://www.disciplinerift.com/register" style="height:50px;v-text-anchor:middle;width:230px;" arcsize="14%" stroke="f" fillcolor="#ef4444">
                         <w:anchorlock/>
                         <center style="color:#ffffff;font-family:Arial, Helvetica, sans-serif;font-size:16px;font-weight:700;">REGISTER NOW</center>
                       </v:roundrect>
                       <![endif]-->
                       <!--[if !mso]><!-- -->
-                      <a href="https://www.disciplinerift.com/#register" target="_blank" style="display:inline-block; padding:16px 26px; font-size:16px; line-height:18px; color:#ffffff; text-decoration:none; font-weight:700; border-radius:12px; font-family: Arial, Helvetica, sans-serif; background:linear-gradient(135deg,#ef4444,#dc2626); box-shadow:0 8px 16px rgba(220,38,38,0.25);">REGISTER NOW</a>
+                      <a href="https://www.disciplinerift.com/register" target="_blank" style="display:inline-block; padding:16px 26px; font-size:16px; line-height:18px; color:#ffffff; text-decoration:none; font-weight:700; border-radius:12px; font-family: Arial, Helvetica, sans-serif; background:linear-gradient(135deg,#ef4444,#dc2626); box-shadow:0 8px 16px rgba(220,38,38,0.25);">REGISTER NOW</a>
                       <!--<![endif]-->
                     </td>
                   </tr>

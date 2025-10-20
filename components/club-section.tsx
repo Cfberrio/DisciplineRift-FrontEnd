@@ -126,7 +126,7 @@ export default function ClubSection() {
         <AnimatedSection animation="fade-up" className="text-center" delay={800}>
           <Button className="bg-white hover:bg-gray-100 rounded-full px-2 xs:px-4 sm:px-8 py-1 xs:py-2 sm:py-3 shadow-lg transform transition-transform hover:scale-105">
             <Link
-              href="#register"
+              href="/register"
               className="flex items-center justify-center ethnocentric-title-blue not-italic
                         text-base sm:text-base        /* ↑ móvil más grande; desktop igual */
                         leading-tight whitespace-normal text-center px-3"

@@ -29,17 +29,23 @@ export default function Header() {
   }, [])
 
   const navItems = [
-    { name: "ABOUT", href: "#about" },
-    { name: "PROGRAMS", href: "#programs" },
-    { name: "DR EXPERIENCE", href: "#experience" },
-    { name: "CLUB", href: "#club" },
-    { name: "FAQ", href: "#faq" },
-    { name: "CONTACT US", href: "#contact" },
-    { name: "JOIN TEAM", href: "#join-team" },
+    { name: "REGISTER", href: "/register", isRoute: true },
+    { name: "PROGRAMS", href: "#programs", isRoute: false },
+    { name: "DR EXPERIENCE", href: "#experience", isRoute: false },
+    { name: "CLUB", href: "#club", isRoute: false },
+    { name: "FAQ", href: "#faq", isRoute: false },
+    { name: "CONTACT US", href: "#contact", isRoute: false },
+    { name: "JOIN TEAM", href: "#join-team", isRoute: false },
   ]
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, isRoute: boolean) => {
     setIsMenuOpen(false)
+
+    // If it's a route, navigate to it
+    if (isRoute) {
+      window.location.href = href
+      return
+    }
 
     // Smooth scroll to section
     const element = document.querySelector(href)
@@ -81,7 +87,7 @@ export default function Header() {
             {navItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => handleNavClick(item.href)}
+                onClick={() => handleNavClick(item.href, item.isRoute)}
                 className={cn(
                   "font-bold transition-colors duration-300 px-3 py-2 rounded-md text-sm hover:bg-opacity-80 cursor-pointer",
                   isScrolled ? "text-gray-700 hover:bg-blue-50 hover:text-dr-blue" : "text-white hover:bg-white/10",
@@ -154,18 +160,12 @@ export default function Header() {
               {navItems.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => handleNavClick(item.href)}
+                  onClick={() => handleNavClick(item.href, item.isRoute)}
                   className="text-gray-700 font-bold py-2 px-3 hover:bg-blue-50 hover:text-dr-blue rounded-md transition-colors text-left"
                 >
                   {item.name}
                 </button>
               ))}
-              <Button
-                className="bg-sky-500 hover:bg-blue-600 text-white rounded-full w-full mt-2"
-                onClick={() => handleNavClick("#register")}
-              >
-                REGISTER NOW
-              </Button>
                              <div className="flex space-x-3 pt-3 border-t border-gray-200 mt-3">
                  <button
                    aria-label="Parent Dashboard"

@@ -33,7 +33,7 @@ export default function ConfirmedPage() {
 
           // Set a small delay to ensure everything is properly set up
           setTimeout(() => {
-            const next = searchParams.get("next") || "/#register"
+            const next = searchParams.get("next") || "/register"
             console.log("🔄 Redirecting to:", next)
             router.push(next)
           }, 2000)
@@ -102,7 +102,7 @@ export default function ConfirmedPage() {
           </p>
         </div>
         <button 
-          onClick={() => router.push("/#register")} 
+          onClick={() => router.push("/register")} 
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition"
         >
           Continue Registration Now

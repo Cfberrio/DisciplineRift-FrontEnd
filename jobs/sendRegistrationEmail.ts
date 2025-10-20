@@ -133,14 +133,14 @@ function createRegistrationEmailHtml(parentName: string): string {
                       <tr>
                         <td align="center">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://www.disciplinerift.com/#register" arcsize="50%" stroke="f" fillcolor="#FFFFFF" style="v-text-anchor:middle; height:48px; width:240px;">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://www.disciplinerift.com/register" arcsize="50%" stroke="f" fillcolor="#FFFFFF" style="v-text-anchor:middle; height:48px; width:240px;">
                             <w:anchorlock/>
                             <center style="color:#0f172a; font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:700;">👉 Register Now</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
                           <div class="btn-wrap" style="display:inline-block;">
-                            <a class="btn" href="https://www.disciplinerift.com/#register" target="_blank" rel="noopener">👉 Register Now</a>
+                            <a class="btn" href="https://www.disciplinerift.com/register" target="_blank" rel="noopener">👉 Register Now</a>
                           </div>
                           <!--<![endif]-->
                         </td>
@@ -176,14 +176,14 @@ function createRegistrationEmailHtml(parentName: string): string {
                       <tr>
                         <td align="center">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://www.disciplinerift.com/#register" arcsize="50%" stroke="f" fillcolor="#FFFFFF" style="v-text-anchor:middle; height:48px; width:240px;">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="https://www.disciplinerift.com/register" arcsize="50%" stroke="f" fillcolor="#FFFFFF" style="v-text-anchor:middle; height:48px; width:240px;">
                             <w:anchorlock/>
                             <center style="color:#0f172a; font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:700;">👉 Register Now</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
                           <div class="btn-wrap" style="display:inline-block;">
-                            <a class="btn" href="https://www.disciplinerift.com/#register" target="_blank" rel="noopener">👉 Register Now</a>
+                            <a class="btn" href="https://www.disciplinerift.com/register" target="_blank" rel="noopener">👉 Register Now</a>
                           </div>
                           <!--<![endif]-->
                         </td>
@@ -214,7 +214,7 @@ function createRegistrationEmailHtml(parentName: string): string {
                     </p>
                     <p class="foot center" style="margin:6px 0 0 0;">
                       If the button doesn't work, copy and paste this link: <br>
-                      <a href="https://www.disciplinerift.com/#register" target="_blank" style="color:#2563eb; text-decoration:underline;">https://www.disciplinerift.com/#register</a>
+                      <a href="https://www.disciplinerift.com/register" target="_blank" style="color:#2563eb; text-decoration:underline;">https://www.disciplinerift.com/register</a>
                     </p>
                   </td>
                 </tr>

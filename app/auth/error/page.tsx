@@ -18,7 +18,7 @@ export default function AuthErrorPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Authentication Error</h1>
         <p className="text-gray-600 mb-6">{message}</p>
         <div className="space-y-3">
-          <Button onClick={() => router.push("/#register")} className="w-full bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => router.push("/register")} className="w-full bg-blue-600 hover:bg-blue-700">
             Try Registration Again
           </Button>
           <Button onClick={() => router.push("/")} variant="outline" className="w-full">

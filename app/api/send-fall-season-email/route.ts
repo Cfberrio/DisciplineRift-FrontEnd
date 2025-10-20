@@ -394,7 +394,7 @@ async function sendFallSeasonEmail(transporter: any, data: {
 
               <p class="text">If your player is planning to join us, please register ASAP to secure a spot:</p>
 
-              <p class="text">👉 Register here: <a href="https://www.disciplinerift.com/#register">https://www.disciplinerift.com/#register</a></p>
+              <p class="text">👉 Register here: <a href="https://www.disciplinerift.com/register">https://www.disciplinerift.com/register</a></p>
 
               <p class="section-title">Quick details:</p>
               <ul class="text">

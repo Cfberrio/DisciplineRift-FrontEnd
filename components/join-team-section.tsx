@@ -313,7 +313,7 @@ export default function JoinTeamSection() {
         <div className="max-w-4xl mx-auto">
           <AnimatedSection animation="fade-up">
             <div className="bg-white/30 backdrop-blur-md p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg shadow-lg">
-              <h3 className="text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-4 sm:mb-6 text-center">JOIN OUR DR TEAM</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl ethnocentric-title-white mb-4 sm:mb-6 text-center">APPLY BELOW</h3>
               
               
               

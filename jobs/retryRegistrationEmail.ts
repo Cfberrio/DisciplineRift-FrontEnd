@@ -156,7 +156,7 @@ function createRegistrationEmailHtml(parentName: string): string {
                       <tr>
                         <td align="center">
                           <div class="btn-wrap" style="display:inline-block;">
-                            <a class="btn" href="https://www.disciplinerift.com/#register" target="_blank" rel="noopener">👉 Register Now</a>
+                            <a class="btn" href="https://www.disciplinerift.com/register" target="_blank" rel="noopener">👉 Register Now</a>
                           </div>
                         </td>
                       </tr>
@@ -185,7 +185,7 @@ function createRegistrationEmailHtml(parentName: string): string {
                       <tr>
                         <td align="center">
                           <div class="btn-wrap" style="display:inline-block;">
-                            <a class="btn" href="https://www.disciplinerift.com/#register" target="_blank" rel="noopener">👉 Register Now</a>
+                            <a class="btn" href="https://www.disciplinerift.com/register" target="_blank" rel="noopener">👉 Register Now</a>
                           </div>
                         </td>
                       </tr>
@@ -210,7 +210,7 @@ function createRegistrationEmailHtml(parentName: string): string {
                     <p class="foot center" style="margin:0;">Registration • Volleyball • Tennis • Pickleball</p>
                     <p class="foot center" style="margin:6px 0 0 0;">
                       If the button doesn't work, copy and paste this link: <br>
-                      <a href="https://www.disciplinerift.com/#register" target="_blank" style="color:#2563eb; text-decoration:underline;">https://www.disciplinerift.com/#register</a>
+                      <a href="https://www.disciplinerift.com/register" target="_blank" style="color:#2563eb; text-decoration:underline;">https://www.disciplinerift.com/register</a>
                     </p>
                   </td>
                 </tr>
@@ -404,6 +404,8 @@ if (require.main === module) {
 }
 
 export { retryRegistrationEmails };
+
+
 
 
 

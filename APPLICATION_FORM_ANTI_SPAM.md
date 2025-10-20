@@ -226,3 +226,5 @@ El formulario de aplicación ahora tiene:
 - Protección BotID: `components/botid-client.tsx`
 
 
+
+

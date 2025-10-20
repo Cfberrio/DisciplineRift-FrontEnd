@@ -1,7 +1,6 @@
 "use client"
 
 import { Suspense, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
 import ScrollProgress from "@/components/scroll-progress"
 import Header from "@/components/header"
 import PassionInspiredHero from "@/components/passion-inspired-hero"
@@ -25,33 +24,28 @@ function SuccessMessageSuspense() {
   )
 }
 
-function ScrollToSection() {
-  const searchParams = useSearchParams()
-
+function ScrollToRegister() {
   useEffect(() => {
-    const scrollTo = searchParams.get("scrollTo")
-    if (scrollTo) {
-      // Wait for the page to fully load
-      setTimeout(() => {
-        const element = document.getElementById(scrollTo)
-        if (element) {
-          const headerHeight = 100 // Ajustado para que la sección quede completamente visible
-          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-          const offsetPosition = elementPosition - headerHeight
+    // Wait for the page to fully load
+    setTimeout(() => {
+      const element = document.getElementById("register")
+      if (element) {
+        const headerHeight = 100
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        const offsetPosition = elementPosition - headerHeight
 
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth",
-          })
-        }
-      }, 100)
-    }
-  }, [searchParams])
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        })
+      }
+    }, 100)
+  }, [])
 
   return null
 }
 
-export default function Home() {
+export default function RegisterPage() {
   return (
     <div className="min-h-screen">
       <ScrollProgress />
@@ -60,10 +54,8 @@ export default function Home() {
       {/* Success Message Handler with Suspense */}
       <SuccessMessageSuspense />
       
-      {/* Scroll to section handler */}
-      <Suspense fallback={null}>
-        <ScrollToSection />
-      </Suspense>
+      {/* Scroll to register section */}
+      <ScrollToRegister />
       
       <main className="flex flex-col bg-pattern">
         {/* Passion-inspired Hero Section (no id needed for nav) */}
@@ -179,7 +171,8 @@ export default function Home() {
                   <p className="mission-text-large text-gray-800 mb-6 xs:mb-8 px-4 xs:px-0 text-sm xs:text-base sm:text-lg md:text-xl about-text-mobile text-left">
       
                    Our programs provide <strong>all the equipment</strong> and coaches <strong>needed to support</strong> this journey and build a strong, lasting
-                  foundation for a <strong>lifestyle in sports</strong>. 
+                  foundation for a 
+                   <strong>lifestyle in sports</strong>. 
                   </p>
                 </AnimatedSection>
               </div>
@@ -226,3 +219,4 @@ export default function Home() {
     </div>
   )
 }
+

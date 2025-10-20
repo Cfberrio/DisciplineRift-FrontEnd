@@ -130,7 +130,7 @@ export default function PaymentConfirmPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Payment Failed</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <div className="space-y-3">
-            <Link href="/#register">
+            <Link href="/register">
               <Button className="w-full bg-blue-600 hover:bg-blue-700">Try Again</Button>
             </Link>
             <Link href="/">

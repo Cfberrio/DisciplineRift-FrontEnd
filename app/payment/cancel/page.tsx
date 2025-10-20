@@ -99,7 +99,7 @@ export default function PaymentCancelPage() {
           </div>
 
           <div className="space-y-3">
-            <Link href="/#register">
+            <Link href="/register">
               <Button className="w-full bg-dr-blue hover:bg-blue-700 text-white">Complete Registration</Button>
             </Link>
             <Link href="/">
@@ -121,7 +121,7 @@ export default function PaymentCancelPage() {
         <p className="text-gray-600 mb-6">{message}</p>
 
         <div className="space-y-3">
-          <Link href="/#register">
+          <Link href="/register">
             <Button className="w-full bg-dr-blue hover:bg-blue-700 text-white">Try Again</Button>
           </Link>
           <Link href="/">
