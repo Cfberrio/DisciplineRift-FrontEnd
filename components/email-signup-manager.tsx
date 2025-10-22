@@ -24,9 +24,9 @@ export default function EmailSignupManager() {
     }
   }, [])
 
-  const handleSubscribe = async (email: string, sportInterest?: string) => {
+  const handleSubscribe = async (email: string, name: string) => {
     setIsSubmitting(true)
-    console.log("Subscribing email:", email, "Sport interest:", sportInterest)
+    console.log("Subscribing email:", email, "Name:", name)
 
     try {
       // Call the API to send the Parent Guide email
@@ -37,7 +37,7 @@ export default function EmailSignupManager() {
         },
         body: JSON.stringify({
           email,
-          sportInterest,
+          name,
         }),
       })
 

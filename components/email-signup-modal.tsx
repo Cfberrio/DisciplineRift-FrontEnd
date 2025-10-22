@@ -4,19 +4,18 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { Mail, ArrowRight, Loader2 } from "lucide-react"
+import { Mail, ArrowRight, Loader2, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface EmailSignupModalProps {
-  onSubscribe: (email: string, sportInterest?: string) => Promise<void>
+  onSubscribe: (email: string, name: string) => Promise<void>
   isSubmitting: boolean
 }
 
 export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSignupModalProps) {
   const [email, setEmail] = useState("")
-  const [sportInterest, setSportInterest] = useState("")
+  const [name, setName] = useState("")
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,8 +29,12 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
       setError("Please enter a valid email address.")
       return
     }
+    if (!name.trim()) {
+      setError("Name is required.")
+      return
+    }
     setError("")
-    await onSubscribe(email, sportInterest)
+    await onSubscribe(email, name)
   }
 
   return (
@@ -50,6 +53,26 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
       </DialogHeader>
       <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 sm:py-6 space-y-4">
         <div className="relative">
+          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-300" />
+          <Input
+            id="name"
+            type="text"
+            placeholder="Your Name"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value)
+              if (error) setError("")
+            }}
+            required
+            className={cn(
+              "w-full pl-10 pr-4 py-3 h-12 text-base rounded-md border-2 bg-blue-600/50 text-white placeholder-blue-300 focus:bg-blue-600 focus:border-yellow-400 focus:ring-yellow-400",
+              error && "border-red-400 focus:border-red-500 ring-red-500",
+            )}
+            aria-describedby="form-error"
+          />
+        </div>
+        
+        <div className="relative">
           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-300" />
           <Input
             id="email"
@@ -65,26 +88,12 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
               "w-full pl-10 pr-4 py-3 h-12 text-base rounded-md border-2 bg-blue-600/50 text-white placeholder-blue-300 focus:bg-blue-600 focus:border-yellow-400 focus:ring-yellow-400",
               error && "border-red-400 focus:border-red-500 ring-red-500",
             )}
-            aria-describedby="email-error"
+            aria-describedby="form-error"
           />
-        </div>
-        
-        {/* Sport Interest Dropdown */}
-        <div className="space-y-2">
-          <Select value={sportInterest} onValueChange={setSportInterest}>
-            <SelectTrigger className="w-full h-12 text-base rounded-md border-2 bg-blue-600/50 text-white border-blue-400 focus:border-yellow-400 focus:ring-yellow-400">
-              <SelectValue placeholder="Child's sport interest" className="text-blue-300" />
-            </SelectTrigger>
-            <SelectContent className="bg-blue-600 border-blue-400">
-              <SelectItem value="volleyball" className="text-white hover:bg-blue-500">Volleyball</SelectItem>
-              <SelectItem value="pickleball" className="text-white hover:bg-blue-500">Pickleball</SelectItem>
-              <SelectItem value="tennis" className="text-white hover:bg-blue-500">Tennis</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {error && (
-          <p id="email-error" className="text-sm text-red-300 bg-red-900/50 px-3 py-2 rounded-md">
+          <p id="form-error" className="text-sm text-red-300 bg-red-900/50 px-3 py-2 rounded-md">
             {error}
           </p>
         )}

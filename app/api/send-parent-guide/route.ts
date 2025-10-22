@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { email, sportInterest } = body
+    const { email, name } = body
 
     // Validar que el email sea requerido
     if (!email || !email.trim()) {
@@ -24,7 +24,15 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log("📧 Saving newsletter subscription and sending Parent Guide email to:", email, "Sport interest:", sportInterest)
+    // Validar que el nombre sea requerido
+    if (!name || !name.trim()) {
+      return NextResponse.json(
+        { success: false, message: "Name is required" },
+        { status: 400 }
+      )
+    }
+
+    console.log("📧 Saving newsletter subscription and sending Parent Guide email to:", email, "Name:", name)
 
     // Guardar en la tabla Newsletter de Supabase
     try {
@@ -32,7 +40,7 @@ export async function POST(request: Request) {
         .from("Newsletter")
         .insert({
           email: email.trim(),
-          sport: sportInterest || null,
+          name: name.trim(),
         })
         .select()
 
@@ -41,12 +49,12 @@ export async function POST(request: Request) {
         
         // Verificar si es un error de duplicado (email ya existe)
         if (newsletterError.code === '23505') {
-          console.log("ℹ️ Email already exists in newsletter, updating sport interest...")
+          console.log("ℹ️ Email already exists in newsletter, updating name...")
           
-          // Actualizar el deporte si el email ya existe
+          // Actualizar el nombre si el email ya existe
           const { error: updateError } = await supabase
             .from("Newsletter")
-            .update({ sport: sportInterest || null })
+            .update({ name: name.trim() })
             .eq("email", email.trim())
 
           if (updateError) {
@@ -68,7 +76,7 @@ export async function POST(request: Request) {
     }
 
     // Enviar el email
-    const result = await sendParentGuideEmail(email, sportInterest)
+    const result = await sendParentGuideEmail(email, name)
 
     if (result.success) {
       return NextResponse.json({

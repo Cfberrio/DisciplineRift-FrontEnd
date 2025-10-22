@@ -35,7 +35,7 @@ function ScrollToSection() {
       setTimeout(() => {
         const element = document.getElementById(scrollTo)
         if (element) {
-          const headerHeight = 100 // Ajustado para que la sección quede completamente visible
+          const headerHeight = 80 // Altura del header fijo
           const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
           const offsetPosition = elementPosition - headerHeight
 
@@ -44,7 +44,7 @@ function ScrollToSection() {
             behavior: "smooth",
           })
         }
-      }, 100)
+      }, 300)
     }
   }, [searchParams])
 

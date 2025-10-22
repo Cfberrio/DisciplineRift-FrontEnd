@@ -29,36 +29,18 @@ export default function Header() {
   }, [])
 
   const navItems = [
-    { name: "REGISTER", href: "/register", isRoute: true },
-    { name: "PROGRAMS", href: "#programs", isRoute: false },
-    { name: "DR EXPERIENCE", href: "#experience", isRoute: false },
-    { name: "CLUB", href: "#club", isRoute: false },
-    { name: "FAQ", href: "#faq", isRoute: false },
-    { name: "CONTACT US", href: "#contact", isRoute: false },
-    { name: "JOIN TEAM", href: "#join-team", isRoute: false },
+    { name: "REGISTER", href: "/?scrollTo=register" },
+    { name: "PROGRAMS", href: "/?scrollTo=programs" },
+    { name: "DR EXPERIENCE", href: "/?scrollTo=experience" },
+    { name: "CLUB", href: "/?scrollTo=club" },
+    { name: "FAQ", href: "/?scrollTo=faq" },
+    { name: "CONTACT", href: "/?scrollTo=contact" },
+    { name: "JOIN TEAM", href: "/?scrollTo=join-team" },
   ]
 
-  const handleNavClick = (href: string, isRoute: boolean) => {
+  const handleNavClick = (href: string) => {
     setIsMenuOpen(false)
-
-    // If it's a route, navigate to it
-    if (isRoute) {
-      window.location.href = href
-      return
-    }
-
-    // Smooth scroll to section
-    const element = document.querySelector(href)
-    if (element) {
-      const headerHeight = 80 // Account for fixed header height
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-      const offsetPosition = elementPosition - headerHeight
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      })
-    }
+    window.location.href = href
   }
 
   return (
@@ -87,7 +69,7 @@ export default function Header() {
             {navItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => handleNavClick(item.href, item.isRoute)}
+                onClick={() => handleNavClick(item.href)}
                 className={cn(
                   "font-bold transition-colors duration-300 px-3 py-2 rounded-md text-sm hover:bg-opacity-80 cursor-pointer",
                   isScrolled ? "text-gray-700 hover:bg-blue-50 hover:text-dr-blue" : "text-white hover:bg-white/10",
@@ -160,7 +142,7 @@ export default function Header() {
               {navItems.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => handleNavClick(item.href, item.isRoute)}
+                  onClick={() => handleNavClick(item.href)}
                   className="text-gray-700 font-bold py-2 px-3 hover:bg-blue-50 hover:text-dr-blue rounded-md transition-colors text-left"
                 >
                   {item.name}

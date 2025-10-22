@@ -69,10 +69,10 @@ export default function DynamicHero() {
           {/* Season announcement */}
           <AnimatedSection animation="fade-right" delay={200} className="md:w-1/4 mb-8 md:mb-0">
             <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white p-6 rounded-lg text-center transform rotate-3 shadow-xl border-4 border-white/30">
-              <h3 className="text-xl font-bold mb-2 transform -rotate-3">FALL SEASON</h3>
+              <h3 className="text-xl font-bold mb-2 transform -rotate-3">WINTER SEASON</h3>
               <p className="mb-2 transform -rotate-3">SEASON STARTING</p>
-              <p className="text-xl font-bold transform -rotate-3">SEPTEMBER</p>
-              <p className="text-xl font-bold transform -rotate-3">15th</p>
+              <p className="text-xl font-bold transform -rotate-3">NOVEMBER</p>
+              <p className="text-xl font-bold transform -rotate-3">3th</p>
 
               {/* Decorative elements */}
               <div className="absolute -top-4 -right-4 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center transform rotate-12">
@@ -116,7 +116,7 @@ export default function DynamicHero() {
                   size="lg"
                   className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black rounded-full px-4 xs:px-6 sm:px-8 py-3 xs:py-4 sm:py-6 text-sm xs:text-base sm:text-lg font-bold shadow-lg transform transition-transform hover:scale-105 w-auto min-w-[160px] xs:min-w-[180px] sm:min-w-[200px]"
                 >
-                  <Link href="/register" className="flex items-center">
+                  <Link href="/?scrollTo=register" className="flex items-center">
                     REGISTER NOW <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
