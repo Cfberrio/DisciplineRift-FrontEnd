@@ -43,20 +43,42 @@ function ScrollToSection() {
     const sectionId = routeToSectionMap[pathname]
     
     if (sectionId) {
-      // Wait for the page to fully load
-      setTimeout(() => {
+      // Esperar a que la página cargue completamente
+      const scrollToSection = () => {
         const element = document.getElementById(sectionId)
         if (element) {
-          const headerHeight = 80 // Altura del header fijo
-          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-          const offsetPosition = elementPosition - headerHeight
+          // Para la sección de register, hacer scroll al inicio de la sección sin offset
+          // Para otras secciones, usar el offset del header
+          if (sectionId === 'register') {
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+            window.scrollTo({
+              top: elementPosition,
+              behavior: "smooth",
+            })
+          } else {
+            const headerHeight = 80 // Altura del header fijo
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+            const offsetPosition = elementPosition - headerHeight
 
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth",
-          })
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth",
+            })
+          }
+        } else {
+          // Si el elemento no existe aún, intentar de nuevo
+          setTimeout(scrollToSection, 100)
         }
-      }, 300)
+      }
+
+      // Ejecutar después de un pequeño delay para asegurar que el DOM esté listo
+      setTimeout(scrollToSection, 100)
+    } else if (pathname === '/') {
+      // Si estamos en la ruta raíz, hacer scroll al inicio
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
     }
   }, [pathname])
 

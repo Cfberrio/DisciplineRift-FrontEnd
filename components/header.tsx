@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronDown, ChevronUp } from "lucide-react"
@@ -10,6 +11,8 @@ import { cn } from "@/lib/utils"
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,18 +32,44 @@ export default function Header() {
   }, [])
 
   const navItems = [
-    { name: "REGISTER", href: "/register" },
-    { name: "PROGRAMS", href: "/programs" },
-    { name: "DR EXPERIENCE", href: "/drexperience" },
-    { name: "CLUB", href: "/club" },
-    { name: "FAQ", href: "/faq" },
-    { name: "CONTACT", href: "/contact" },
-    { name: "JOIN TEAM", href: "/join-team" },
+    { name: "REGISTER", href: "/register", sectionId: "register" },
+    { name: "PROGRAMS", href: "/programs", sectionId: "programs" },
+    { name: "DR EXPERIENCE", href: "/drexperience", sectionId: "experience" },
+    { name: "CLUB", href: "/club", sectionId: "club" },
+    { name: "FAQ", href: "/faq", sectionId: "faq" },
+    { name: "CONTACT", href: "/contact", sectionId: "contact" },
+    { name: "JOIN TEAM", href: "/join-team", sectionId: "join-team" },
   ]
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, sectionId: string) => {
     setIsMenuOpen(false)
-    window.location.href = href
+    
+    // Si ya estamos en la ruta, hacer scroll directo
+    if (pathname === href) {
+      const element = document.getElementById(sectionId)
+      if (element) {
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        
+        // Para la sección de register, hacer scroll sin offset
+        // Para otras secciones, usar el offset del header
+        if (sectionId === 'register') {
+          window.scrollTo({
+            top: elementPosition,
+            behavior: "smooth",
+          })
+        } else {
+          const headerHeight = 80
+          const offsetPosition = elementPosition - headerHeight
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          })
+        }
+      }
+    } else {
+      // Si no estamos en la ruta, navegar a ella
+      router.push(href)
+    }
   }
 
   return (
@@ -69,7 +98,7 @@ export default function Header() {
             {navItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => handleNavClick(item.href)}
+                onClick={() => handleNavClick(item.href, item.sectionId)}
                 className={cn(
                   "font-bold transition-colors duration-300 px-3 py-2 rounded-md text-sm hover:bg-opacity-80 cursor-pointer",
                   isScrolled ? "text-gray-700 hover:bg-blue-50 hover:text-dr-blue" : "text-white hover:bg-white/10",
@@ -142,7 +171,7 @@ export default function Header() {
               {navItems.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => handleNavClick(item.href)}
+                  onClick={() => handleNavClick(item.href, item.sectionId)}
                   className="text-gray-700 font-bold py-2 px-3 hover:bg-blue-50 hover:text-dr-blue rounded-md transition-colors text-left"
                 >
                   {item.name}
