@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import ScrollProgress from "@/components/scroll-progress"
 import Header from "@/components/header"
 import PassionInspiredHero from "@/components/passion-inspired-hero"
@@ -26,14 +26,26 @@ function SuccessMessageSuspense() {
 }
 
 function ScrollToSection() {
-  const searchParams = useSearchParams()
+  const pathname = usePathname()
 
   useEffect(() => {
-    const scrollTo = searchParams.get("scrollTo")
-    if (scrollTo) {
+    // Mapeo de rutas a IDs de secciones
+    const routeToSectionMap: { [key: string]: string } = {
+      '/programs': 'programs',
+      '/drexperience': 'experience',
+      '/club': 'club',
+      '/faq': 'faq',
+      '/contact': 'contact',
+      '/join-team': 'join-team',
+      '/register': 'register',
+    }
+
+    const sectionId = routeToSectionMap[pathname]
+    
+    if (sectionId) {
       // Wait for the page to fully load
       setTimeout(() => {
-        const element = document.getElementById(scrollTo)
+        const element = document.getElementById(sectionId)
         if (element) {
           const headerHeight = 80 // Altura del header fijo
           const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
@@ -46,7 +58,7 @@ function ScrollToSection() {
         }
       }, 300)
     }
-  }, [searchParams])
+  }, [pathname])
 
   return null
 }
@@ -61,9 +73,7 @@ export default function Home() {
       <SuccessMessageSuspense />
       
       {/* Scroll to section handler */}
-      <Suspense fallback={null}>
-        <ScrollToSection />
-      </Suspense>
+      <ScrollToSection />
       
       <main className="flex flex-col bg-pattern">
         {/* Passion-inspired Hero Section (no id needed for nav) */}

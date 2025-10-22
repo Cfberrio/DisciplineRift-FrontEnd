@@ -29,13 +29,13 @@ export default function Header() {
   }, [])
 
   const navItems = [
-    { name: "REGISTER", href: "/?scrollTo=register" },
-    { name: "PROGRAMS", href: "/?scrollTo=programs" },
-    { name: "DR EXPERIENCE", href: "/?scrollTo=experience" },
-    { name: "CLUB", href: "/?scrollTo=club" },
-    { name: "FAQ", href: "/?scrollTo=faq" },
-    { name: "CONTACT", href: "/?scrollTo=contact" },
-    { name: "JOIN TEAM", href: "/?scrollTo=join-team" },
+    { name: "REGISTER", href: "/register" },
+    { name: "PROGRAMS", href: "/programs" },
+    { name: "DR EXPERIENCE", href: "/drexperience" },
+    { name: "CLUB", href: "/club" },
+    { name: "FAQ", href: "/faq" },
+    { name: "CONTACT", href: "/contact" },
+    { name: "JOIN TEAM", href: "/join-team" },
   ]
 
   const handleNavClick = (href: string) => {

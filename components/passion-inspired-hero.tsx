@@ -90,7 +90,7 @@ export default function PassionInspiredHero() {
                 size="lg"
                 className="bg-dr-blue hover:bg-blue-700 ethnocentric-title-white rounded-full min-h-[50px] xs:min-h-[55px] sm:min-h-[60px] px-8 xs:px-10 sm:px-12 py-4 xs:py-5 sm:py-6 text-sm xs:text-base sm:text-lg shadow-lg hero-button-mobile"
               >
-                <Link href="/?scrollTo=register" className="flex items-center">
+                <Link href="/register" className="flex items-center">
                   REGISTER NOW <ArrowRight className="ml-2 h-5 w-5 xs:h-6 xs:w-6" />
                 </Link>
               </Button>
@@ -110,7 +110,7 @@ export default function PassionInspiredHero() {
                   size="lg"
                   className="bg-dr-blue hover:bg-blue-700 ethnocentric-title-white rounded-full min-h-[60px] px-12 py-6 text-lg shadow-lg"
                 >
-                  <Link href="/?scrollTo=register" className="flex items-center">
+                  <Link href="/register" className="flex items-center">
                     REGISTER NOW <ArrowRight className="ml-3 h-6 w-6" />
                   </Link>
                 </Button>

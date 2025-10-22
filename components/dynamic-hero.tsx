@@ -116,7 +116,7 @@ export default function DynamicHero() {
                   size="lg"
                   className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black rounded-full px-4 xs:px-6 sm:px-8 py-3 xs:py-4 sm:py-6 text-sm xs:text-base sm:text-lg font-bold shadow-lg transform transition-transform hover:scale-105 w-auto min-w-[160px] xs:min-w-[180px] sm:min-w-[200px]"
                 >
-                  <Link href="/?scrollTo=register" className="flex items-center">
+                  <Link href="/register" className="flex items-center">
                     REGISTER NOW <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>

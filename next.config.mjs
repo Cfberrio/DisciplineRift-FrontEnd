@@ -11,6 +11,17 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async rewrites() {
+    return [
+      { source: '/programs', destination: '/' },
+      { source: '/drexperience', destination: '/' },
+      { source: '/club', destination: '/' },
+      { source: '/faq', destination: '/' },
+      { source: '/contact', destination: '/' },
+      { source: '/join-team', destination: '/' },
+      { source: '/register', destination: '/' },
+    ]
+  },
 }
 
 export default withBotId(nextConfig)
