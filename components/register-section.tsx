@@ -146,6 +146,9 @@ export default function RegisterSection() {
   } | null>(null);
   const [couponError, setCouponError] = useState("");
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  
+  // Newsletter subscription state
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
 
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
@@ -894,6 +897,34 @@ export default function RegisterSection() {
           parentEmail: currentUser.email || "",
           parentPhone: currentUser.phone || "",
         }));
+      }
+
+      // Si estamos pasando del step 5 (Review) al step 6 (Payment) y el usuario marcó el checkbox de newsletter
+      if (step === 5 && subscribeToNewsletter && currentUser) {
+        try {
+          // Guardar en la tabla Newsletter usando el email del usuario autenticado y el nombre del padre
+          const response = await fetch("/api/send-parent-guide", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: currentUser.email,
+              name: formData.parentFirstName,
+            }),
+          });
+
+          const result = await response.json();
+          
+          if (response.ok && result.success) {
+            console.log("✅ Newsletter subscription saved successfully");
+          } else {
+            console.error("❌ Failed to save newsletter subscription:", result.message);
+          }
+        } catch (error) {
+          console.error("❌ Error saving newsletter subscription:", error);
+          // No mostramos error al usuario, solo logueamos
+        }
       }
 
       setStep((prev) => prev + 1);
@@ -2399,6 +2430,21 @@ export default function RegisterSection() {
                     <strong>{registrationResult.enrollmentId}</strong>
                   </div>
 
+                  {/* Newsletter Subscription Checkbox */}
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <label className="flex items-start cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={subscribeToNewsletter}
+                        onChange={(e) => setSubscribeToNewsletter(e.target.checked)}
+                        className="mt-1 mr-3 h-4 w-4 text-dr-blue border-gray-300 rounded focus:ring-dr-blue flex-shrink-0"
+                      />
+                      <span className="text-sm text-gray-700">
+                        <span className="font-semibold text-dr-blue">Subscribe to our Newsletter</span> — Get updates on upcoming seasons, exclusive discounts & more!
+                      </span>
+                    </label>
+                  </div>
+
                   <div className="flex gap-4">
                     <Button
                       onClick={prevStep}
@@ -2411,7 +2457,7 @@ export default function RegisterSection() {
                       onClick={nextStep}
                       className="flex-1 bg-dr-blue hover:bg-blue-700"
                     >
-                      Proceed to Payment
+                      Continue to Payment
                     </Button>
                   </div>
                 </div>
