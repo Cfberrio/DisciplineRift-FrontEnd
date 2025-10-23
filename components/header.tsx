@@ -50,14 +50,28 @@ export default function Header() {
       if (element) {
         const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
         
-        // Para la sección de register, hacer scroll sin offset
-        // Para otras secciones, usar el offset del header
         if (sectionId === 'register') {
+          // Para la sección de register, calcular offset dinámicamente según el tamaño de pantalla
+          const viewportHeight = window.innerHeight
+          const screenWidth = window.innerWidth
+          
+          let dynamicOffset = 0
+          
+          // MacBook Air 13" y superiores (típicamente 1440px+ de ancho)
+          if (screenWidth >= 1440) {
+            dynamicOffset = Math.min(viewportHeight * 0.15, 150)
+          } else if (screenWidth >= 1024) {
+            dynamicOffset = Math.min(viewportHeight * 0.1, 100)
+          }
+          
+          const offsetPosition = elementPosition - dynamicOffset
+          
           window.scrollTo({
-            top: elementPosition,
+            top: offsetPosition,
             behavior: "smooth",
           })
         } else {
+          // Para otras secciones, usar el offset del header
           const headerHeight = 80
           const offsetPosition = elementPosition - headerHeight
           window.scrollTo({

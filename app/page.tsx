@@ -47,17 +47,35 @@ function ScrollToSection() {
       const scrollToSection = () => {
         const element = document.getElementById(sectionId)
         if (element) {
-          // Para la sección de register, hacer scroll al inicio de la sección sin offset
-          // Para otras secciones, usar el offset del header
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+          
           if (sectionId === 'register') {
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+            // Para la sección de register, calcular offset dinámicamente según el tamaño de pantalla
+            // En pantallas grandes (>= 1440px como MacBook Air/Pro), usar un offset mayor
+            const viewportHeight = window.innerHeight
+            const screenWidth = window.innerWidth
+            
+            let dynamicOffset = 0
+            
+            // MacBook Air 13" y superiores (típicamente 1440px+ de ancho)
+            if (screenWidth >= 1440) {
+              // Calcular offset basado en la altura de la ventana
+              // Para asegurar que solo se vea la sección de register
+              dynamicOffset = Math.min(viewportHeight * 0.15, 150)
+            } else if (screenWidth >= 1024) {
+              // Pantallas medianas (tablets landscape, laptops pequeños)
+              dynamicOffset = Math.min(viewportHeight * 0.1, 100)
+            }
+            
+            const offsetPosition = elementPosition - dynamicOffset
+
             window.scrollTo({
-              top: elementPosition,
+              top: offsetPosition,
               behavior: "smooth",
             })
           } else {
-            const headerHeight = 80 // Altura del header fijo
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+            // Para otras secciones, usar el offset del header
+            const headerHeight = 80
             const offsetPosition = elementPosition - headerHeight
 
             window.scrollTo({
@@ -220,37 +238,37 @@ export default function Home() {
         </section>
 
         {/* Programs Section - ProgramShowcase component has id="programs" internally */}
-        <div id="programs">
+        <div>
           <ProgramShowcase />
         </div>
 
         {/* DR Experience Section - ExperienceSection component has id="experience" internally */}
-        <div id="experience">
+        <div>
           <ExperienceSection />
         </div>
 
         {/* Club Section - ClubSection component has id="club" internally */}
-        <div id="club">
+        <div>
           <ClubSection />
         </div>
 
         {/* FAQ Section - FaqSection component has id="faq" internally */}
-        <div id="faq">
+        <div>
           <FaqSection />
         </div>
 
         {/* Contact Section - ContactSection component has id="contact" internally */}
-        <div id="contact">
+        <div>
           <ContactSection />
         </div>
 
         {/* Join Team Section - JoinTeamSection component has id="join-team" internally */}
-        <div id="join-team">
+        <div>
           <JoinTeamSection />
         </div>
 
         {/* Registration Section - RegisterSection component has id="register" internally */}
-        <div id="register">
+        <div>
           <RegisterSection />
         </div>
       </main>
