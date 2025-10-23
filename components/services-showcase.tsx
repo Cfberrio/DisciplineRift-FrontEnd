@@ -73,10 +73,13 @@ export default function ServicesShowcase() {
               <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="relative h-48">
                   <Image
-                    src={`/placeholder.svg?height=200&width=400&text=${encodeURIComponent(team.name)}`}
+                    src={team.logo || `/placeholder.svg?height=200&width=400&text=${encodeURIComponent(team.name)}`}
                     alt={team.name}
                     fill
                     className="object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = `/placeholder.svg?height=200&width=400&text=${encodeURIComponent(team.name)}`;
+                    }}
                   />
                   <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                     ${team.price}

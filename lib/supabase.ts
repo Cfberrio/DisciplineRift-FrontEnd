@@ -132,6 +132,7 @@ export interface Team {
   participants: number;
   currentEnrollments?: number;
   isactive: boolean;
+  logo?: string;
   created_at: string;
   updated_at: string;
   school?: School;

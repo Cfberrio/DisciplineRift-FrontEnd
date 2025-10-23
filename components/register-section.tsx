@@ -53,6 +53,7 @@ interface Team {
   description: string;
   participants: number;
   currentEnrollments: number;
+  logo?: string;
 }
 
 interface Session {
@@ -385,7 +386,7 @@ export default function RegisterSection() {
       id: school.schoolid || "",
       name: school.name || "Unknown School",
       location: school.location || "Unknown Location",
-      logo: `/placeholder.svg?height=60&width=60&text=${encodeURIComponent(
+      logo: school.teams?.[0]?.logo || `/placeholder.svg?height=48&width=48&text=${encodeURIComponent(
         school.name || "School"
       )}`,
       teams:
@@ -401,6 +402,7 @@ export default function RegisterSection() {
           description: team.description || "Elite training program",
           participants: team.participants || 20,
           currentEnrollments: team.currentEnrollments || 0,
+          logo: team.logo || undefined,
           coach: {
             name: team.session?.[0]?.staff?.name || "TBD",
             email: team.session?.[0]?.staff?.email || "",
@@ -1304,16 +1306,18 @@ export default function RegisterSection() {
                               className="border border-gray-200 rounded-lg p-6"
                             >
                               <div className="flex items-center mb-4">
-                                <Image
-                                  src={
-                                    school.logo ||
-                                    "/placeholder.svg?height=60&width=60&text=School"
-                                  }
-                                  alt={school.name}
-                                  width={60}
-                                  height={60}
-                                  className="rounded-lg mr-4"
-                                />
+                                <div className="w-12 h-12 flex-shrink-0 mr-4">
+                                  <Image
+                                    src={
+                                      school.logo ||
+                                      "/placeholder.svg?height=48&width=48&text=School"
+                                    }
+                                    alt={school.name}
+                                    width={48}
+                                    height={48}
+                                    className="rounded-lg object-cover w-full h-full"
+                                  />
+                                </div>
                                 <div>
                                   <h4 className="text-xl font-bold text-dr-blue">
                                     {school.name}

@@ -172,6 +172,7 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
         participants,
         isactive,
         isongoing,
+        logo,
         created_at,
         updated_at
       `
