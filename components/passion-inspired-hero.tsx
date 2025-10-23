@@ -123,7 +123,7 @@ export default function PassionInspiredHero() {
                 }`}
               >
                 <h2 className="text-lg xl:text-xl font-medium wild-youth-text-white">
-                  <span className="invisible">Fall Season </span>September 2025<span className="invisible">, </span>Fall Season<span className="invisible"> is here! Join us this</span>
+                  <span className="invisible">Winter Season </span>November 2025<span className="invisible">, </span>Winter Season<span className="invisible"> is here! Join us this</span>
                 </h2>
               </div>
             </div>
