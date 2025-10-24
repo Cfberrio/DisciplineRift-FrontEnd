@@ -2435,18 +2435,47 @@ export default function RegisterSection() {
                   </div>
 
                   {/* Newsletter Subscription Checkbox */}
-                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                    <label className="flex items-start cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={subscribeToNewsletter}
-                        onChange={(e) => setSubscribeToNewsletter(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-dr-blue border-gray-300 rounded focus:ring-dr-blue flex-shrink-0"
-                      />
-                      <span className="text-sm text-gray-700">
-                        <span className="font-semibold text-dr-blue">Subscribe to our Newsletter</span> — Get updates on upcoming seasons, exclusive discounts & more!
+                  <div className="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-lg">
+                    <div 
+                      className="flex items-start gap-3 cursor-pointer"
+                      onClick={() => setSubscribeToNewsletter(!subscribeToNewsletter)}
+                    >
+                      <div 
+                        className="mt-0.5 flex-shrink-0 border-2 rounded transition-all"
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          minWidth: '18px',
+                          minHeight: '18px',
+                          borderColor: subscribeToNewsletter ? '#0085B7' : '#D1D5DB',
+                          backgroundColor: subscribeToNewsletter ? '#0085B7' : 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {subscribeToNewsletter && (
+                          <svg 
+                            width="12" 
+                            height="12" 
+                            viewBox="0 0 12 12" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path 
+                              d="M10 3L4.5 8.5L2 6" 
+                              stroke="white" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-gray-700 leading-relaxed flex-1" style={{ fontSize: '13px', lineHeight: '1.5' }}>
+                        <span className="font-semibold text-dr-blue">Subscribe and send me value</span> - season launches, downloadable parent guides, and event invites.
                       </span>
-                    </label>
+                    </div>
                   </div>
 
                   <div className="flex gap-4">
