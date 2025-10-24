@@ -113,10 +113,13 @@ export default function FAQSection() {
       id="faq"
       style={{ 
         backgroundImage: "url('/faq-background.png')",
-        backgroundSize: isMobile ? "100% 100%" : "cover",
+        backgroundSize: "cover",
         backgroundPosition: "center center"
       }}
     >
+      {/* Optional: Subtle overlay if needed for text readability, can be adjusted */}
+      <div className="absolute inset-0 bg-black/10 z-0"></div>
+
       {/* FAQS.png - esquina superior izquierda solo en desktop */}
       <AnimatedSection animation="fade-down" className="hidden sm:block absolute top-6 left-0 z-30">
         <img 
