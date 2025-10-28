@@ -1745,17 +1745,18 @@ export default function RegisterSection() {
                       <Button
                         onClick={handleVerifyOTP}
                         disabled={isAuthLoading}
-                        className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
                       >
                         {isAuthLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Verifying Code...
+                            <span className="hidden sm:inline">Verifying Code...</span>
+                            <span className="sm:hidden">Verifying...</span>
                           </>
                         ) : (
                           <>
-                            <LogIn className="mr-2 h-4 w-4" />
-                            Verify Code & Continue
+                            <LogIn className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                            <span className="text-xs sm:text-base">Verify Code & Continue</span>
                           </>
                         )}
                       </Button>
@@ -1763,17 +1764,18 @@ export default function RegisterSection() {
                       <Button
                         onClick={handleSendOTP}
                         disabled={isAuthLoading}
-                        className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        className="flex-1 bg-dr-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
                       >
                         {isAuthLoading ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Sending Code...
+                            <span className="hidden sm:inline">Sending Code...</span>
+                            <span className="sm:hidden">Sending...</span>
                           </>
                         ) : (
                           <>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Send Access Code
+                            <Mail className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                            <span className="text-xs sm:text-base">Send Access Code</span>
                           </>
                         )}
                       </Button>

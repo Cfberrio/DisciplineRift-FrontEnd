@@ -57,7 +57,7 @@ export default function PassionInspiredHero() {
                 priority
                 sizes="(max-width: 1024px) 200vw, 200vw"
                 className="w-full max-w-[100%] h-auto hero-logo-main drop-shadow-2xl
-                          origin-center scale-[4] md:scale-[2]"  // 4x en móvil, 2x en desktop
+                          origin-center scale-[2.5] sm:scale-[3] md:scale-[2]"
               />
             </div>
 
