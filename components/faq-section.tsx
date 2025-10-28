@@ -107,8 +107,27 @@ export default function FAQSection() {
     }
   }
 
+  // JSON-LD for FAQPage
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(item => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  }
+
   return (
-    <section
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <section
       className="py-20 relative overflow-hidden bg-no-repeat bg-center min-h-screen"
       id="faq"
       style={{ 
@@ -257,6 +276,7 @@ export default function FAQSection() {
           </AnimatedSection>
         )}
       </div>
-    </section>
+      </section>
+    </>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Head from 'next/head';
 import { Analytics } from '@vercel/analytics/next';
 
 interface AnalyticsData {
@@ -105,8 +106,13 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <Analytics />
+    <>
+      <Head>
+        <title>Analytics Dashboard | Discipline Rift Admin</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+        <Analytics />
       
       {/* Header */}
       <header className="bg-white/5 backdrop-blur-lg border-b border-white/10">
@@ -405,7 +411,8 @@ export default function AnalyticsPage() {
           </a>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   );
 }
 

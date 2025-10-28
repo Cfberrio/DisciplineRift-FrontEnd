@@ -1199,9 +1199,9 @@ export default function RegisterSection() {
             <Image
               src="/REGISTERNOW.png"
               alt="Register Now"
-              width={1000}
-              height={300}
-              className="w-auto h-auto max-w-full max-h-40 xs:max-h-48 sm:max-h-56 md:max-h-64 lg:max-h-72"
+              width={2400}
+              height={720}
+              className="w-auto h-auto max-w-full max-h-[28rem] xs:max-h-[32rem] sm:max-h-[40rem] md:max-h-[48rem] lg:max-h-[56rem]"
             />
           </div>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-16">
@@ -1211,7 +1211,7 @@ export default function RegisterSection() {
 
         <div className="max-w-4xl mx-auto">
           {/* Progress Steps */}
-          <div className="flex justify-between mb-12 px-2 sm:px-0">
+          <div className="flex justify-between mb-12 px-2 sm:px-0 gap-2 sm:gap-3">
             {[1, 2, 3, 4, 5, 6, 7].map((s) => (
               <div key={s} className="flex flex-col items-center flex-1 min-w-0">
                 <div
@@ -1223,7 +1223,7 @@ export default function RegisterSection() {
                   {s}
                 </div>
                 <span
-                  className={`mt-1 sm:mt-2 text-xs sm:text-sm text-center leading-tight px-1 ${
+                  className={`mt-1 sm:mt-2 text-[0.65rem] sm:text-sm text-center leading-tight px-0 ${
                     step >= s ? "font-medium" : "text-gray-500"
                   }`}
                   style={{ color: step >= s ? '#0085B7' : undefined }}
@@ -2229,7 +2229,7 @@ export default function RegisterSection() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 bg-dr-blue hover:bg-blue-700"
+                      className="flex-1 bg-dr-blue hover:bg-blue-700 whitespace-nowrap px-3 sm:px-4 text-sm sm:text-base"
                     >
                       {isSubmitting ? (
                         <>
@@ -2488,7 +2488,7 @@ export default function RegisterSection() {
                     </Button>
                     <Button
                       onClick={nextStep}
-                      className="flex-1 bg-dr-blue hover:bg-blue-700"
+                      className="flex-1 bg-dr-blue hover:bg-blue-700 whitespace-nowrap px-3 sm:px-4 text-sm sm:text-base"
                     >
                       Continue to Payment
                     </Button>

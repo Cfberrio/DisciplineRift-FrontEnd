@@ -15,7 +15,7 @@ export default function PassionInspiredHero() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden hero-section-mobile">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden hero-section-mobile mb-0">
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0 hero-background-container">
         {/* Desktop background */}
@@ -36,16 +36,12 @@ export default function PassionInspiredHero() {
           className="object-cover object-center w-full h-full hero-background-mobile lg:hidden"
         />
 
-        {/* Subtle overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-black/20"></div>
-
-        {/* Bottom gradient overlay for smooth transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-blue-600/30 to-transparent"></div>
+        {/* Overlays removidos para mostrar imagen original */}
       </div>
 
       {/* Content container */}
       <div className="container relative z-10 px-3 xs:px-4 sm:px-6 md:px-8 py-6 xs:py-8 sm:py-12 md:py-16 lg:py-20 h-full hero-mobile-container">
-        <div className="flex flex-col items-center justify-center text-center h-full min-h-screen">
+        <div className="flex flex-col items-center justify-center text-center h-full lg:min-h-screen">
           {/* Main DISCIPLINE RIFT Logo */}
           <div
             className={`relative transition-all duration-1000 transform ${
@@ -54,14 +50,14 @@ export default function PassionInspiredHero() {
           >
             <div className="flex justify-center items-center px-4 sm:px-6 mb-4 xs:mb-6 sm:mb-8 md:mb-10 lg:mb-12 relative z-20 overflow-visible">
               <Image
-                src="DISCIPLINE_RIFT_HEROIMAGE.png"
+                src="/DISCIPLINE_RIFT_HEROIMAGE.png"
                 alt="Discipline Rift"
-                width={2200}              // 2x para servir imagen nítida
+                width={2200}
                 height={1329}
                 priority
-                sizes="(max-width: 1024px) 200vw, 200vw"  // indica que se mostrará al doble del viewport
+                sizes="(max-width: 1024px) 200vw, 200vw"
                 className="w-full max-w-[100%] h-auto hero-logo-main drop-shadow-2xl
-                          origin-center scale-[2]"       // 2x en todos los breakpoints
+                          origin-center scale-[4] md:scale-[2]"  // 4x en móvil, 2x en desktop
               />
             </div>
 
@@ -76,7 +72,7 @@ export default function PassionInspiredHero() {
               }`}
             >
               <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl font-medium wild-youth-text-white mb-8 xs:mb-10 sm:mb-12 md:mb-16 hero-text-mobile">
-                September<br />2025, Fall Season
+                November<br />2025, Winter Season
               </h2>
             </div>
 

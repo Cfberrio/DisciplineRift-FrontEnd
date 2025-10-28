@@ -164,3 +164,4 @@ http://localhost:3000/api/debug-teams
 Esto me ayudará a identificar exactamente qué falta configurar.
 
 
+

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import Head from "next/head"
 import { CheckCircle, XCircle, Loader2, Home, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -110,19 +111,30 @@ export default function PaymentConfirmPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <>
+        <Head>
+          <title>Confirming Payment | Discipline Rift</title>
+          <meta name="robots" content="noindex,nofollow" />
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full mx-4">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Confirming Payment</h2>
           <p className="text-gray-600">Please wait while we process your payment...</p>
         </div>
-      </div>
+        </div>
+      </>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <>
+        <Head>
+          <title>Payment Failed | Discipline Rift</title>
+          <meta name="robots" content="noindex,nofollow" />
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full mx-4">
           <div className="bg-red-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
             <XCircle className="h-8 w-8 text-red-600 mx-auto" />
@@ -141,13 +153,19 @@ export default function PaymentConfirmPage() {
             </Link>
           </div>
         </div>
-      </div>
+        </div>
+      </>
     )
   }
 
   if (paymentDetails) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <>
+        <Head>
+          <title>Payment Successful | Discipline Rift</title>
+          <meta name="robots" content="noindex,nofollow" />
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full mx-4">
           <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
             <CheckCircle className="h-8 w-8 text-green-600 mx-auto" />
@@ -201,7 +219,8 @@ export default function PaymentConfirmPage() {
             </Link>
           </div>
         </div>
-      </div>
+        </div>
+      </>
     )
   }
 

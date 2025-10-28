@@ -4,14 +4,15 @@
 @media screen and (max-width: 480px) {
   /* SECCIÓN HERO MÓVIL - Reducir altura */
   .hero-section-mobile {
-    min-height: 80vh !important; /* Reducir de 100vh a 80vh */
-    height: 80vh !important;
+    min-height: 50vh !important; /* Altura mínima reducida */
+    height: auto !important; /* Altura automática */
+    margin-bottom: 0 !important; /* Sin margen inferior */
   }
   
   /* Contenedor principal móvil */
   .hero-mobile-container {
-    min-height: 80vh !important;
-    height: 80vh !important;
+    min-height: 50vh !important;
+    height: auto !important; /* Altura automática */
     padding: 1rem !important;
   }
   
@@ -34,8 +35,8 @@
   
   /* Contenedor de imagen móvil */
   .hero-background-container {
-    height: 60vh !important; /* Altura ajustada para sección pequeña */
-    min-height: 60vh !important;
+    height: 50vh !important; /* Altura reducida al mínimo */
+    min-height: 50vh !important;
     width: 100vw !important;
     overflow: hidden !important; /* Evitar scroll por escala */
   }
@@ -67,13 +68,14 @@
 @media screen and (min-width: 481px) and (max-width: 640px) {
   /* Sección para iPhone grandes */
   .hero-section-mobile {
-    min-height: 85vh !important;
-    height: 85vh !important;
+    min-height: 55vh !important;
+    height: auto !important; /* Altura automática */
+    margin-bottom: 0 !important; /* Sin margen inferior */
   }
   
   .hero-mobile-container {
-    min-height: 85vh !important;
-    height: 85vh !important;
+    min-height: 55vh !important;
+    height: auto !important; /* Altura automática */
   }
   
   /* Imagen de fondo para iPhone grandes */
@@ -94,8 +96,8 @@
   }
   
   .hero-background-container {
-    height: 65vh !important; /* Altura ajustada para iPhone grandes */
-    min-height: 65vh !important;
+    height: 55vh !important; /* Altura reducida al mínimo */
+    min-height: 55vh !important;
     width: 100vw !important;
     overflow: hidden !important;
   }
@@ -175,32 +177,29 @@
     backdrop-filter: blur(8px) !important;
   }
   
-  /* Logo principal móvil - tamaño reducido para evitar cortes */
+  /* Logo principal móvil - tamaño reducido 1.5x */
   .hero-logo-main {
-    max-width: 80% !important; /* Reducido para evitar cortes en bordes */
-    width: 80% !important;
+    max-width: 95% !important;
+    width: 95% !important;
     height: auto !important;
-    z-index: 20 !important; /* Asegurar que esté sobre otros elementos */
+    z-index: 20 !important;
     position: relative !important;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4)) !important;
-    transform: scale(1.1) !important; /* Escala reducida para móvil */
+    transform: scale(1.73) !important; /* Reducido 1.5x (2.6 / 1.5 = 1.73) */
   }
   
   /* Ajustar hero section para mejor distribución */
   .hero-section-mobile {
-    min-height: 60vh !important; /* Sección mucho más pequeña */
-    height: 60vh !important;
-    overflow: hidden !important; /* Evitar overflow horizontal */
+    overflow: visible !important; /* Permitir que el logo grande sea visible */
+    position: relative !important;
   }
   
   .hero-mobile-container {
-    min-height: 60vh !important; /* Coincidir con la sección */
-    height: 60vh !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    overflow: visible !important; /* Permitir visibilidad controlada */
-    padding: 1rem !important; /* Espaciado interno para evitar tocar bordes */
+    overflow: visible !important; /* Permitir que el logo sea visible */
+    padding: 1rem 0.5rem !important; /* Padding mínimo */
   }
   
   /* Texto hero mobile */
@@ -273,32 +272,29 @@
     backdrop-filter: blur(10px) !important;
   }
   
-  /* Logo principal para iPhone grandes - tamaño controlado */
+  /* Logo principal para iPhone grandes - tamaño reducido 1.5x */
   .hero-logo-main {
-    max-width: 75% !important; /* Reducido para evitar cortes */
-    width: 75% !important;
+    max-width: 100% !important;
+    width: 100% !important;
     height: auto !important;
     z-index: 20 !important;
     position: relative !important;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4)) !important;
-    transform: scale(1.2) !important; /* Escala controlada para iPhone grandes */
+    transform: scale(2.0) !important; /* Reducido 1.5x (3.0 / 1.5 = 2.0) */
   }
   
   /* Ajustar hero section para iPhone grandes */
   .hero-section-mobile {
-    min-height: 65vh !important; /* Sección pequeña para iPhone grandes */
-    height: 65vh !important;
-    overflow: hidden !important; /* Evitar overflow horizontal */
+    overflow: visible !important; /* Permitir que el logo grande sea visible */
+    position: relative !important;
   }
   
   .hero-mobile-container {
-    min-height: 65vh !important; /* Coincidir con la sección */
-    height: 65vh !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    overflow: visible !important; /* Permitir visibilidad controlada */
-    padding: 1.5rem !important; /* Espaciado interno para iPhone grandes */
+    overflow: visible !important; /* Permitir que el logo sea visible */
+    padding: 1.5rem 1rem !important; /* Padding mínimo */
   }
   
   .about-title-mobile {

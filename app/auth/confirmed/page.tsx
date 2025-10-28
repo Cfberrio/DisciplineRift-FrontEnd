@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import Head from "next/head"
 import { supabase } from "@/lib/supabase"
 import { CheckCircle, Loader2, ArrowRight } from "lucide-react"
 
@@ -53,19 +54,30 @@ export default function ConfirmedPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <>
+        <Head>
+          <title>Confirming Email | Discipline Rift</title>
+          <meta name="robots" content="noindex,nofollow" />
+        </Head>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Confirming your email...</h1>
           <p className="text-gray-600">Please wait while we set up your account.</p>
         </div>
-      </div>
+        </div>
+      </>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <>
+        <Head>
+          <title>Confirmation Error | Discipline Rift</title>
+          <meta name="robots" content="noindex,nofollow" />
+        </Head>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="bg-red-100 rounded-full p-3 w-16 h-16 mx-auto mb-4">
             <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,12 +93,18 @@ export default function ConfirmedPage() {
             Return Home
           </button>
         </div>
-      </div>
+        </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <>
+      <Head>
+        <title>Email Confirmed | Discipline Rift</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center max-w-md mx-auto p-6">
         <div className="bg-green-100 rounded-full p-3 w-16 h-16 mx-auto mb-4">
           <CheckCircle className="w-10 h-10 text-green-600" />
@@ -108,6 +126,7 @@ export default function ConfirmedPage() {
           Continue Registration Now
         </button>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

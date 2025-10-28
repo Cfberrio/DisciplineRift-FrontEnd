@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Head from 'next/head';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -30,8 +31,13 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <div className="w-full max-w-md p-8">
+    <>
+      <Head>
+        <title>Admin Login | Discipline Rift</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+        <div className="w-full max-w-md p-8">
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Admin Login</h1>
@@ -98,7 +104,8 @@ export default function AdminLoginPage() {
           Discipline Rift © {new Date().getFullYear()}
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

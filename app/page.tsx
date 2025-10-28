@@ -115,14 +115,14 @@ export default function Home() {
       {/* Scroll to section handler */}
       <ScrollToSection />
       
-      <main className="flex flex-col bg-pattern">
+      <main className="flex flex-col bg-pattern gap-0">
         {/* Passion-inspired Hero Section (no id needed for nav) */}
         <PassionInspiredHero />
 
         {/* About Us Section with id="about" */}
         <section
           id="about"
-          className="py-8 xs:py-12 sm:py-16 md:py-20 bg-cover bg-center min-h-screen about-container-mobile"
+          className="py-4 xs:py-6 sm:py-8 md:py-12 lg:py-16 bg-cover bg-center lg:min-h-screen about-container-mobile mt-0"
           style={{ backgroundImage: "url('/about-us-background.png')" }}
         >
           <div className="container px-4 relative z-10">

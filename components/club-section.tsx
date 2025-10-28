@@ -32,9 +32,9 @@ export default function ClubSection() {
         </AnimatedSection>
 
         <AnimatedSection animation="fade-up" className="text-center mb-8 xs:mb-10 sm:mb-12">
-          <div className="flex items-center justify-center space-x-3 max-w-4xl mx-auto px-4">
-            <span className="text-2xl xs:text-3xl text-white flex-shrink-0" style={{ filter: 'brightness(0) invert(1)' }}>⭐</span>
-            <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl ethnocentric-title-white whitespace-nowrap">
+          <div className="flex items-center justify-center space-x-2 xs:space-x-3 max-w-4xl mx-auto px-4">
+            <span className="text-xl xs:text-2xl sm:text-3xl text-white flex-shrink-0" style={{ filter: 'brightness(0) invert(1)' }}>⭐</span>
+            <h3 className="text-sm xs:text-base sm:text-xl md:text-2xl lg:text-3xl ethnocentric-title-white text-center leading-tight">
               FIND THE RIGHT CLUB FOR YOUR CHILD
             </h3>
           </div>

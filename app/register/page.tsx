@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useEffect } from "react"
+import Head from "next/head"
 import ScrollProgress from "@/components/scroll-progress"
 import Header from "@/components/header"
 import PassionInspiredHero from "@/components/passion-inspired-hero"
@@ -47,9 +48,23 @@ function ScrollToRegister() {
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen">
-      <ScrollProgress />
-      <Header />
+    <>
+      <Head>
+        <title>Register Now - Fall 2025 Season | Discipline Rift</title>
+        <meta name="description" content="Register for Discipline Rift's Fall 2025 youth sports programs. Join our volleyball, tennis, and pickleball training programs. Limited spots available." />
+        <meta name="robots" content="index,follow" />
+        <link rel="canonical" href="https://www.disciplinerift.com/register" />
+        <meta property="og:title" content="Register Now - Fall 2025 Season | Discipline Rift" />
+        <meta property="og:description" content="Register for Discipline Rift's Fall 2025 youth sports programs. Limited spots available." />
+        <meta property="og:url" content="https://www.disciplinerift.com/register" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Register Now - Fall 2025 Season | Discipline Rift" />
+        <meta name="twitter:description" content="Register for Discipline Rift's Fall 2025 youth sports programs." />
+      </Head>
+      <div className="min-h-screen">
+        <ScrollProgress />
+        <Header />
       
       {/* Success Message Handler with Suspense */}
       <SuccessMessageSuspense />
@@ -216,7 +231,8 @@ export default function RegisterPage() {
         </div>
       </main>
       <EmailSignupManager />
-    </div>
+      </div>
+    </>
   )
 }
 

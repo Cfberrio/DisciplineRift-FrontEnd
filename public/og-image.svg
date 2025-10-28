@@ -1,0 +1,75 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0085B7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#005a82;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Pattern Overlay -->
+  <g opacity="0.1">
+    <circle cx="150" cy="100" r="80" fill="#fff"/>
+    <circle cx="1050" cy="530" r="100" fill="#fff"/>
+    <circle cx="900" cy="150" r="60" fill="#fff"/>
+  </g>
+  
+  <!-- Main Content Container -->
+  <g>
+    <!-- Brand Name -->
+    <text x="600" y="220" 
+          font-family="Arial, sans-serif" 
+          font-size="72" 
+          font-weight="bold" 
+          fill="#ffffff" 
+          text-anchor="middle"
+          letter-spacing="4">
+      DISCIPLINE RIFT
+    </text>
+    
+    <!-- Tagline -->
+    <text x="600" y="290" 
+          font-family="Arial, sans-serif" 
+          font-size="32" 
+          fill="#ffffff" 
+          text-anchor="middle"
+          opacity="0.95">
+      Youth Sports Development Programs
+    </text>
+    
+    <!-- Sports Icons/Text -->
+    <text x="600" y="360" 
+          font-family="Arial, sans-serif" 
+          font-size="28" 
+          fill="#ffffff" 
+          text-anchor="middle"
+          font-weight="500">
+      ⚽ Volleyball  •  🎾 Tennis  •  🏓 Pickleball
+    </text>
+    
+    <!-- Call to Action -->
+    <rect x="400" y="400" width="400" height="70" rx="35" fill="#ffffff" opacity="0.95"/>
+    <text x="600" y="445" 
+          font-family="Arial, sans-serif" 
+          font-size="28" 
+          font-weight="bold" 
+          fill="#0085B7" 
+          text-anchor="middle">
+      Register for Fall 2025
+    </text>
+    
+    <!-- Website URL -->
+    <text x="600" y="550" 
+          font-family="Arial, sans-serif" 
+          font-size="24" 
+          fill="#ffffff" 
+          text-anchor="middle"
+          opacity="0.9">
+      www.disciplinerift.com
+    </text>
+  </g>
+</svg>
+
