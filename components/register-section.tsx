@@ -80,6 +80,7 @@ interface ParentRegistrationData {
   childBirthdate: string;
   childGrade: string;
   childDismissal: string;
+  teacherName: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
   emergencyContactRelation: string;
@@ -164,6 +165,7 @@ export default function RegisterSection() {
     childBirthdate: "",
     childGrade: "",
     childDismissal: "",
+    teacherName: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
     emergencyContactRelation: "",
@@ -1827,6 +1829,7 @@ export default function RegisterSection() {
                                 childBirthdate: "",
                                 childGrade: "",
                                 childDismissal: "",
+                                teacherName: "",
                                 emergencyContactName: "",
                                 emergencyContactPhone: "",
                                 emergencyContactRelation: ""
@@ -1844,6 +1847,7 @@ export default function RegisterSection() {
                                   childBirthdate: student.dob,
                                   childGrade: student.grade.toString(),
                                   childDismissal: student.StudentDismisall || "",
+                                  teacherName: student.teacher || "",
                                   emergencyContactName: student.ecname,
                                   emergencyContactPhone: student.ecphone,
                                   emergencyContactRelation: student.ecrelationship
@@ -2075,6 +2079,25 @@ export default function RegisterSection() {
                         {errors.childDismissal && (
                           <p className="text-red-500 text-sm mt-1">
                             {errors.childDismissal}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Teacher's Name
+                        </label>
+                        <Input
+                          name="teacherName"
+                          value={formData.teacherName}
+                          onChange={handleChange}
+                          placeholder="Enter teacher's name"
+                          className={
+                            errors.teacherName ? "border-red-500" : ""
+                          }
+                        />
+                        {errors.teacherName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.teacherName}
                           </p>
                         )}
                       </div>

@@ -250,6 +250,7 @@ export async function POST(request: Request) {
           ecphone: formData.emergencyContactPhone,
           ecrelationship: formData.emergencyContactRelation,
           StudentDismisall: formData.childDismissal,
+          teacher: formData.teacherName,
         })
         .eq("studentid", studentId)
 
@@ -287,6 +288,7 @@ export async function POST(request: Request) {
             ecphone: formData.emergencyContactPhone,
             ecrelationship: formData.emergencyContactRelation,
             StudentDismisall: formData.childDismissal,
+            teacher: formData.teacherName,
           })
           .eq("studentid", studentId)
 
@@ -317,6 +319,7 @@ export async function POST(request: Request) {
             ecphone: formData.emergencyContactPhone,
             ecrelationship: formData.emergencyContactRelation,
             StudentDismisall: formData.childDismissal,
+            teacher: formData.teacherName,
           })
           .select("studentid")
           .single()
@@ -339,6 +342,7 @@ export async function POST(request: Request) {
             ecphone: formData.emergencyContactPhone,
             ecrelationship: formData.emergencyContactRelation,
             StudentDismisall: formData.childDismissal,
+            teacher: formData.teacherName,
           })
           return NextResponse.json(
             {
