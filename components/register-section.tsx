@@ -149,7 +149,10 @@ export default function RegisterSection() {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   
   // Newsletter subscription state
-  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
+  
+  // Terms and conditions acceptance state (required)
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
@@ -2480,6 +2483,81 @@ export default function RegisterSection() {
                     </div>
                   </div>
 
+                  {/* Terms and Conditions Checkbox (Required) */}
+                  <div className="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-lg">
+                    <div 
+                      className="flex items-start gap-3 cursor-pointer"
+                      onClick={() => setAcceptedTerms(!acceptedTerms)}
+                    >
+                      <div 
+                        className="mt-0.5 flex-shrink-0 border-2 rounded transition-all"
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          minWidth: '18px',
+                          minHeight: '18px',
+                          borderColor: acceptedTerms ? '#0085B7' : '#D1D5DB',
+                          backgroundColor: acceptedTerms ? '#0085B7' : 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {acceptedTerms && (
+                          <svg 
+                            width="12" 
+                            height="12" 
+                            viewBox="0 0 12 12" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path 
+                              d="M10 3L4.5 8.5L2 6" 
+                              stroke="white" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-gray-700 leading-relaxed flex-1" style={{ fontSize: '13px', lineHeight: '1.5' }}>
+                        Yes, I've read the{' '}
+                        <a 
+                          href="/Privacy_Policy.pdf" 
+                          download="Privacy_Policy.pdf"
+                          className="font-semibold text-dr-blue hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Privacy Policy
+                        </a>
+                        {' '}and agree to the{' '}
+                        <a 
+                          href="/Site_terms.pdf" 
+                          download="Site_terms.pdf"
+                          className="font-semibold text-dr-blue hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Site Terms of Use
+                        </a>
+                        {' '}and{' '}
+                        <a 
+                          href="/SMS_TERMS.pdf" 
+                          download="SMS_TERMS.pdf"
+                          className="font-semibold text-dr-blue hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          SMS Terms of Use
+                        </a>
+                      </span>
+                    </div>
+                    {!acceptedTerms && (
+                      <p className="text-red-600 text-xs mt-2 ml-9">
+                        * Required to continue
+                      </p>
+                    )}
+                  </div>
+
                   <div className="flex gap-4">
                     <Button
                       onClick={prevStep}
@@ -2490,7 +2568,8 @@ export default function RegisterSection() {
                     </Button>
                     <Button
                       onClick={nextStep}
-                      className="flex-1 bg-dr-blue hover:bg-blue-700 whitespace-nowrap px-3 sm:px-4 text-sm sm:text-base"
+                      disabled={!acceptedTerms}
+                      className="flex-1 bg-dr-blue hover:bg-blue-700 whitespace-nowrap px-3 sm:px-4 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Continue to Payment
                     </Button>
