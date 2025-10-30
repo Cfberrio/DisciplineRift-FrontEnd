@@ -1112,24 +1112,8 @@ export default function RegisterSection() {
     const normalizedCode = code.trim().toUpperCase();
     
     switch (normalizedCode) {
-      case 'FACULTY':
-        return { isValid: true, percentage: 15 };
-      case 'SIBLING':
-        return { isValid: true, percentage: 10 };
-      case 'LABORDAY':
-        return { isValid: true, percentage: 10 };
-      case 'DRRIDE':
-        return { isValid: true, percentage: 100 };
-      case 'DRTEAM':
-        return { isValid: true, percentage: 50 };
-      case 'MONDAY':
-        return { isValid: true, percentage: 20 };
-      case 'THANKS':
-        return { isValid: true, percentage: 15 };
-      case 'OCS':
-        return { isValid: true, percentage: 100 };
-      case 'OPA':
-        return { isValid: true, percentage: 100 };
+      case 'HALLO':
+        return { isValid: true, percentage: 12 };
       default:
         return { isValid: false, percentage: 0 };
     }
