@@ -24,6 +24,8 @@ const validateCouponServer = (code: string): { isValid: boolean; percentage: num
   switch (normalizedCode) {
     case 'HALLO':
       return { isValid: true, percentage: 12 };
+    case 'DISCIPLINE':
+      return { isValid: true, percentage: 15 };
     default:
       return { isValid: false, percentage: 0 };
   }

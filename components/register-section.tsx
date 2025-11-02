@@ -152,8 +152,8 @@ export default function RegisterSection() {
   // Newsletter subscription state
   const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
   
-  // Terms and conditions acceptance state (required)
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  // Terms and conditions acceptance state (required) - pre-selected by default
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
 
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
@@ -1114,6 +1114,8 @@ export default function RegisterSection() {
     switch (normalizedCode) {
       case 'HALLO':
         return { isValid: true, percentage: 12 };
+      case 'DISCIPLINE':
+        return { isValid: true, percentage: 15 };
       default:
         return { isValid: false, percentage: 0 };
     }
