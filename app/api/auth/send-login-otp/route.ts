@@ -26,12 +26,14 @@ export async function POST(request: Request) {
 
     // Usar la función integrada de Supabase para enviar OTP de 6 dígitos
     // La configuración para códigos OTP debe estar habilitada en el dashboard de Supabase
+    console.log("📧 Sending OTP email with custom template from Supabase");
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
         shouldCreateUser: true, // Crear usuario automáticamente si no existe
-        // Para códigos OTP de 6 dígitos, la configuración debe estar en Supabase Dashboard:
-        // Authentication > Settings > Email Templates > Enable "Email OTP"
+        // Supabase usará la plantilla "Magic Link" configurada en:
+        // Authentication > Email Templates > Magic Link
+        // Asegúrate de que la plantilla esté habilitada y contenga {{ .Token }} para el código OTP
       },
     });
 
