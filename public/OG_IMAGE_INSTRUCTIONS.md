@@ -114,3 +114,12 @@ Usa los assets existentes en `/public/`:
 
 *Una vez creada la imagen, elimina este archivo de instrucciones.*
 
+
+
+
+
+
+
+
+
+

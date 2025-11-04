@@ -118,3 +118,7 @@ Si el problema persiste después de seguir estos pasos:
 - Contacta a soporte de Supabase con el Project ID
 - Verifica las variables de entorno en tu proyecto
 
+
+
+
+

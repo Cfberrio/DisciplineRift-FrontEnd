@@ -30,10 +30,11 @@ export async function POST(request: Request) {
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        shouldCreateUser: true, // Crear usuario automáticamente si no existe
-        // Supabase usará la plantilla "Magic Link" configurada en:
-        // Authentication > Email Templates > Magic Link
-        // Asegúrate de que la plantilla esté habilitada y contenga {{ .Token }} para el código OTP
+        shouldCreateUser: true,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/register`,
+        data: {
+          email: email,
+        },
       },
     });
 
