@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /auth/
+Disallow: /payment/
+Disallow: /students
+Disallow: /example
+
+# Sitemap
+Sitemap: https://www.disciplinerift.com/sitemap.xml
+

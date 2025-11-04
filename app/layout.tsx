@@ -98,6 +98,15 @@ export default function RootLayout({
     "logo": `${siteUrl}/android-chrome-512x512.png`,
     "description": "Elite youth sports development programs in Volleyball, Tennis & Pickleball",
     "foundingDate": "2024",
+    "telephone": "+14076147454",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "713 W Yale St",
+      "addressLocality": "Orlando",
+      "addressRegion": "FL",
+      "postalCode": "32804",
+      "addressCountry": "US"
+    },
     "sameAs": [
       "https://facebook.com/disciplinerift",
       "https://instagram.com/disciplinerift",
@@ -105,14 +114,54 @@ export default function RootLayout({
     ],
     "contactPoint": {
       "@type": "ContactPoint",
+      "telephone": "+14076147454",
       "contactType": "Customer Service",
-      "availableLanguage": ["English", "Spanish"]
+      "availableLanguage": ["English", "Spanish"],
+      "areaServed": "US"
     },
     "areaServed": {
       "@type": "Place",
       "name": "United States"
     },
     "sport": ["Volleyball", "Tennis", "Pickleball"]
+  }
+
+  // JSON-LD for LocalBusiness
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "SportsActivityLocation",
+    "name": "Discipline Rift",
+    "image": `${siteUrl}/og-image.svg`,
+    "@id": siteUrl,
+    "url": siteUrl,
+    "telephone": "+14076147454",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "713 W Yale St",
+      "addressLocality": "Orlando",
+      "addressRegion": "FL",
+      "postalCode": "32804",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 28.5496,
+      "longitude": -81.3897
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    ],
+    "sameAs": [
+      "https://facebook.com/disciplinerift",
+      "https://instagram.com/disciplinerift",
+      "https://tiktok.com/@disciplinerift"
+    ]
   }
 
   // JSON-LD for WebSite
@@ -131,6 +180,49 @@ export default function RootLayout({
       "target": `${siteUrl}/?s={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
+  }
+
+  // JSON-LD for Service/Course offerings
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Youth Sports Programs",
+    "description": "Elite youth sports development programs in Volleyball, Tennis, and Pickleball",
+    "itemListElement": [
+      {
+        "@type": "Course",
+        "name": "Youth Volleyball Program",
+        "description": "Professional volleyball training and development for young athletes",
+        "provider": {
+          "@type": "Organization",
+          "name": "Discipline Rift"
+        },
+        "educationalLevel": "Youth",
+        "sport": "Volleyball"
+      },
+      {
+        "@type": "Course",
+        "name": "Youth Tennis Program",
+        "description": "Comprehensive tennis instruction and skill development for youth",
+        "provider": {
+          "@type": "Organization",
+          "name": "Discipline Rift"
+        },
+        "educationalLevel": "Youth",
+        "sport": "Tennis"
+      },
+      {
+        "@type": "Course",
+        "name": "Youth Pickleball Program",
+        "description": "Dynamic pickleball training program for young athletes",
+        "provider": {
+          "@type": "Organization",
+          "name": "Discipline Rift"
+        },
+        "educationalLevel": "Youth",
+        "sport": "Pickleball"
+      }
+    ]
   }
 
   return (
@@ -152,7 +244,15 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
         />
         
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>

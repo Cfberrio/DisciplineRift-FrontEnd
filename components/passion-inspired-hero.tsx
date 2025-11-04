@@ -24,6 +24,7 @@ export default function PassionInspiredHero() {
           alt="Dynamic halftone pattern background"
           fill
           priority
+          fetchPriority="high"
           className="object-cover object-center w-full h-full hero-background-image hidden lg:block"
         />
         
@@ -33,6 +34,7 @@ export default function PassionInspiredHero() {
           alt="Mobile background"
           fill
           priority
+          fetchPriority="high"
           className="object-cover object-center w-full h-full hero-background-mobile lg:hidden"
         />
 

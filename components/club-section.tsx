@@ -19,7 +19,7 @@ export default function ClubSection() {
         <AnimatedSection animation="fade-down" className="text-center mb-6 xs:mb-8 sm:mb-10">
           <img 
             src="/04_OUR_VOLLEYBALL_CLUB.png" 
-            alt="Our Volleyball Club" 
+            alt="Our Volleyball Club - Elite youth volleyball training and competitive teams" 
             className="mx-auto max-w-full h-auto"
             style={{ maxHeight: '200px' }}
           />

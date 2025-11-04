@@ -115,6 +115,11 @@ export default function Home() {
       {/* Scroll to section handler */}
       <ScrollToSection />
       
+      {/* SEO: H1 semántico invisible para buscadores */}
+      <h1 className="sr-only">
+        Discipline Rift - Elite Youth Sports Development Programs in Volleyball, Tennis and Pickleball
+      </h1>
+      
       <main className="flex flex-col bg-pattern gap-0">
         {/* Passion-inspired Hero Section (no id needed for nav) */}
         <PassionInspiredHero />
@@ -133,7 +138,7 @@ export default function Home() {
                 <div className="mb-6 text-center">
                   <img
                     src="/01_WHAT_IS_DR.png"
-                    alt="What is Discipline Rift"
+                    alt="What is Discipline Rift - Youth sports development programs header"
                     className="w-auto h-12 xs:h-14 sm:h-16 object-contain mx-auto"
                   />
                 </div>
@@ -174,7 +179,7 @@ export default function Home() {
                 <div className="w-full">
                   <img
                     src="/Imagen-about-us.png"
-                    alt="About Us - Discipline Rift"
+                    alt="Young athletes training in youth sports program - Discipline Rift sports development"
                     className="w-full h-auto rounded-lg shadow-lg object-cover"
                   />
                 </div>
@@ -191,7 +196,7 @@ export default function Home() {
                   <div className="relative md:-ml-12 lg:-ml-16">
                     <img
                       src="/Imagen-about-us.png"
-                      alt="About Us - Discipline Rift"
+                      alt="Young athletes training in youth sports program - Discipline Rift sports development"
                       className="w-full h-auto rounded-lg shadow-lg object-cover"
                     />
                   </div>
@@ -204,7 +209,7 @@ export default function Home() {
                   <div className="mb-4 px-4 xs:px-0 about-title-mobile">
                     <img
                       src="/01_WHAT_IS_DR.png"
-                      alt="What is Discipline Rift"
+                      alt="What is Discipline Rift - Youth sports development programs header"
                       className="w-auto h-12 xs:h-14 sm:h-16 md:h-18 lg:h-20 object-contain"
                     />
                   </div>
