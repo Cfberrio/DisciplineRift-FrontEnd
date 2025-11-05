@@ -21,15 +21,14 @@ const nextConfig = {
       },
     ],
   },
+  // Rewrites eliminados para /register, /programs, /contact (páginas reales para SEO/sitelinks)
+  // Mantenemos solo rewrites internos de secciones
   async rewrites() {
     return [
-      { source: '/programs', destination: '/' },
       { source: '/drexperience', destination: '/' },
       { source: '/club', destination: '/' },
       { source: '/faq', destination: '/' },
-      { source: '/contact', destination: '/' },
       { source: '/join-team', destination: '/' },
-      { source: '/register', destination: '/' },
     ]
   },
 }

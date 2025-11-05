@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react"
 import Head from "next/head"
+import Script from "next/script"
 import ScrollProgress from "@/components/scroll-progress"
 import Header from "@/components/header"
 import PassionInspiredHero from "@/components/passion-inspired-hero"
@@ -47,6 +48,28 @@ function ScrollToRegister() {
 }
 
 export default function RegisterPage() {
+  const siteUrl = 'https://www.disciplinerift.com'
+  const pageUrl = `${siteUrl}/register`
+  
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteUrl
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Register",
+        "item": pageUrl
+      }
+    ]
+  }
+
   return (
     <>
       <Head>
@@ -62,6 +85,13 @@ export default function RegisterPage() {
         <meta name="twitter:title" content="Register Now - Fall 2025 Season | Discipline Rift" />
         <meta name="twitter:description" content="Register for Discipline Rift's Fall 2025 youth sports programs." />
       </Head>
+      
+      {/* JSON-LD Breadcrumbs */}
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <div className="min-h-screen">
         <ScrollProgress />
         <Header />

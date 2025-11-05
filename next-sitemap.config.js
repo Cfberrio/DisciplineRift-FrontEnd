@@ -22,7 +22,7 @@ module.exports = {
     ],
     additionalSitemaps: []
   },
-  // Prioridades por tipo de página
+  // Prioridades optimizadas para Google Sitelinks
   transform: async (config, path) => {
     // Homepage tiene máxima prioridad
     if (path === '/') {
@@ -34,12 +34,12 @@ module.exports = {
       }
     }
     
-    // Página de registro - alta prioridad
-    if (path === '/register') {
+    // Páginas clave para sitelinks - prioridad 0.8 (register, programs, contact)
+    if (['/register', '/programs', '/contact'].includes(path)) {
       return {
         loc: path,
         changefreq: 'weekly',
-        priority: 0.9,
+        priority: 0.8,
         lastmod: new Date().toISOString(),
       }
     }

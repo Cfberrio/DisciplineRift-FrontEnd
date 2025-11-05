@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import ScrollProgress from "@/components/scroll-progress"
 import Header from "@/components/header"
 import PassionInspiredHero from "@/components/passion-inspired-hero"

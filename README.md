@@ -28,6 +28,7 @@
 - **Pagos**: Stripe
 - **UI Components**: Radix UI + shadcn/ui
 - **Animaciones**: Framer Motion / CSS Animations
+- **SEO**: next-sitemap, JSON-LD breadcrumbs, optimized metadata
 
 ## 🚀 Instalación y Configuración
 
@@ -220,6 +221,48 @@ Las contribuciones son bienvenidas. Por favor:
 Si tienes preguntas o necesitas soporte, puedes:
 - Abrir un Issue en GitHub
 - Contactar al equipo de desarrollo
+
+---
+
+---
+
+## 🔍 SEO & Google Sitelinks Setup
+
+### Arquitectura SEO Optimizada
+
+Este proyecto está configurado para maximizar la visibilidad en Google y favorecer la aparición de **sitelinks** (enlaces internos bajo el resultado principal).
+
+#### 📄 Páginas Clave Indexables
+
+Tres páginas principales optimizadas para sitelinks:
+
+- **`/register`** - Registro de estudiantes  
+- **`/programs`** - Programas deportivos  
+- **`/contact`** - Información de contacto
+
+#### ✅ Características SEO Implementadas
+
+1. **Metadatos Completos**: Title único, meta descriptions, canonical URLs, Open Graph, Twitter Cards
+2. **JSON-LD Breadcrumbs**: Breadcrumbs estructurados en cada página (Home → [Página])
+3. **Navegación Interna Clara**: Enlaces prominentes desde la Home con anchor text descriptivo
+4. **Sitemap.xml Automático**: Generado en cada build con prioridades configuradas
+5. **robots.txt Optimizado**: Permite indexación de páginas públicas, bloquea privadas
+
+#### 🚀 Post-Deploy: Google Search Console
+
+Después de desplegar en Vercel:
+
+1. **Verificar dominio**: https://search.google.com/search-console
+2. **Enviar sitemap**: https://www.disciplinerift.com/sitemap.xml
+3. **Solicitar indexación**: Para /, /register, /programs, /contact
+
+#### ⏱️ Tiempo Estimado para Sitelinks
+
+- **1-2 semanas**: Indexación completa
+- **1-3 meses**: Posible aparición de sitelinks
+- **3-6 meses**: Sitelinks consolidados
+
+> Los sitelinks son generados automáticamente por Google. Mantén la estructura clara y los enlaces internos.
 
 ---
 
