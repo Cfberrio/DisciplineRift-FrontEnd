@@ -96,8 +96,9 @@ export default function ContactSection() {
               alt="Contact Us"
               width={400}
               height={120}
-              className="w-auto h-auto max-w-full max-h-24 xs:max-h-28 sm:max-h-32 md:max-h-36 lg:max-h-40"
+              className="mx-auto max-w-full h-auto"
               style={{ 
+                maxHeight: '200px',
                 filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 15px rgba(255,255,255,0.8))"
               }}
             />

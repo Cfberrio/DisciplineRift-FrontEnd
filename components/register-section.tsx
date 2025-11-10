@@ -380,6 +380,15 @@ export default function RegisterSection() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Helper function to get sport priority for sorting (higher number = higher priority)
+  const getSportPriority = (sport: string): number => {
+    const normalizedSport = (sport || "").toLowerCase();
+    if (normalizedSport.includes("pickleball") || normalizedSport === "pickleball") return 3;
+    if (normalizedSport.includes("tennis") || normalizedSport === "tennis") return 2;
+    if (normalizedSport.includes("volleyball") || normalizedSport === "volleyball") return 1;
+    return 0; // Other sports go last
+  };
+
   // Transform database data to component format
   const transformSchoolData = (dbSchools: any[]): School[] => {
     if (!Array.isArray(dbSchools)) {
@@ -387,75 +396,83 @@ export default function RegisterSection() {
       return [];
     }
 
-    return dbSchools.map((school) => ({
-      id: school.schoolid || "",
-      name: school.name || "Unknown School",
-      location: school.location || "Unknown Location",
-      logo: school.teams?.[0]?.logo || `/placeholder.svg?height=48&width=48&text=${encodeURIComponent(
-        school.name || "School"
-      )}`,
-      teams:
-        school.teams?.map((team: any) => ({
-          id: team.teamid || "",
-          name: team.name || "Unknown Team",
-          schoolId: school.schoolid || "",
-          schoolName: school.name || "Unknown School",
-          sport: "Volleyball",
-          ageGroup: "12-18",
-          skillLevel: "All Levels",
-          price: team.price || 299,
-          description: team.description || "Elite training program",
-          participants: team.participants || 20,
-          currentEnrollments: team.currentEnrollments || 0,
-          logo: team.logo || undefined,
-          coach: {
-            name: team.session?.[0]?.staff?.name || "TBD",
-            email: team.session?.[0]?.staff?.email || "",
-            phone: team.session?.[0]?.staff?.phone || "",
-          },
-          sessions:
-            team.session?.flatMap((session: any) => {
-              const individualSessions = session.individualSessions || [];
-              if (individualSessions.length === 0) {
-                // Create default sessions if none exist
-                return [
-                  {
-                    id: `default-${session.sessionid || "session"}`,
-                    dayOfWeek: "Monday",
-                    time: "3:00 PM - 4:30 PM",
-                    duration: "1h 30m",
-                    location: school.location || "TBD",
-                    startDate:
-                      session.startdate ||
-                      new Date().toISOString().split("T")[0],
-                    endDate:
-                      session.enddate ||
-                      new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-                        .toISOString()
-                        .split("T")[0],
-                    totalSessions: 12,
-                    formattedDate: "Mondays, starting soon",
-                    coachName: session.staff?.name || "TBD",
-                    trainingType: "General Training",
-                  },
-                ];
-              }
-              return individualSessions.map((indSession: any) => ({
-                id: indSession.id || "",
-                dayOfWeek: indSession.dayOfWeek || "",
-                time: indSession.time || "",
-                duration: indSession.duration || "",
-                location: indSession.location || "",
-                startDate: session.startdate || "",
-                endDate: session.enddate || "",
-                totalSessions: individualSessions.length,
-                formattedDate: indSession.formattedDate || "",
-                coachName: indSession.coachName || "",
-                trainingType: "General Training",
-              }));
-            }) || [],
-        })) || [],
-    }));
+    return dbSchools.map((school) => {
+      const teams = school.teams?.map((team: any) => ({
+        id: team.teamid || "",
+        name: team.name || "Unknown Team",
+        schoolId: school.schoolid || "",
+        schoolName: school.name || "Unknown School",
+        sport: team.sport || "Volleyball",
+        ageGroup: "12-18",
+        skillLevel: "All Levels",
+        price: team.price || 299,
+        description: team.description || "Elite training program",
+        participants: team.participants || 20,
+        currentEnrollments: team.currentEnrollments || 0,
+        logo: team.logo || undefined,
+        coach: {
+          name: team.session?.[0]?.staff?.name || "TBD",
+          email: team.session?.[0]?.staff?.email || "",
+          phone: team.session?.[0]?.staff?.phone || "",
+        },
+        sessions:
+          team.session?.flatMap((session: any) => {
+            const individualSessions = session.individualSessions || [];
+            if (individualSessions.length === 0) {
+              // Create default sessions if none exist
+              return [
+                {
+                  id: `default-${session.sessionid || "session"}`,
+                  dayOfWeek: "Monday",
+                  time: "3:00 PM - 4:30 PM",
+                  duration: "1h 30m",
+                  location: school.location || "TBD",
+                  startDate:
+                    session.startdate ||
+                    new Date().toISOString().split("T")[0],
+                  endDate:
+                    session.enddate ||
+                    new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                      .toISOString()
+                      .split("T")[0],
+                  totalSessions: 12,
+                  formattedDate: "Mondays, starting soon",
+                  coachName: session.staff?.name || "TBD",
+                  trainingType: "General Training",
+                },
+              ];
+            }
+            return individualSessions.map((indSession: any) => ({
+              id: indSession.id || "",
+              dayOfWeek: indSession.dayOfWeek || "",
+              time: indSession.time || "",
+              duration: indSession.duration || "",
+              location: indSession.location || "",
+              startDate: session.startdate || "",
+              endDate: session.enddate || "",
+              totalSessions: individualSessions.length,
+              formattedDate: indSession.formattedDate || "",
+              coachName: indSession.coachName || "",
+              trainingType: "General Training",
+            }));
+          }) || [],
+      })) || [];
+
+      // Sort teams by sport: volleyball, tennis, pickleball, others
+      const sortedTeams = teams.sort((a, b) => {
+        return getSportPriority(b.sport) - getSportPriority(a.sport);
+      });
+
+      return {
+        id: school.schoolid || "",
+        name: school.name || "Unknown School",
+        location: school.location || "Unknown Location",
+        logo: school.teams?.[0]?.logo || `/placeholder.svg?height=48&width=48&text=${encodeURIComponent(
+          school.name || "School"
+        )}`,
+        teams: sortedTeams,
+      };
+    });
   };
 
   // Load all data on component mount
@@ -594,20 +611,35 @@ export default function RegisterSection() {
               .includes(searchQuery.toLowerCase());
 
           if (schoolMatches) {
-            return school;
+            // Sort teams by sport even if school matches
+            const sortedTeams = [...school.teams].sort((a, b) => {
+              return getSportPriority(b.sport) - getSportPriority(a.sport);
+            });
+            
+            return {
+              ...school,
+              teams: sortedTeams,
+            };
           }
+
+          // Filter teams and sort by sport
+          const filteredTeams = school.teams.filter(
+            (team: any) =>
+              (team.name || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (team.description || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
+          );
+
+          const sortedTeams = filteredTeams.sort((a, b) => {
+            return getSportPriority(b.sport) - getSportPriority(a.sport);
+          });
 
           return {
             ...school,
-            teams: school.teams.filter(
-              (team: any) =>
-                (team.name || "")
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase()) ||
-                (team.description || "")
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase())
-            ),
+            teams: sortedTeams,
           };
         });
 
@@ -1316,7 +1348,15 @@ export default function RegisterSection() {
                                   />
                                 </div>
                                 <div>
-                                  <h4 className="text-xl font-bold text-dr-blue">
+                                  <h4 
+                                    className="text-xl font-bold text-dr-blue cursor-pointer hover:opacity-80 transition-opacity"
+                                    onClick={() => {
+                                      const teamsSection = document.getElementById(`school-teams-${school.id}`);
+                                      if (teamsSection) {
+                                        teamsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                      }
+                                    }}
+                                  >
                                     {school.name}
                                   </h4>
                                   <p className="text-gray-600 flex items-center">
@@ -1325,7 +1365,7 @@ export default function RegisterSection() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="space-y-3">
+                              <div id={`school-teams-${school.id}`} className="space-y-3">
                                 {school.teams.map((team) => (
                                   <div
                                     key={team.id}

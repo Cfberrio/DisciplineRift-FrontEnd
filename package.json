@@ -23,9 +23,10 @@
     "manual-labor-day-campaign": "npx tsx scripts/manual-labor-day-campaign.ts",
     "debug-email-dates": "npx tsx scripts/debug-email-dates.ts",
     "test-end-date": "npx tsx scripts/test-end-date-issue.ts",
-    "preview-september-18": "node generate-1week-september-18-preview.js",
-    "preview-september-19": "node generate-1week-september-19-preview.js",
-    "generate-email-preview": "node generate-email-preview.js"
+    "preview-september-18": "node scripts/email-previews/generate-1week-september-18-preview.js",
+    "preview-september-19": "node scripts/email-previews/generate-1week-september-19-preview.js",
+    "preview-monday-15": "node scripts/email-previews/generate-monday-15-preview.js",
+    "preview-tuesday-16": "node scripts/email-previews/generate-tuesday-16-preview.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

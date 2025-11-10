@@ -296,8 +296,9 @@ export default function JoinTeamSection() {
               alt="Contact Form"
               width={500}
               height={150}
-              className="w-auto h-auto max-w-full max-h-20 xs:max-h-24 sm:max-h-28 md:max-h-32 lg:max-h-36"
+              className="mx-auto max-w-full h-auto"
               style={{ 
+                maxHeight: '200px',
                 filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 15px rgba(255,255,255,0.8))"
               }}
             />

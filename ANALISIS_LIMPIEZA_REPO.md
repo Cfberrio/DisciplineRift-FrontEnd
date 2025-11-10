@@ -493,3 +493,6 @@ curl http://localhost:3000/manifest.json
 **Autor**: Análisis automatizado + revisión manual
 **Estado**: ✅ Listo para ejecutar
 
+
+
+
