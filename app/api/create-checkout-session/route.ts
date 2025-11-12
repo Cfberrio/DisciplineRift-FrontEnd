@@ -30,6 +30,8 @@ const validateCouponServer = (code: string): { isValid: boolean; percentage: num
       return { isValid: true, percentage: 10 };
     case 'FACULTY':
       return { isValid: true, percentage: 12 };
+    case '50':
+      return { isValid: true, percentage: 50 };
     case 'TRELLIS':
       return { isValid: true, percentage: 100 };
     default:

@@ -26,7 +26,9 @@
     "preview-september-18": "node scripts/email-previews/generate-1week-september-18-preview.js",
     "preview-september-19": "node scripts/email-previews/generate-1week-september-19-preview.js",
     "preview-monday-15": "node scripts/email-previews/generate-monday-15-preview.js",
-    "preview-tuesday-16": "node scripts/email-previews/generate-tuesday-16-preview.js"
+    "preview-tuesday-16": "node scripts/email-previews/generate-tuesday-16-preview.js",
+    "diagnose-emails": "npx tsx scripts/diagnose-email-system.ts",
+    "resend-confirmation-emails": "npx tsx scripts/resend-confirmation-emails.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
