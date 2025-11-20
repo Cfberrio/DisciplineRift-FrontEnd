@@ -941,7 +941,7 @@ export default function RegisterSection() {
       // Si estamos pasando del step 5 (Review) al step 6 (Payment) y el usuario marcó el checkbox de newsletter
       if (step === 5 && subscribeToNewsletter && currentUser) {
         try {
-          // Guardar en la tabla Newsletter usando el email del usuario autenticado y el nombre del padre
+          // Guardar en la tabla Newsletter usando el email del usuario autenticado, el nombre del padre y el sport del team
           const response = await fetch("/api/send-parent-guide", {
             method: "POST",
             headers: {
@@ -950,6 +950,7 @@ export default function RegisterSection() {
             body: JSON.stringify({
               email: currentUser.email,
               name: formData.parentFirstName,
+              sport: formData.selectedTeam?.sport || null,
             }),
           });
 

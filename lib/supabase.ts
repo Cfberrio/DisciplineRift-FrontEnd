@@ -198,6 +198,7 @@ export interface Payment {
 export interface Newsletter {
   id: string;
   email: string;
+  name: string;
   sport: string | null;
   created_at: string;
   updated_at: string;

@@ -50,3 +50,5 @@ Todos los diagramas están organizados por función y tipo:
 - **Diagramas de Decisión**: Validaciones y decisiones críticas
 - **Diagramas de Estructura**: Arquitectura y organización
 
+
+

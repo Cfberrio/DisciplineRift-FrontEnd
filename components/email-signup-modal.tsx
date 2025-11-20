@@ -1,40 +1,82 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { Mail, ArrowRight, Loader2, User } from "lucide-react"
+import { Mail, ArrowRight, Loader2, User, AlertCircle, CheckCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { validateEmail, getSuggestedEmail, normalizeEmail } from "@/lib/email-validation"
 
 interface EmailSignupModalProps {
-  onSubscribe: (email: string, name: string) => Promise<void>
+  onSubscribe: (email: string, name: string, honeypot: string) => Promise<void>
   isSubmitting: boolean
 }
 
 export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSignupModalProps) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
+  const [honeypot, setHoneypot] = useState("")
   const [error, setError] = useState("")
+  const [suggestion, setSuggestion] = useState<string | null>(null)
+  const [validationWarning, setValidationWarning] = useState("")
+
+  // Real-time validation on email change
+  useEffect(() => {
+    if (!email.trim()) {
+      setSuggestion(null)
+      setValidationWarning("")
+      return
+    }
+
+    const normalized = normalizeEmail(email)
+    const result = validateEmail(normalized)
+
+    if (!result.valid && result.error) {
+      setValidationWarning(result.error)
+      setSuggestion(null)
+    } else if (result.suggestion) {
+      setSuggestion(result.suggestion)
+      setValidationWarning("")
+    } else {
+      setSuggestion(null)
+      setValidationWarning("")
+    }
+  }, [email])
+
+  const handleSuggestionClick = () => {
+    if (suggestion) {
+      setEmail(suggestion)
+      setSuggestion(null)
+      setValidationWarning("")
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!email.trim()) {
-      setError("Email address is required.")
-      return
-    }
-    // Basic email validation
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError("Please enter a valid email address.")
-      return
-    }
+    
     if (!name.trim()) {
       setError("Name is required.")
       return
     }
+
+    if (!email.trim()) {
+      setError("Email address is required.")
+      return
+    }
+
+    // Validate email
+    const normalized = normalizeEmail(email)
+    const result = validateEmail(normalized)
+    
+    if (!result.valid) {
+      setError(result.error || "Invalid email address")
+      return
+    }
+
     setError("")
-    await onSubscribe(email, name)
+    await onSubscribe(email, name, honeypot)
   }
 
   return (
@@ -52,6 +94,24 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 sm:py-6 space-y-4">
+        {/* Honeypot field - hidden from users, bots will fill it */}
+        <input
+          type="text"
+          name="website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+          }}
+          aria-hidden="true"
+        />
+
         <div className="relative">
           <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-300" />
           <Input
@@ -86,14 +146,37 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
             required
             className={cn(
               "w-full pl-10 pr-4 py-3 h-12 text-base rounded-md border-2 bg-blue-600/50 text-white placeholder-blue-300 focus:bg-blue-600 focus:border-yellow-400 focus:ring-yellow-400",
-              error && "border-red-400 focus:border-red-500 ring-red-500",
+              (error || validationWarning) && "border-red-400 focus:border-red-500 ring-red-500",
             )}
-            aria-describedby="form-error"
+            aria-describedby="form-error validation-warning email-suggestion"
           />
         </div>
 
+        {/* Email suggestion */}
+        {suggestion && !error && (
+          <button
+            type="button"
+            onClick={handleSuggestionClick}
+            className="w-full text-left text-sm text-yellow-300 bg-yellow-900/30 px-3 py-2 rounded-md hover:bg-yellow-900/50 transition-colors flex items-center gap-2"
+            id="email-suggestion"
+          >
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span>Did you mean <strong className="underline">{suggestion}</strong>?</span>
+          </button>
+        )}
+
+        {/* Validation warning (real-time) */}
+        {validationWarning && !error && (
+          <p id="validation-warning" className="text-sm text-yellow-300 bg-yellow-900/30 px-3 py-2 rounded-md flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {validationWarning}
+          </p>
+        )}
+
+        {/* Error message */}
         {error && (
-          <p id="form-error" className="text-sm text-red-300 bg-red-900/50 px-3 py-2 rounded-md">
+          <p id="form-error" className="text-sm text-red-300 bg-red-900/50 px-3 py-2 rounded-md flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
             {error}
           </p>
         )}

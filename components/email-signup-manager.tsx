@@ -24,13 +24,13 @@ export default function EmailSignupManager() {
     }
   }, [])
 
-  const handleSubscribe = async (email: string, name: string) => {
+  const handleSubscribe = async (email: string, name: string, honeypot: string) => {
     setIsSubmitting(true)
-    console.log("Subscribing email:", email, "Name:", name)
+    console.log("Subscribing to newsletter:", email, "Name:", name)
 
     try {
-      // Call the API to send the Parent Guide email
-      const response = await fetch("/api/send-parent-guide", {
+      // Call the new newsletter subscribe API with soft validation
+      const response = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,26 +38,27 @@ export default function EmailSignupManager() {
         body: JSON.stringify({
           email,
           name,
+          honeypot,
         }),
       })
 
       const result = await response.json()
 
-      if (response.ok && result.success) {
-        console.log("✅ Parent Guide email sent successfully")
+      if (response.ok && result.ok) {
+        console.log("✅ Newsletter subscription successful:", result.msg)
         // On successful subscription:
         localStorage.setItem(LOCAL_STORAGE_KEY, "true")
         setIsModalOpen(false)
         // Optionally, show a success toast/message here
       } else {
-        console.error("❌ Failed to send Parent Guide email:", result.message)
+        console.error("❌ Newsletter subscription failed:", result.msg)
         // Handle error - could show an error message to the user
         // For now, we'll still close the modal to avoid blocking the user
         localStorage.setItem(LOCAL_STORAGE_KEY, "true")
         setIsModalOpen(false)
       }
     } catch (error) {
-      console.error("❌ Error sending Parent Guide email:", error)
+      console.error("❌ Error subscribing to newsletter:", error)
       // Handle error - still close modal to avoid blocking the user
       localStorage.setItem(LOCAL_STORAGE_KEY, "true")
       setIsModalOpen(false)

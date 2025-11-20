@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { email, name } = body
+    const { email, name, sport } = body
 
     // Validar que el email sea requerido
     if (!email || !email.trim()) {
@@ -32,16 +32,23 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log("📧 Saving newsletter subscription and sending Parent Guide email to:", email, "Name:", name)
+    console.log("📧 Saving newsletter subscription and sending Parent Guide email to:", email, "Name:", name, "Sport:", sport)
 
     // Guardar en la tabla Newsletter de Supabase
     try {
+      const insertData: any = {
+        email: email.trim(),
+        name: name.trim(),
+      }
+      
+      // Solo incluir sport si está definido
+      if (sport) {
+        insertData.sport = sport.trim()
+      }
+      
       const { data: newsletterData, error: newsletterError } = await supabase
         .from("Newsletter")
-        .insert({
-          email: email.trim(),
-          name: name.trim(),
-        })
+        .insert(insertData)
         .select()
 
       if (newsletterError) {
@@ -49,12 +56,18 @@ export async function POST(request: Request) {
         
         // Verificar si es un error de duplicado (email ya existe)
         if (newsletterError.code === '23505') {
-          console.log("ℹ️ Email already exists in newsletter, updating name...")
+          console.log("ℹ️ Email already exists in newsletter, updating name and sport...")
           
-          // Actualizar el nombre si el email ya existe
+          // Preparar datos de actualización
+          const updateData: any = { name: name.trim() }
+          if (sport) {
+            updateData.sport = sport.trim()
+          }
+          
+          // Actualizar el nombre y sport si el email ya existe
           const { error: updateError } = await supabase
             .from("Newsletter")
-            .update({ name: name.trim() })
+            .update(updateData)
             .eq("email", email.trim())
 
           if (updateError) {

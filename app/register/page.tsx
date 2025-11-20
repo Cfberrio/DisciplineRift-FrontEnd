@@ -109,7 +109,7 @@ export default function RegisterPage() {
         {/* About Us Section with id="about" */}
         <section
           id="about"
-          className="py-8 xs:py-12 sm:py-16 md:py-20 bg-cover bg-center min-h-screen about-container-mobile"
+          className="py-8 xs:py-12 sm:py-16 md:py-20 bg-cover bg-center min-h-screen about-container-mobile -mt-16 xs:-mt-20 sm:-mt-24 md:mt-0"
           style={{ backgroundImage: "url('/about-us-background.png')" }}
         >
           <div className="container px-4 relative z-10">

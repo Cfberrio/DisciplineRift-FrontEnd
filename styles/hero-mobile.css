@@ -7,6 +7,7 @@
     min-height: 50vh !important; /* Altura mínima reducida */
     height: auto !important; /* Altura automática */
     margin-bottom: 0 !important; /* Sin margen inferior */
+    z-index: 5 !important; /* Debajo del about */
   }
   
   /* Contenedor principal móvil */
@@ -71,6 +72,7 @@
     min-height: 55vh !important;
     height: auto !important; /* Altura automática */
     margin-bottom: 0 !important; /* Sin margen inferior */
+    z-index: 5 !important; /* Debajo del about */
   }
   
   .hero-mobile-container {
@@ -159,6 +161,9 @@
     position: relative !important;
     padding: 3rem 0 !important;
     min-height: 80vh !important;
+    z-index: 10 !important; /* Sobre el hero */
+    border-top-left-radius: 24px !important;
+    border-top-right-radius: 24px !important;
   }
   
 
@@ -244,6 +249,9 @@
     position: relative !important;
     padding: 4rem 0 !important;
     min-height: 85vh !important;
+    z-index: 10 !important; /* Sobre el hero */
+    border-top-left-radius: 28px !important;
+    border-top-right-radius: 28px !important;
   }
   
   /* Overlay para iPhone grandes */

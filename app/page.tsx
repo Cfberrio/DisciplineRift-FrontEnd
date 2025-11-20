@@ -128,7 +128,7 @@ export default function Home() {
         {/* About Us Section with id="about" */}
         <section
           id="about"
-          className="py-4 xs:py-6 sm:py-8 md:py-12 lg:py-16 bg-cover bg-center lg:min-h-screen about-container-mobile mt-0"
+          className="py-4 xs:py-6 sm:py-8 md:py-12 lg:py-16 bg-cover bg-center lg:min-h-screen about-container-mobile -mt-16 xs:-mt-20 sm:-mt-24 md:mt-0"
           style={{ backgroundImage: "url('/about-us-background.png')" }}
         >
           <div className="container px-4 relative z-10">
