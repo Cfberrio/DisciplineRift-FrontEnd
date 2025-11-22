@@ -121,6 +121,7 @@ export default function RegisterSection() {
   // Selected team for Step 2
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [showAllSessions, setShowAllSessions] = useState(false);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
 
   // Authentication state
 
@@ -1354,6 +1355,7 @@ export default function RegisterSection() {
                                   <h4 
                                     className="text-xl font-bold text-dr-blue cursor-pointer hover:opacity-80 transition-opacity"
                                     onClick={() => {
+                                      setSelectedSchoolId(school.id);
                                       const teamsSection = document.getElementById(`school-teams-${school.id}`);
                                       if (teamsSection) {
                                         teamsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1372,7 +1374,12 @@ export default function RegisterSection() {
                                 {school.teams.map((team) => (
                                   <div
                                     key={team.id}
-                                    className="bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                                    className="p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                                    style={{
+                                      backgroundColor: selectedSchoolId === school.id 
+                                        ? 'rgba(0, 133, 183, 0.1)' 
+                                        : '#f9fafb'
+                                    }}
                                     onClick={() => {
                                       handleTeamSelect(team);
                                       nextStep();
