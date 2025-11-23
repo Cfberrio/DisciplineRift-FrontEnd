@@ -77,14 +77,6 @@ npm run dev
 
 La aplicación estará disponible en `http://localhost:3000`
 
-## 🔐 Acceso Administrativo
-
-Para acceder al panel de administración:
-
-1. Visita `/dashboard`
-2. Utiliza las credenciales:
-   - **Email**: admin@disciplinerift.com
-   - **Contraseña**: admin123
 
 ## 📱 Funcionalidades
 
