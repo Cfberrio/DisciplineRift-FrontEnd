@@ -5,17 +5,17 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 /**
- * Componente interno que usa useSearchParams
+ * Internal component that reads query params via useSearchParams
  */
 function UnsubscribeSuccessContent() {
   const searchParams = useSearchParams();
-  const email = searchParams.get('email') || 'tu email';
+  const email = searchParams.get('email') || 'your email';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          {/* Icono de éxito */}
+          {/* Success icon */}
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
               <svg
@@ -35,47 +35,47 @@ function UnsubscribeSuccessContent() {
             </div>
           </div>
 
-          {/* Título */}
+          {/* Title */}
           <h1 className="text-3xl font-bold text-center mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Successfully Unsubscribed
           </h1>
 
-          {/* Mensaje */}
+          {/* Message */}
           <div className="text-center mb-6">
             <p className="text-gray-600 mb-2">
-              Te has desuscrito exitosamente de nuestro newsletter.
+              You have successfully unsubscribed from our newsletter.
             </p>
             <div className="bg-gray-50 rounded-lg p-3 mt-4">
-              <p className="text-sm text-gray-500 mb-1">Email removido:</p>
+              <p className="text-sm text-gray-500 mb-1">Removed email:</p>
               <p className="text-gray-900 font-medium break-all">{email}</p>
             </div>
           </div>
 
-          {/* Información adicional */}
+          {/* Additional info */}
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
             <p className="text-sm text-blue-800">
-              Ya no recibirás correos de nuestro newsletter. Si cambias de opinión, 
-              siempre puedes volver a suscribirte desde nuestra página principal.
+              You will no longer receive newsletter emails from us. If you change your mind,
+              you can always subscribe again from our homepage.
             </p>
           </div>
 
-          {/* Botón para regresar */}
+          {/* Back button */}
           <Link
             href="/"
             className="block w-full text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
           >
-            Regresar al Home
+            Back to Home
           </Link>
         </div>
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
-          ¿Problemas? Contáctanos en{' '}
+          Need help? Contact us at{' '}
           <a
-            href="mailto:support@disciplinerift.com"
+            href="mailto:info@disciplinerift.com"
             className="text-blue-600 hover:text-blue-700 underline"
           >
-            support@disciplinerift.com
+            info@disciplinerift.com
           </a>
         </p>
       </div>
@@ -84,7 +84,7 @@ function UnsubscribeSuccessContent() {
 }
 
 /**
- * Página de confirmación de unsubscribe
+ * Unsubscribe confirmation page
  */
 export default function UnsubscribeSuccessPage() {
   return (
@@ -92,7 +92,7 @@ export default function UnsubscribeSuccessPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     }>
