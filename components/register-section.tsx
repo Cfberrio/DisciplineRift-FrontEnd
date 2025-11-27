@@ -2587,33 +2587,39 @@ export default function RegisterSection() {
                         )}
                       </div>
                       <span className="text-gray-700 leading-relaxed flex-1" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                        Yes, I've read the{' '}
-                        <a 
-                          href="/Privacy_Policy.pdf" 
-                          download="Privacy_Policy.pdf"
+                        Yes, I've read the{" "}
+                        <a
+                          href="/privacy-policy"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
                           Privacy Policy
                         </a>
-                        {' '}and agree to the{' '}
-                        <a 
-                          href="/Site_terms.pdf" 
-                          download="Site_terms.pdf"
+                        {" "}and agree to the{" "}
+                        <a
+                          href="/terms-of-use"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
                           Site Terms of Use
                         </a>
-                        {' '}and{' '}
-                        <a 
-                          href="/SMS_TERMS.pdf" 
-                          download="SMS_TERMS.pdf"
+                        {" "}and{" "}
+                        <a
+                          href="/sms-terms"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
                           SMS Terms of Use
                         </a>
+                        <span className="block text-xs text-gray-500 mt-1">
+                          Message &amp; data rates may apply.
+                        </span>
                       </span>
                     </div>
                     {!acceptedTerms && (
