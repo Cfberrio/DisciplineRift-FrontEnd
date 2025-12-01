@@ -2587,9 +2587,9 @@ export default function RegisterSection() {
                         )}
                       </div>
                       <span className="text-gray-700 leading-relaxed flex-1" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                        Yes, I've read the{" "}
+                        By checking this box, you agree to receive recurring SMS updates from Discipline Rift. Message frequency varies. Message and data rates may apply. Reply STOP to cancel, HELP for help. View our{" "}
                         <a
-                          href="/privacy-policy"
+                          href="/Site_terms.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
@@ -2597,29 +2597,27 @@ export default function RegisterSection() {
                         >
                           Privacy Policy
                         </a>
-                        {" "}and agree to the{" "}
+                        {", "}
                         <a
-                          href="/terms-of-use"
+                          href="/Site_terms.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          Site Terms of Use
+                          Terms of Use
                         </a>
-                        {" "}and{" "}
+                        {", and "}
                         <a
-                          href="/sms-terms"
+                          href="/SMS_TERMS.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          SMS Terms of Use
+                          SMS Terms
                         </a>
-                        <span className="block text-xs text-gray-500 mt-1">
-                          Message &amp; data rates may apply.
-                        </span>
+                        . We do not share or sell mobile numbers with third parties/affiliates for marketing or promotional purposes.
                       </span>
                     </div>
                     {!acceptedTerms && (
