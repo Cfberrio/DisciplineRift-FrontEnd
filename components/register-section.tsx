@@ -151,10 +151,10 @@ export default function RegisterSection() {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   
   // Newsletter subscription state
-  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
   
-  // Terms and conditions acceptance state (required) - pre-selected by default
-  const [acceptedTerms, setAcceptedTerms] = useState(true);
+  // Terms and conditions acceptance state (required)
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [formData, setFormData] = useState<ParentRegistrationData>({
     parentFirstName: "",
