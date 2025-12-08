@@ -74,8 +74,7 @@ export async function getTeamsBySchool(schoolId: string) {
       `
       )
       .eq("schoolid", schoolId)
-      .eq("isactive", true)
-      .eq("isongoing", true)
+      .in("status", ["open", "ongoing"])
       .order("name");
 
     if (error) {
@@ -119,8 +118,7 @@ export async function getAllTeams() {
         )
       `
       )
-      .eq("isactive", true)
-      .eq("isongoing", true)
+      .in("status", ["open", "ongoing"])
       .order("name");
 
     if (error) {
@@ -159,7 +157,7 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
 
     console.log(`[QUERY] ✅ Found ${schools.length} schools`);
 
-    // Step 2: Get only active AND ongoing teams with basic info
+    // Step 2: Get only teams with status='open' or status='ongoing'
     const { data: teams, error: teamsError } = await supabase
       .from("team")
       .select(
@@ -171,14 +169,13 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
         price,
         participants,
         isactive,
-        isongoing,
+        status,
         logo,
         created_at,
         updated_at
       `
       )
-      .eq("isactive", true)
-      .eq("isongoing", true)
+      .in("status", ["open", "ongoing"])
       .order("name");
 
     if (teamsError) {
@@ -407,7 +404,7 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
               price: 299,
               participants: 0,
               isactive: true,
-              isongoing: true,
+              status: "open",
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
               session: [
