@@ -168,10 +168,12 @@ export interface Student {
   lastname: string;
   dob: string;
   grade: string;
+  uniform_size?: string;
   ecname: string;
   ecphone: string;
   ecrelationship: string;
   studentdismisall: string;
+  teacher?: string;
 }
 
 export interface Parent {

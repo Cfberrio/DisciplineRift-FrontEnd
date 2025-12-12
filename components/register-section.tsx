@@ -79,6 +79,7 @@ interface ParentRegistrationData {
   childLastName: string;
   childBirthdate: string;
   childGrade: string;
+  uniformSize: string;
   childDismissal: string;
   teacherName: string;
   emergencyContactName: string;
@@ -165,6 +166,7 @@ export default function RegisterSection() {
     childLastName: "",
     childBirthdate: "",
     childGrade: "",
+    uniformSize: "",
     childDismissal: "",
     teacherName: "",
     emergencyContactName: "",
@@ -202,6 +204,44 @@ export default function RegisterSection() {
       console.error("❌ Error loading existing students:", error);
       setExistingStudents([]);
     }
+  };
+
+  // Helper function to check if team requires uniform size
+  const requiresUniformSize = (teamName: string | undefined): boolean => {
+    if (!teamName) return false;
+    return teamName === "13U LEAGU TEAM (5th-6th GRADE + ADVANCED PLAYERS)" || 
+           teamName === "15U TEAM (7th-8th)";
+  };
+
+  // Helper function to get available grades for selected team
+  const getAvailableGrades = (teamName: string | undefined): Array<{value: string, label: string}> => {
+    if (!teamName) {
+      // Default grades (current behavior)
+      return Array.from({ length: 6 }, (_, i) => ({
+        value: i === 0 ? "K" : i.toString(),
+        label: i === 0 ? "Kindergarten" : `Grade ${i}`
+      }));
+    }
+    
+    if (teamName === "13U LEAGU TEAM (5th-6th GRADE + ADVANCED PLAYERS)") {
+      return [
+        { value: "5", label: "Grade 5" },
+        { value: "6", label: "Grade 6" }
+      ];
+    }
+    
+    if (teamName === "15U TEAM (7th-8th)") {
+      return [
+        { value: "7", label: "Grade 7" },
+        { value: "8", label: "Grade 8" }
+      ];
+    }
+    
+    // Default grades for other teams
+    return Array.from({ length: 6 }, (_, i) => ({
+      value: i === 0 ? "K" : i.toString(),
+      label: i === 0 ? "Kindergarten" : `Grade ${i}`
+    }));
   };
 
   // Check for existing session on component mount
@@ -920,6 +960,11 @@ export default function RegisterSection() {
       if (!formData.emergencyContactRelation.trim())
         newErrors.emergencyContactRelation =
           "Emergency contact relation is required";
+      
+      // Validate uniform size for specific teams
+      if (requiresUniformSize(selectedTeam?.name) && !formData.uniformSize) {
+        newErrors.uniformSize = "Uniform size is required for this team";
+      }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -1870,6 +1915,7 @@ export default function RegisterSection() {
                                 childLastName: "",
                                 childBirthdate: "",
                                 childGrade: "",
+                                uniformSize: "",
                                 childDismissal: "",
                                 teacherName: "",
                                 emergencyContactName: "",
@@ -1888,6 +1934,7 @@ export default function RegisterSection() {
                                   childLastName: student.lastname,
                                   childBirthdate: student.dob,
                                   childGrade: student.grade.toString(),
+                                  uniformSize: student.uniform_size || "",
                                   childDismissal: student.StudentDismisall || "",
                                   teacherName: student.teacher || "",
                                   emergencyContactName: student.ecname,
@@ -2084,12 +2131,9 @@ export default function RegisterSection() {
                           }`}
                         >
                           <option value="">Select Grade</option>
-                          {Array.from({ length: 6 }, (_, i) => (
-                            <option
-                              key={i}
-                              value={i === 0 ? "K" : i.toString()}
-                            >
-                              {i === 0 ? "Kindergarten" : `Grade ${i}`}
+                          {getAvailableGrades(selectedTeam?.name).map((grade) => (
+                            <option key={grade.value} value={grade.value}>
+                              {grade.label}
                             </option>
                           ))}
                         </select>
@@ -2143,6 +2187,36 @@ export default function RegisterSection() {
                           </p>
                         )}
                       </div>
+                      
+                      {/* Uniform Size - Solo para equipos específicos */}
+                      {requiresUniformSize(selectedTeam?.name) && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Uniform Size <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            name="uniformSize"
+                            value={formData.uniformSize}
+                            onChange={handleChange}
+                            className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-dr-blue focus:border-dr-blue ${
+                              errors.uniformSize
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            <option value="">Select Size</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                          </select>
+                          {errors.uniformSize && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.uniformSize}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 

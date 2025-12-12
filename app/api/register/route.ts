@@ -315,6 +315,7 @@ export async function POST(request: Request) {
             lastname: formData.childLastName,
             dob: formData.childBirthdate,
             grade: formData.childGrade,
+            uniform_size: formData.uniformSize || null,
             ecname: formData.emergencyContactName,
             ecphone: formData.emergencyContactPhone,
             ecrelationship: formData.emergencyContactRelation,
