@@ -430,6 +430,22 @@ export default function RegisterSection() {
     return 0; // Other sports go last
   };
 
+  // Helper function to construct team logo URL
+  const getTeamLogoUrl = (logoValue: string | undefined | null): string => {
+    if (!logoValue) {
+      return "/placeholder.svg?height=48&width=48&text=Team";
+    }
+
+    // Si ya es una URL completa, retornarla tal cual
+    if (logoValue.startsWith("http://") || logoValue.startsWith("https://")) {
+      return logoValue;
+    }
+
+    // Si es solo el nombre del archivo, construir la URL completa
+    const baseUrl = "https://tdyyjoyotvzgbeowtlfv.supabase.co/storage/v1/object/public/team-logo/teams";
+    return `${baseUrl}/${logoValue}`;
+  };
+
   // Transform database data to component format
   const transformSchoolData = (dbSchools: any[]): School[] => {
     if (!Array.isArray(dbSchools)) {
@@ -508,7 +524,7 @@ export default function RegisterSection() {
         id: school.schoolid || "",
         name: school.name || "Unknown School",
         location: school.location || "Unknown Location",
-        logo: school.teams?.[0]?.logo || `/placeholder.svg?height=48&width=48&text=${encodeURIComponent(
+        logo: getTeamLogoUrl(school.teams?.[0]?.logo) || `/placeholder.svg?height=48&width=48&text=${encodeURIComponent(
           school.name || "School"
         )}`,
         teams: sortedTeams,
@@ -1394,6 +1410,9 @@ export default function RegisterSection() {
                                     width={48}
                                     height={48}
                                     className="rounded-lg object-cover w-full h-full"
+                                    onError={(e) => {
+                                      e.currentTarget.src = "/placeholder.svg?height=48&width=48&text=School";
+                                    }}
                                   />
                                 </div>
                                 <div>
