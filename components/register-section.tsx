@@ -1198,8 +1198,18 @@ export default function RegisterSection() {
   };
 
   const formatDescription = (description: string) => {
-    if (!description) return "";
-    return description.split('.').filter(part => part.trim() !== '').join('\n');
+    if (!description) return null;
+    
+    // Split by newlines and filter empty lines
+    const lines = description.split('\n').map(line => line.trim()).filter(line => line !== '');
+    
+    return (
+      <div className="flex flex-col" style={{ gap: '0.375rem' }}>
+        {lines.map((line, index) => (
+          <span key={index}>{line}</span>
+        ))}
+      </div>
+    );
   };
 
   // Coupon validation and application
@@ -1454,7 +1464,7 @@ export default function RegisterSection() {
                                         <h5 className="font-semibold text-dr-blue">
                                           {team.name}
                                         </h5>
-                                        <div className="text-sm text-gray-600 mb-2 whitespace-pre-line">
+                                        <div className="text-sm text-gray-600 mb-2">
                                           {formatDescription(team.description)}
                                         </div>
                                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
@@ -1500,7 +1510,7 @@ export default function RegisterSection() {
                         {selectedTeam.name}
                       </h4>
                       <p className="text-gray-600">{selectedTeam.schoolName}</p>
-                      <div className="text-sm text-gray-600 mt-2 whitespace-pre-line">
+                      <div className="text-sm text-gray-600 mt-2">
                         {formatDescription(selectedTeam.description)}
                       </div>
                     </div>
