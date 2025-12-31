@@ -12,9 +12,12 @@ export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     subject: "",
     message: "",
     company: "", // Honeypot field - should remain empty
+    consentTransactional: false,
+    consentMarketing: false,
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -22,8 +25,13 @@ export default function ContactSection() {
   const [submitError, setSubmitError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+    
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }))
     // Clear any previous messages when user starts typing
     if (submitMessage) setSubmitMessage("")
     if (submitError) setSubmitError("")
@@ -58,7 +66,16 @@ export default function ContactSection() {
       console.log("Contact form submitted successfully")
       
       // Reset form on success
-      setFormData({ name: "", email: "", subject: "", message: "", company: "" })
+      setFormData({ 
+        name: "", 
+        email: "", 
+        phone: "",
+        subject: "", 
+        message: "", 
+        company: "",
+        consentTransactional: false,
+        consentMarketing: false,
+      })
       setSubmitMessage(data.message || "Thank you for your message! We'll get back to you soon.")
       
       // Clear success message after 5 seconds
@@ -249,6 +266,22 @@ export default function ContactSection() {
                 </div>
 
                 <div>
+                  <label htmlFor="phone" className="block text-gray-700 font-medium mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    pattern="[0-9\s\-\+\(\)]*"
+                    placeholder="(123) 456-7890"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80"
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="subject" className="block text-gray-700 font-medium mb-1">
                     Subject
                   </label>
@@ -294,6 +327,67 @@ export default function ContactSection() {
                     tabIndex={-1}
                     autoComplete="off"
                   />
+                </div>
+
+                {/* Consent Checkboxes */}
+                <div className="space-y-1.5 sm:space-y-4">
+                  <div className="flex flex-row items-start gap-2 sm:gap-3 p-1.5 sm:p-4 bg-white/50 rounded-lg border border-gray-200">
+                    <div className="relative flex-shrink-0 mt-0.5">
+                      <input
+                        type="checkbox"
+                        id="consentTransactional"
+                        name="consentTransactional"
+                        checked={formData.consentTransactional}
+                        onChange={handleChange}
+                        className="opacity-0 absolute w-3 h-3 sm:w-5 sm:h-5 cursor-pointer"
+                      />
+                      <div className={`w-3 h-3 sm:w-5 sm:h-5 border-2 rounded-sm cursor-pointer flex items-center justify-center transition-colors ${formData.consentTransactional ? 'bg-dr-blue border-dr-blue' : 'bg-white border-gray-300'}`}>
+                        {formData.consentTransactional && (
+                          <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" viewBox="0 0 12 10" fill="none">
+                            <polyline points="1.5 6 4.5 9 10.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <label
+                      htmlFor="consentTransactional"
+                      className="text-xs sm:text-sm text-left text-gray-700 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
+                    >
+                      By checking this box, I consent to receive transactional messages related to my account, orders, or services I have requested from DisciplineRift. These messages may include appointment reminders, order confirmations, and account notifications among others. Message frequency may vary. Message & Data rates may apply. Reply HELP for help or STOP to opt-out. For more information access the{" "}
+                      <a href="/privacy-policy" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                      {" "}and{" "}
+                      <a href="/sms-terms" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">SMS Terms</a>.
+                    </label>
+                  </div>
+
+                  <div className="flex flex-row items-start gap-2 sm:gap-3 p-1.5 sm:p-4 bg-white/50 rounded-lg border border-gray-200">
+                    <div className="relative flex-shrink-0 mt-0.5">
+                      <input
+                        type="checkbox"
+                        id="consentMarketing"
+                        name="consentMarketing"
+                        checked={formData.consentMarketing}
+                        onChange={handleChange}
+                        className="opacity-0 absolute w-3 h-3 sm:w-5 sm:h-5 cursor-pointer"
+                      />
+                      <div className={`w-3 h-3 sm:w-5 sm:h-5 border-2 rounded-sm cursor-pointer flex items-center justify-center transition-colors ${formData.consentMarketing ? 'bg-dr-blue border-dr-blue' : 'bg-white border-gray-300'}`}>
+                        {formData.consentMarketing && (
+                          <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" viewBox="0 0 12 10" fill="none">
+                            <polyline points="1.5 6 4.5 9 10.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <label
+                      htmlFor="consentMarketing"
+                      className="text-xs sm:text-sm text-left text-gray-700 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
+                    >
+                      By checking this box, I consent to receive marketing and promotional messages, including special offers, discounts, new product updates among others. Message frequency may vary. Message & Data rates may apply. Reply HELP for help or STOP to opt-out. For more information access the{" "}
+                      <a href="/privacy-policy" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                      {" "}and{" "}
+                      <a href="/sms-terms" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">SMS Terms</a>.
+                    </label>
+                  </div>
                 </div>
 
                 {/* Success/Error Messages */}
