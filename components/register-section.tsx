@@ -1217,18 +1217,10 @@ export default function RegisterSection() {
     const normalizedCode = code.trim().toUpperCase();
     
     switch (normalizedCode) {
-      case 'HALLO':
-        return { isValid: true, percentage: 12 };
-      case 'DISCIPLINE':
-        return { isValid: true, percentage: 15 };
       case 'SIBLING':
         return { isValid: true, percentage: 10 };
       case 'FACULTY':
         return { isValid: true, percentage: 12 };
-      case '50':
-        return { isValid: true, percentage: 50 };
-      case 'TRELLIS':
-        return { isValid: true, percentage: 100 };
       default:
         return { isValid: false, percentage: 0 };
     }
