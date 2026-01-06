@@ -116,7 +116,16 @@ export default function ProgramsPage() {
         {/* Footer */}
         <footer className="bg-gray-900 text-white py-6">
           <div className="container mx-auto px-4">
-            <p className="text-center text-sm">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-3">
+              <a href="/privacy-policy" className="text-sm hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
+                Privacy Policy
+              </a>
+              <span className="hidden sm:inline text-gray-500">|</span>
+              <a href="/terms-of-use" className="text-sm hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
+                Terms of Use
+              </a>
+            </div>
+            <p className="text-center text-sm text-gray-400">
               Copyright © 2025 Discipline Rift (Torres Rivero LLC). All rights reserved.
             </p>
           </div>
