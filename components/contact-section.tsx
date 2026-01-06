@@ -422,8 +422,8 @@ export default function ContactSection() {
                     Privacy Policy
                   </a>
                   {" "}and{" "}
-                  <a href="/sms-terms" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">
-                    SMS Terms
+                  <a href="/terms-of-use" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">
+                    Terms of Use
                   </a>.
                 </div>
               </form>

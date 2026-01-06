@@ -112,6 +112,15 @@ export default function ContactPage() {
             <RegisterSection />
           </div>
         </main>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-6">
+          <div className="container mx-auto px-4">
+            <p className="text-center text-sm">
+              Copyright © 2025 Discipline Rift (Torres Rivero LLC). All rights reserved.
+            </p>
+          </div>
+        </footer>
         
         <EmailSignupManager />
       </div>

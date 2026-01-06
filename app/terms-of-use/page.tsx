@@ -11,9 +11,10 @@ export default function TermsOfUsePage() {
   return (
     <LegalDocumentViewer
       title="Terms of Use"
-      description="Review the terms that govern participation in Discipline Rift programs, websites, and communications."
-      pdfPath="/Site_terms.pdf"
-      downloadName="Site_terms.pdf"
+      description="Learn about opt-in requirements, frequency expectations, and message policies for our SMS communications."
+      pdfPath="/SMS_TERMS.pdf"
+      downloadName="Terms_of_Use.pdf"
+      extraNote="Message & data rates may apply."
     />
   )
 }
