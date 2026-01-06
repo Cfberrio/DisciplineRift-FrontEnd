@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <LegalDocumentViewer
-      title="Privacy Policy"
-      description="Review how Discipline Rift collects, uses, and safeguards your personal information throughout the registration experience."
-      pdfPath="/Site_terms.pdf"
+      title="Privacy Policy & Terms of Use"
+      description="Review Discipline Rift's Privacy Policy, Terms of Use, and how we handle your personal information including SMS communications."
+      pdfPath="/Privacy_Policy.pdf"
       downloadName="Privacy_Policy.pdf"
     />
   )

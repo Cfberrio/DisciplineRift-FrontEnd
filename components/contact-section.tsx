@@ -353,10 +353,7 @@ export default function ContactSection() {
                       htmlFor="consentTransactional"
                       className="text-xs sm:text-sm text-left text-gray-700 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
                     >
-                      By checking this box, I consent to receive transactional messages related to my account, orders, or services I have requested from DisciplineRift. These messages may include appointment reminders, order confirmations, and account notifications among others. Message frequency may vary. Message & Data rates may apply. Reply HELP for help or STOP to opt-out. For more information access the{" "}
-                      <a href="/privacy-policy" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-                      {" "}and{" "}
-                      <a href="/sms-terms" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">SMS Terms</a>.
+                      By checking this box, I agree to receive transactional SMS from Discipline Rift (Torres Rivero LLC) related to my account or services I request (e.g., registration confirmations, practice reminders, schedule updates, and account notifications). Message frequency varies. Msg & data rates may apply. Reply STOP to cancel; HELP for help.
                     </label>
                   </div>
 
@@ -382,10 +379,7 @@ export default function ContactSection() {
                       htmlFor="consentMarketing"
                       className="text-xs sm:text-sm text-left text-gray-700 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
                     >
-                      By checking this box, I consent to receive marketing and promotional messages, including special offers, discounts, new product updates among others. Message frequency may vary. Message & Data rates may apply. Reply HELP for help or STOP to opt-out. For more information access the{" "}
-                      <a href="/privacy-policy" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-                      {" "}and{" "}
-                      <a href="/sms-terms" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">SMS Terms</a>.
+                      By checking this box, I agree to receive marketing and promotional SMS from Discipline Rift (e.g., seasonal announcements, enrollment openings, special offers). Message frequency varies. Msg & data rates may apply. Reply STOP to cancel; HELP for help. Consent is not a condition of purchase. We do not sell or share mobile numbers for marketing/promotional purposes.
                     </label>
                   </div>
                 </div>
@@ -420,6 +414,18 @@ export default function ContactSection() {
                     "Send Message"
                   )}
                 </Button>
+
+                {/* Privacy and SMS Terms Links */}
+                <div className="text-center text-xs sm:text-sm text-gray-600 mt-4">
+                  For more information, please review our{" "}
+                  <a href="/privacy-policy" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">
+                    Privacy Policy
+                  </a>
+                  {" "}and{" "}
+                  <a href="/sms-terms" className="text-dr-blue underline hover:text-blue-700" target="_blank" rel="noopener noreferrer">
+                    SMS Terms
+                  </a>.
+                </div>
               </form>
             </div>
           </AnimatedSection>
