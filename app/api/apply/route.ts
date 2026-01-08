@@ -1,9 +1,127 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { checkBotId } from 'botid/server'
+import nodemailer from 'nodemailer'
 
 // Configuración para el endpoint
 export const runtime = 'nodejs'
+
+// Configurar el transportador de Gmail
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  })
+}
+
+// Enviar notificación al equipo sobre nueva aplicación
+async function sendTeamNotificationEmail(applicationData: {
+  firstName: string
+  lastName: string
+  email: string
+  number: string
+  currentAddre: string
+  sport: string | null
+  description: string
+  applicationId: string
+  hasResume: boolean
+}) {
+  try {
+    const transporter = createTransporter()
+    
+    const emailHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New DR Team Application</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f3f4f6; font-family: Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <tr>
+      <td style="background: linear-gradient(135deg, #0085B7 0%, #005a7d 100%); padding: 30px; text-align: center;">
+        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">New Team Application Received</h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 30px;">
+        <p style="margin: 0 0 20px; font-size: 16px; color: #374151;">
+          A new application has been submitted to join the DR Team:
+        </p>
+        
+        <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 6px;">
+          <tr style="background-color: #f9fafb;">
+            <td style="font-weight: bold; color: #374151; width: 140px;">Name:</td>
+            <td style="color: #1f2937;">${applicationData.firstName} ${applicationData.lastName}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #374151;">Email:</td>
+            <td style="color: #1f2937;"><a href="mailto:${applicationData.email}" style="color: #0085B7; text-decoration: none;">${applicationData.email}</a></td>
+          </tr>
+          <tr style="background-color: #f9fafb;">
+            <td style="font-weight: bold; color: #374151;">Phone:</td>
+            <td style="color: #1f2937;">${applicationData.number}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #374151;">Address:</td>
+            <td style="color: #1f2937;">${applicationData.currentAddre}</td>
+          </tr>
+          ${applicationData.sport ? `
+          <tr style="background-color: #f9fafb;">
+            <td style="font-weight: bold; color: #374151;">Sport:</td>
+            <td style="color: #1f2937;">${applicationData.sport}</td>
+          </tr>
+          ` : ''}
+          <tr${applicationData.sport ? '' : ' style="background-color: #f9fafb;"'}>
+            <td style="font-weight: bold; color: #374151;">Resume:</td>
+            <td style="color: #1f2937;">${applicationData.hasResume ? '✅ Attached' : '❌ Not provided'}</td>
+          </tr>
+        </table>
+        
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; border-left: 4px solid #0085B7; margin-bottom: 20px;">
+          <p style="margin: 0 0 8px; font-weight: bold; color: #374151;">Description / Why they want to join:</p>
+          <p style="margin: 0; font-size: 14px; color: #4b5563; line-height: 1.6;">${applicationData.description}</p>
+        </div>
+        
+        <div style="background-color: #eff6ff; padding: 15px; border-radius: 6px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #1e40af;">
+            <strong>Application ID:</strong> ${applicationData.applicationId}
+          </p>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+        <p style="margin: 0; font-size: 12px; color: #6b7280;">
+          © ${new Date().getFullYear()} Discipline Rift (Torres Rivero LLC)
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `
+    
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: 'info@disciplinerift.com',
+      subject: `New DR Team Application: ${applicationData.firstName} ${applicationData.lastName}`,
+      html: emailHtml,
+    }
+    
+    await transporter.sendMail(mailOptions)
+    console.log('✅ Team notification email sent to info@disciplinerift.com')
+    return { success: true }
+  } catch (error) {
+    console.error('❌ Failed to send team notification email:', error)
+    // No lanzamos error, solo logueamos - el aplicante ya fue guardado exitosamente
+    return { success: false, error }
+  }
+}
 
 // List of disposable email domains to block (includes popular ones in US/Latin America)
 const DISPOSABLE_EMAIL_DOMAINS = [
@@ -279,6 +397,19 @@ export async function POST(request: NextRequest) {
         console.log(`🎉 Application submission completed successfully`)
         console.log(`📄 Resume accessible at: ${publicUrl}`)
         
+        // Enviar notificación por email al equipo
+        await sendTeamNotificationEmail({
+          firstName: sanitizedFirstName,
+          lastName: sanitizedLastName,
+          email: sanitizedEmail,
+          number: sanitizedNumber,
+          currentAddre: sanitizedCurrentAddre,
+          sport: sanitizedSport,
+          description: sanitizedDescription,
+          applicationId: insertedId,
+          hasResume: true
+        })
+        
         // Respuesta de éxito con archivo
         return NextResponse.json({
           ok: true,
@@ -315,6 +446,20 @@ export async function POST(request: NextRequest) {
     } else {
       // No hay archivo de resume, aplicación completada sin archivo
       console.log(`🎉 Application submission completed successfully (without resume)`)
+      
+      // Enviar notificación por email al equipo
+      await sendTeamNotificationEmail({
+        firstName: sanitizedFirstName,
+        lastName: sanitizedLastName,
+        email: sanitizedEmail,
+        number: sanitizedNumber,
+        currentAddre: sanitizedCurrentAddre,
+        sport: sanitizedSport,
+        description: sanitizedDescription,
+        applicationId: insertedId,
+        hasResume: false
+      })
+      
       return NextResponse.json({
         ok: true,
         id: insertedId,
