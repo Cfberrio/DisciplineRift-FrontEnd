@@ -155,6 +155,48 @@ function sanitizeString(str: string): string {
   return str.replace(/[<>]/g, '').trim()
 }
 
+/**
+ * Detecta si un texto parece gibberish/caracteres aleatorios
+ */
+function isGibberishText(text: string): boolean {
+  if (!text || text.length < 10) return false
+  
+  const cleanText = text.toLowerCase().replace(/[^a-z]/g, '')
+  if (cleanText.length < 5) return false
+  
+  // 1. Verificar ratio de vocales (debe estar entre 20% y 60%)
+  const vowels = cleanText.match(/[aeiou]/g)?.length || 0
+  const vowelRatio = vowels / cleanText.length
+  if (vowelRatio < 0.2 || vowelRatio > 0.6) return true
+  
+  // 2. Detectar secuencias de teclado comunes
+  const keyboardPatterns = [
+    'qwerty', 'asdf', 'zxcv', 'qazwsx', 'poiuyt',
+    'lkjhgf', 'mnbvcx', '123456', 'abcdef'
+  ]
+  for (const pattern of keyboardPatterns) {
+    if (cleanText.includes(pattern)) return true
+  }
+  
+  // 3. Detectar caracteres repetidos (más de 3 veces seguidas)
+  if (/(.)\1{3,}/.test(cleanText)) return true
+  
+  // 4. Verificar palabras muy largas sin vocales (>8 caracteres)
+  const words = text.split(/\s+/)
+  for (const word of words) {
+    const wordClean = word.toLowerCase().replace(/[^a-z]/g, '')
+    if (wordClean.length > 8) {
+      const wordVowels = wordClean.match(/[aeiou]/g)?.length || 0
+      if (wordVowels === 0) return true
+    }
+  }
+  
+  // 5. Detectar demasiadas consonantes seguidas (>5)
+  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(cleanText)) return true
+  
+  return false
+}
+
 // Función para sanitizar nombre de archivo
 function sanitizeFilename(filename: string): string {
   // Extraer extensión
@@ -260,6 +302,24 @@ export async function POST(request: NextRequest) {
         { ok: false, error: 'Please provide a valid email address' },
         { status: 400 }
       )
+    }
+
+    // STEP 4.5: Validate text quality (detect gibberish)
+    const fieldsToCheck = [
+      { name: 'firstName', value: firstName },
+      { name: 'lastName', value: lastName },
+      { name: 'address', value: currentAddre },
+      { name: 'description', value: description }
+    ]
+
+    for (const field of fieldsToCheck) {
+      if (isGibberishText(field.value)) {
+        console.log(`🚫 Gibberish text detected in field: ${field.name}`)
+        return NextResponse.json(
+          { ok: false, error: `Please provide valid information in the ${field.name} field` },
+          { status: 400 }
+        )
+      }
     }
 
     if (!number || number.trim().length < 10) {

@@ -22,6 +22,8 @@ export default function JoinTeamSection() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
   const [submitError, setSubmitError] = useState("")
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
+  const [resumeError, setResumeError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -29,6 +31,34 @@ export default function JoinTeamSection() {
     // Clear any previous messages when user starts typing
     if (submitMessage) setSubmitMessage("")
     if (submitError) setSubmitError("")
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    
+    if (!file) {
+      setResumeFile(null)
+      setResumeError("")
+      return
+    }
+    
+    // Validar tipo
+    if (file.type !== 'application/pdf') {
+      setResumeError("Only PDF files are allowed")
+      setResumeFile(null)
+      return
+    }
+    
+    // Validar tamaño (10MB)
+    const maxSize = 10 * 1024 * 1024
+    if (file.size > maxSize) {
+      setResumeError("File size must be less than 10MB")
+      setResumeFile(null)
+      return
+    }
+    
+    setResumeFile(file)
+    setResumeError("")
   }
 
 
@@ -219,6 +249,11 @@ export default function JoinTeamSection() {
       submitFormData.append('currentAddre', formData.currentAddress.trim()) // Mantener typo como en BD
       submitFormData.append('description', formData.description.trim())
       submitFormData.append('company', formData.company) // Honeypot field
+      
+      // Agregar el archivo si existe
+      if (resumeFile) {
+        submitFormData.append('resume', resumeFile)
+      }
       
       console.log('📤 Submitting to /api/apply endpoint...')
       
@@ -427,6 +462,32 @@ export default function JoinTeamSection() {
                     className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 resize-none"
                     placeholder="Tell us what motivates you to coach and make a difference in young athletes' lives..."
                   ></textarea>
+                </div>
+
+                {/* Resume Upload - Optional */}
+                <div>
+                  <label htmlFor="resume" className="block text-gray-700 font-medium mb-2">
+                    Upload Resume (Optional)
+                  </label>
+                  <input
+                    type="file"
+                    id="resume"
+                    name="resume"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-dr-blue file:text-white hover:file:bg-blue-700"
+                  />
+                  {resumeFile && (
+                    <p className="mt-2 text-sm text-green-600">
+                      ✓ {resumeFile.name} ({(resumeFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
+                  {resumeError && (
+                    <p className="mt-2 text-sm text-red-600">{resumeError}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    PDF only, max 10MB
+                  </p>
                 </div>
 
                 {/* Honeypot field - hidden from users, but bots will fill it */}
