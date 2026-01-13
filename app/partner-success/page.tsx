@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { CheckCircle, Mail, MessageCircle, Home, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import AnimatedSection from "@/components/animated-section"
 
-export default function PartnerSuccessPage() {
+function PartnerSuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
   const [isLoading, setIsLoading] = useState(true)
@@ -191,5 +191,20 @@ export default function PartnerSuccessPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function PartnerSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-[#0085B7] animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    }>
+      <PartnerSuccessContent />
+    </Suspense>
   )
 }
