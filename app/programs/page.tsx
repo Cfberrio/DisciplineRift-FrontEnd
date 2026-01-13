@@ -112,7 +112,7 @@ export default function ProgramsPage() {
             <RegisterSection />
           </div>
         </main>
-
+        
         {/* Footer */}
         <footer className="bg-gray-900 text-white py-6">
           <div className="container mx-auto px-4">
