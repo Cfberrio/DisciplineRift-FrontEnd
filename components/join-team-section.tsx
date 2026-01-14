@@ -597,6 +597,28 @@ export default function JoinTeamSection() {
                     "APPLY NOW"
                   )}
                 </Button>
+
+                {/* Privacy Policy and Terms Links */}
+                <p className="text-xs sm:text-sm text-center text-gray-600 mt-4">
+                  For more information, please review our{" "}
+                  <a 
+                    href="/privacy-policy" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-dr-blue hover:underline font-semibold"
+                  >
+                    Privacy Policy
+                  </a>
+                  {" "}and{" "}
+                  <a 
+                    href="/terms-of-use" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-dr-blue hover:underline font-semibold"
+                  >
+                    Terms of Use
+                  </a>.
+                </p>
               </form>
             </div>
           </AnimatedSection>
