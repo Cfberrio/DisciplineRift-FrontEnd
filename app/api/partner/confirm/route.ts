@@ -294,6 +294,10 @@ async function sendPartnerConfirmationEmail(
 export async function GET(request: Request) {
   try {
     console.log("🚀 === PARTNER PAYMENT CONFIRMATION STARTED ===")
+    console.log("🔍 Environment check:")
+    console.log("- GMAIL_USER:", process.env.GMAIL_USER ? "✅ Set" : "❌ Missing")
+    console.log("- GMAIL_APP_PASSWORD:", process.env.GMAIL_APP_PASSWORD ? "✅ Set" : "❌ Missing")
+    console.log("- STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY ? "✅ Set" : "❌ Missing")
 
     const { searchParams } = new URL(request.url)
     const sessionId = searchParams.get("session_id")
@@ -321,6 +325,7 @@ export async function GET(request: Request) {
       id: session.id,
       status: session.payment_status,
       amount: session.amount_total,
+      metadata: session.metadata,
     })
 
     if (session.payment_status !== "paid") {
@@ -359,12 +364,26 @@ export async function GET(request: Request) {
     }
 
     // Send confirmation email with WhatsApp link
-    console.log("📧 Sending confirmation email...")
+    console.log("📧 === STARTING EMAIL SENDING PROCESS ===")
+    console.log("📧 Email details:", {
+      to: email,
+      parentName: parent_name,
+      playerName: player_name,
+      groupType: group_type,
+      whatsappLink: whatsapp_link,
+    })
+    
     try {
-      await sendPartnerConfirmationEmail(email, parent_name, player_name, whatsapp_link, group_type)
-      console.log(`✅ Confirmation email sent to: ${email}`)
+      console.log("📧 Calling sendPartnerConfirmationEmail...")
+      const emailResult = await sendPartnerConfirmationEmail(email, parent_name, player_name, whatsapp_link, group_type)
+      console.log(`✅ Confirmation email sent successfully!`)
+      console.log(`✅ Message ID: ${emailResult.messageId}`)
+      console.log(`✅ Sent to: ${email}`)
     } catch (emailError) {
-      console.error("❌ Failed to send confirmation email:", emailError)
+      console.error("❌ === EMAIL SENDING FAILED ===")
+      console.error("❌ Error details:", emailError)
+      console.error("❌ Error message:", emailError instanceof Error ? emailError.message : String(emailError))
+      console.error("❌ Error stack:", emailError instanceof Error ? emailError.stack : "No stack trace")
       // Continue to success page even if email fails
     }
 
