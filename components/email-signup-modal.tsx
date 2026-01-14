@@ -244,6 +244,28 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ArrowRight className="mr-2 h-5 w-5" />}
           {isSubmitting ? "GETTING GUIDE..." : "Get My Parent Guide"}
         </Button>
+
+        {/* Privacy Policy and Terms Links */}
+        <p className="text-xs sm:text-sm text-center text-blue-200">
+          For more information, please review our{" "}
+          <a 
+            href="/privacy-policy" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-yellow-300 hover:text-yellow-400 underline font-semibold"
+          >
+            Privacy Policy
+          </a>
+          {" "}and{" "}
+          <a 
+            href="/terms-of-use" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-yellow-300 hover:text-yellow-400 underline font-semibold"
+          >
+            Terms of Use
+          </a>.
+        </p>
       </form>
       <DialogFooter className="px-6 sm:px-8 pb-6 sm:pb-8 text-center space-y-3">
         <div className="w-full">
