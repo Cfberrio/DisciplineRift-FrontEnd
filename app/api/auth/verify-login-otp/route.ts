@@ -127,7 +127,8 @@ export async function POST(request: Request) {
         return NextResponse.json(
           { 
             message: "No students found. Please complete registration first at /register",
-            noStudents: true
+            noStudents: true,
+            redirectTo: "/register"
           },
           { status: 403 }
         );

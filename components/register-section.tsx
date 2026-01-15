@@ -770,20 +770,20 @@ export default function RegisterSection() {
     try {
       console.log("🔄 Sending OTP to:", authEmail);
 
-      const response = await fetch("/api/auth/send-login-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: authEmail }),
+      // Use Supabase OTP directly for registration (no student validation)
+      const { error } = await supabase.auth.signInWithOtp({
+        email: authEmail,
+        options: {
+          shouldCreateUser: true,
+        },
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to send login code");
+      if (error) {
+        throw new Error(error.message || "Failed to send login code");
       }
 
       setOtpSent(true);
-      setOtpExpiresIn(data.expiresIn || "10 minutes");
+      setOtpExpiresIn("10 minutes");
       setAuthError(null);
       setMessage("Login code sent successfully. Please check your email.");
     } catch (error) {
@@ -813,56 +813,32 @@ export default function RegisterSection() {
     try {
       console.log("🔄 Verifying OTP for:", authEmail);
 
-      const response = await fetch("/api/auth/verify-login-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: authEmail, otp: authOtp }),
+      // Use Supabase OTP verification directly for registration (no student validation)
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: authEmail,
+        token: authOtp,
+        type: "email",
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Invalid login code");
+      if (error) {
+        throw new Error(error.message || "Invalid login code");
       }
 
-      if (!data.user) {
-        throw new Error("No user data received from server");
+      if (!data.user || !data.session) {
+        throw new Error("No user data received from authentication");
       }
 
-      // Create user object from response
+      // Create user object from Supabase response
       const user: UserType = {
         id: data.user.id,
-        email: data.user.email,
-        firstName: data.user.firstName,
-        lastName: data.user.lastName,
-        phone: data.user.phone,
+        email: data.user.email || "",
+        firstName: data.user.user_metadata?.firstName || "",
+        lastName: data.user.user_metadata?.lastName || "",
+        phone: data.user.user_metadata?.phone || "",
       };
 
       console.log("✅ Usuario autenticado:", user.email);
-
-      // Set Supabase session with timeout
-      if (data.session) {
-        try {
-          console.log("🔄 Estableciendo sesión en Supabase...");
-          const sessionPromise = supabase.auth.setSession(data.session);
-          const sessionTimeoutId = setTimeout(() => {
-            console.warn("⚠️ Session set timeout, continuing anyway");
-          }, 3000);
-
-          await Promise.race([
-            sessionPromise,
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error("Session timeout")), 3000)
-            ),
-          ]);
-
-          clearTimeout(sessionTimeoutId);
-          console.log("✅ Sesión establecida en Supabase");
-        } catch (sessionError) {
-          console.warn("⚠️ Error setting session, continuing:", sessionError);
-          // Continue even if session setting fails
-        }
-      }
+      console.log("✅ Sesión establecida en Supabase");
 
       // Update user state and form data immediately
       setCurrentUser(user);
