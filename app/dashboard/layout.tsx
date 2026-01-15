@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Home, Users, Calendar, CreditCard, Settings, Menu, X, LogOut } from "lucide-react"
+import { Home, Users, Calendar, CreditCard, Settings, Menu, X, LogOut, Target } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 
@@ -16,6 +16,7 @@ interface ParentData {
 const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/dashboard/players", label: "My Players", icon: Users },
+  { href: "/dashboard/skills", label: "Skills & Tiers", icon: Target },
   { href: "/dashboard/schedule", label: "Schedule", icon: Calendar },
   { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
@@ -28,16 +29,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const pathname = usePathname()
 
+  // Si estamos en la página de login, no mostrar el layout con sidebar
+  const isLoginPage = pathname === "/dashboard/login"
+
   useEffect(() => {
-    checkAuth()
-  }, [])
+    if (!isLoginPage) {
+      checkAuth()
+    } else {
+      setLoading(false)
+    }
+  }, [isLoginPage])
 
   const checkAuth = async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser()
       
       if (error || !user) {
-        router.push("/register")
+        router.push("/dashboard/login")
         return
       }
 
@@ -62,6 +70,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push("/")
+  }
+
+  // Si es la página de login, renderizar solo children sin sidebar ni auth check
+  if (isLoginPage) {
+    return <>{children}</>
   }
 
   if (loading) {

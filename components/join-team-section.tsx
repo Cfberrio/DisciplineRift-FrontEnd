@@ -235,7 +235,7 @@ export default function JoinTeamSection() {
 
     try {
       // Validate required fields
-      const requiredFields = ['firstName', 'lastName', 'email', 'number', 'currentAddress', 'description']
+      const requiredFields = ['firstName', 'lastName', 'email', 'currentAddress', 'description']
       for (const field of requiredFields) {
         if (!formData[field as keyof typeof formData].trim()) {
           throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required.`)
@@ -295,7 +295,11 @@ export default function JoinTeamSection() {
         currentAddress: "",
         description: "",
         company: "",
+        consentTransactional: false,
+        consentMarketing: false,
       })
+      setResumeFile(null)
+      setResumeError("")
       
       // Personalizar mensaje según el resultado del email
       if (emailResult.success) {
@@ -421,7 +425,7 @@ export default function JoinTeamSection() {
                   <div>
                     <label htmlFor="number" className="block text-gray-700 font-medium mb-2">
                       <Mail className="inline h-4 w-4 mr-2" />
-                      Phone Number <span className="text-red-500">*</span>
+                      Phone Number
                     </label>
                     <input
                       type="tel"
@@ -429,7 +433,6 @@ export default function JoinTeamSection() {
                       name="number"
                       value={formData.number}
                       onChange={handleChange}
-                      required
                       className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-dr-blue focus:border-dr-blue text-gray-900 bg-white/80 min-h-[44px]"
                       placeholder="(555) 123-4567"
                     />

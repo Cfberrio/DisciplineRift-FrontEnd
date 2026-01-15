@@ -105,6 +105,43 @@ export async function POST(request: Request) {
       console.error("❌ Database operation failed:", dbError);
     }
 
+    // Verificar que el padre tenga al menos un estudiante registrado
+    console.log("🔄 Checking if parent has registered students...");
+    try {
+      const { data: students, error: studentsError } = await supabaseAdmin
+        .from("student")
+        .select("studentid")
+        .eq("parentid", data.user.id)
+        .limit(1);
+
+      if (studentsError) {
+        console.error("❌ Error checking students:", studentsError);
+        return NextResponse.json(
+          { message: "Error verifying account access" },
+          { status: 500 }
+        );
+      }
+
+      if (!students || students.length === 0) {
+        console.log("❌ No students found for parent:", data.user.id);
+        return NextResponse.json(
+          { 
+            message: "No students found. Please complete registration first at /register",
+            noStudents: true
+          },
+          { status: 403 }
+        );
+      }
+
+      console.log("✅ Parent has registered student(s)");
+    } catch (studentCheckError) {
+      console.error("❌ Student verification failed:", studentCheckError);
+      return NextResponse.json(
+        { message: "Error verifying account access" },
+        { status: 500 }
+      );
+    }
+
     console.log("✅ User authenticated successfully:", data.user.id);
 
     return NextResponse.json({
