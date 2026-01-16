@@ -46,6 +46,7 @@ export async function GET(request: Request) {
             name,
             description,
             sport,
+            status,
             school (
               name,
               location

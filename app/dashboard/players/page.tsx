@@ -33,6 +33,7 @@ interface Enrollment {
     name: string
     description: string
     sport?: string
+    status: string
     school: {
       name: string
       location: string
@@ -53,11 +54,16 @@ interface Session {
   }
 }
 
-interface NextPractice {
-  day: string
-  date: string
-  time: string
-  location: string
+const getStatusBadge = (status: string) => {
+  const statusConfig = {
+    open: { bg: 'bg-green-100', text: 'text-green-800', label: 'Open' },
+    ongoing: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Ongoing' },
+    closed: { bg: 'bg-red-100', text: 'text-red-800', label: 'Closed' },
+    full: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Full' },
+    cancelled: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Cancelled' },
+    pending: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Pending' }
+  }
+  return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
 }
 
 export default function PlayersPage() {
@@ -117,66 +123,6 @@ export default function PlayersPage() {
     setExpandedStudent(expandedStudent === studentId ? null : studentId)
   }
 
-  const getNextPractice = (enrollments: Enrollment[]): NextPractice | null => {
-    const today = new Date()
-    const todayDay = today.getDay()
-    const dayMap: { [key: string]: number } = {
-      'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
-      'Thursday': 4, 'Friday': 5, 'Saturday': 6
-    }
-
-    let closestPractice: { date: Date, practice: NextPractice } | null = null
-
-    enrollments.forEach(enrollment => {
-      if (!enrollment.isactive || !enrollment.team?.session) return
-
-      enrollment.team.session.forEach(session => {
-        const daysArray = session.daysofweek.split(',').map(d => d.trim())
-
-        daysArray.forEach(day => {
-          const dayNum = dayMap[day]
-          if (dayNum !== undefined) {
-            let daysUntilPractice = (dayNum - todayDay + 7) % 7
-            if (daysUntilPractice === 0) daysUntilPractice = 7
-
-            const nextDate = new Date(today)
-            nextDate.setDate(today.getDate() + daysUntilPractice)
-
-            const sessionStart = new Date(session.startdate)
-            const sessionEnd = new Date(session.enddate)
-
-            if (nextDate >= sessionStart && nextDate <= sessionEnd) {
-              if (!closestPractice || nextDate < closestPractice.date) {
-                closestPractice = {
-                  date: nextDate,
-                  practice: {
-                    day,
-                    date: nextDate.toISOString().split('T')[0],
-                    time: formatTimeRange(session.starttime, session.endtime),
-                    location: enrollment.team.school?.name || 'TBD'
-                  }
-                }
-              }
-            }
-          }
-        })
-      })
-    })
-
-    return closestPractice?.practice || null
-  }
-
-  const getCountdownText = (dateStr: string): string => {
-    const date = new Date(dateStr)
-    const today = new Date()
-    const diffDays = Math.floor((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-
-    if (diffDays === 0) return 'Today'
-    if (diffDays === 1) return 'Tomorrow'
-    if (diffDays < 7) return `In ${diffDays} days`
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -218,11 +164,14 @@ export default function PlayersPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {students.map((student) => {
           const isExpanded = expandedStudent === student.studentid
-          const activeEnrollments = student.enrollments.filter(e => e.isactive)
-          const inactiveEnrollments = student.enrollments.filter(e => !e.isactive)
+          const activeEnrollments = student.enrollments.filter(e => 
+            ['open', 'ongoing'].includes(e.team.status)
+          )
+          const inactiveEnrollments = student.enrollments.filter(e => 
+            !['open', 'ongoing'].includes(e.team.status)
+          )
           const studentColor = getStudentColorById(student.studentid)
           const initials = getInitials(student.firstname, student.lastname)
-          const nextPractice = getNextPractice(student.enrollments)
 
           return (
             <div key={student.studentid} className="bg-white rounded-xl shadow-md border-2 border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
@@ -245,16 +194,6 @@ export default function PlayersPage() {
                     <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 truncate">
                       {student.firstname} {student.lastname}
                     </h2>
-
-                    {/* Next Practice Badge */}
-                    {nextPractice && (
-                      <div className="mt-1.5 sm:mt-2 md:mt-3 inline-flex items-center gap-1 sm:gap-1.5 md:gap-2 px-1.5 py-0.5 sm:px-2 sm:py-1 md:px-3 md:py-1.5 bg-white rounded-lg text-[10px] sm:text-xs md:text-sm shadow-sm border border-gray-200">
-                        <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-[#0085B7] flex-shrink-0" />
-                        <span className="font-semibold text-gray-900">
-                          Next: {getCountdownText(nextPractice.date)} • {nextPractice.time}
-                        </span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Expand Button - Mobile and Desktop */}
@@ -311,9 +250,14 @@ export default function PlayersPage() {
                                   <p className="text-xs md:text-sm text-gray-600 mt-0.5 line-clamp-2">{enrollment.team.description}</p>
                                 </div>
                               </div>
-                              <span className="px-2 py-0.5 md:px-3 md:py-1 bg-green-100 text-green-800 text-[10px] md:text-xs font-bold rounded-full flex-shrink-0 ml-2">
-                                Active
-                              </span>
+                              {(() => {
+                                const badge = getStatusBadge(enrollment.team.status)
+                                return (
+                                  <span className={`px-2 py-0.5 md:px-3 md:py-1 ${badge.bg} ${badge.text} text-[10px] md:text-xs font-bold rounded-full flex-shrink-0 ml-2 capitalize`}>
+                                    {badge.label}
+                                  </span>
+                                )
+                              })()}
                             </div>
 
                             {/* Schedule Info */}
@@ -339,19 +283,22 @@ export default function PlayersPage() {
                       {inactiveEnrollments.length > 0 && isExpanded && (
                         <div className="pt-3 border-t border-gray-200">
                           <h4 className="text-xs font-bold text-gray-500 mb-2 uppercase">Past Enrollments</h4>
-                          {inactiveEnrollments.map((enrollment) => (
-                            <div key={enrollment.enrollmentid} className="border border-gray-200 rounded-lg p-3 bg-gray-50 mb-2">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <h4 className="font-semibold text-gray-700 text-sm">{enrollment.team.name}</h4>
-                                  <p className="text-xs text-gray-500 mt-1">{enrollment.team.school?.name}</p>
+                          {inactiveEnrollments.map((enrollment) => {
+                            const badge = getStatusBadge(enrollment.team.status)
+                            return (
+                              <div key={enrollment.enrollmentid} className="border border-gray-200 rounded-lg p-3 bg-gray-50 mb-2">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-gray-700 text-sm">{enrollment.team.name}</h4>
+                                    <p className="text-xs text-gray-500 mt-1">{enrollment.team.school?.name}</p>
+                                  </div>
+                                  <span className={`px-2 py-1 ${badge.bg} ${badge.text} text-xs font-semibold rounded-full capitalize`}>
+                                    {badge.label}
+                                  </span>
                                 </div>
-                                <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full">
-                                  Inactive
-                                </span>
                               </div>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       )}
                     </div>

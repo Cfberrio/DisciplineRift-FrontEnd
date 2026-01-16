@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 import { Calendar, Clock, MapPin, User, ChevronLeft, ChevronRight, LayoutGrid, List, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import CalendarView from "@/components/calendar-view"
@@ -69,8 +70,19 @@ export default function SchedulePage() {
   const fetchSchedule = async () => {
     setLoading(true)
     try {
+      // Get session for authorization
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push("/dashboard/login")
+        return
+      }
+
       const monthStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`
-      const response = await fetch(`/api/schedule?month=${monthStr}`)
+      const response = await fetch(`/api/schedule?month=${monthStr}`, {
+        headers: {
+          "Authorization": `Bearer ${session.access_token}`
+        }
+      })
       
       if (!response.ok) {
         if (response.status === 401) {
