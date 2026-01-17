@@ -7,6 +7,7 @@ import Image from "next/image"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { supabase } from "@/lib/supabase"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -86,6 +87,28 @@ export default function Header() {
     }
   }
 
+  const handleDashboardClick = () => {
+    router.push("/dashboard/login")
+  }
+
+  const handleLogoutClick = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (session) {
+        // Si hay sesión, hacer logout
+        await supabase.auth.signOut()
+        router.push("/")
+      } else {
+        // Si no hay sesión, navegar a login
+        router.push("/dashboard/login")
+      }
+    } catch (error) {
+      console.error("Error handling logout:", error)
+      router.push("/dashboard/login")
+    }
+  }
+
   return (
     <header
       className={cn(
@@ -128,10 +151,10 @@ export default function Header() {
             <button
               aria-label="Parent Dashboard"
               className={cn(
-                "p-2 rounded-md transition-colors duration-300 cursor-default",
+                "p-2 rounded-md transition-colors duration-300 cursor-pointer",
                 isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
               )}
-              onClick={() => {}} // No hace nada
+              onClick={handleDashboardClick}
             >
               <Image
                 src={isScrolled ? "/CUENTA_ICONO_AZUL.png" : "/PERSONA.png"}
@@ -146,10 +169,10 @@ export default function Header() {
             <button
               aria-label="Login"
               className={cn(
-                "p-2 rounded-md transition-colors duration-300 cursor-default",
+                "p-2 rounded-md transition-colors duration-300 cursor-pointer",
                 isScrolled ? "hover:bg-blue-50 text-gray-700" : "hover:bg-white/10 text-white",
               )}
-              onClick={() => {}} // No hace nada
+              onClick={handleLogoutClick}
             >
               <Image
                 src={isScrolled ? "/Logout_desktop_azul.png" : "/LOG OUT_BLANCO.png"}
@@ -194,8 +217,11 @@ export default function Header() {
                              <div className="flex space-x-3 pt-3 border-t border-gray-200 mt-3">
                  <button
                    aria-label="Parent Dashboard"
-                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors cursor-default"
-                   onClick={() => {}} // No hace nada
+                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors cursor-pointer"
+                   onClick={() => {
+                     setIsMenuOpen(false)
+                     handleDashboardClick()
+                   }}
                  >
                    <Image
                      src="/CUENTA_ICONO_AZUL.png"
@@ -208,8 +234,11 @@ export default function Header() {
                  </button>
                  <button
                    aria-label="Login"
-                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors cursor-default"
-                   onClick={() => {}} // No hace nada
+                   className="flex-1 bg-blue-50 p-2 rounded-md text-dr-blue text-center font-medium hover:bg-blue-100 transition-colors cursor-pointer"
+                   onClick={() => {
+                     setIsMenuOpen(false)
+                     handleLogoutClick()
+                   }}
                  >
                    <Image
                      src="/LOG OUT_BLANCO.png"
