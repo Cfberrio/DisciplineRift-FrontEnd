@@ -228,3 +228,11 @@ export interface UnreadCount {
   coachid: string;
   count: number;
 }
+
+export interface Coupon {
+  couponid: string;
+  code: string;
+  percentage: number;
+  isactive: boolean;
+  created_at: string;
+}

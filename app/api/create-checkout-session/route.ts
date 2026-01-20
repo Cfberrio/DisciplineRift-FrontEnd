@@ -15,22 +15,24 @@ try {
   console.warn("Failed to initialize Stripe:", error)
 }
 
-// Server-side coupon validation
-const validateCouponServer = (code: string): { isValid: boolean; percentage: number } => {
+// Server-side coupon validation from database
+const validateCouponFromDB = async (code: string): Promise<{ isValid: boolean; percentage: number }> => {
   if (!code) return { isValid: false, percentage: 0 };
   
   const normalizedCode = code.trim().toUpperCase();
   
-  switch (normalizedCode) {
-    case 'SIBLING':
-      return { isValid: true, percentage: 10 };
-    case 'FACULTY':
-      return { isValid: true, percentage: 12 };
-    case 'ALANNA':
-      return { isValid: true, percentage: 100 };
-    default:
-      return { isValid: false, percentage: 0 };
+  const { data: coupon, error } = await supabaseAdmin
+    .from('coupon')
+    .select('percentage')
+    .eq('code', normalizedCode)
+    .eq('isactive', true)
+    .single();
+  
+  if (error || !coupon) {
+    return { isValid: false, percentage: 0 };
   }
+  
+  return { isValid: true, percentage: coupon.percentage };
 };
 
 export async function POST(request: Request) {
@@ -69,7 +71,7 @@ export async function POST(request: Request) {
     let validatedCouponCode = null
 
     if (couponCode) {
-      const couponValidation = validateCouponServer(couponCode)
+      const couponValidation = await validateCouponFromDB(couponCode)
       
       if (!couponValidation.isValid) {
         return NextResponse.json({ message: "Invalid coupon code" }, { status: 400 })

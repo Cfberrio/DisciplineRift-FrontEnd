@@ -1189,22 +1189,7 @@ export default function RegisterSection() {
   };
 
   // Coupon validation and application
-  const validateCoupon = (code: string): { isValid: boolean; percentage: number } => {
-    const normalizedCode = code.trim().toUpperCase();
-    
-    switch (normalizedCode) {
-      case 'SIBLING':
-        return { isValid: true, percentage: 10 };
-      case 'FACULTY':
-        return { isValid: true, percentage: 12 };
-      case 'ALANNA':
-        return { isValid: true, percentage: 100 };
-      default:
-        return { isValid: false, percentage: 0 };
-    }
-  };
-
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     if (!couponCode.trim()) {
       setCouponError("Please enter a coupon code");
       return;
@@ -1219,32 +1204,44 @@ export default function RegisterSection() {
     setCouponError("");
 
     try {
-      const validation = validateCoupon(couponCode);
+      // Llamar al endpoint de validación
+      const response = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: couponCode }),
+      });
+
+      const data = await response.json();
       
-      if (!validation.isValid) {
+      if (!data.valid) {
         setCouponError("Invalid coupon code");
+        setIsApplyingCoupon(false);
         return;
       }
 
       if (!selectedTeam) {
         setCouponError("Something went wrong. Please try again");
+        setIsApplyingCoupon(false);
         return;
       }
 
       const basePrice = selectedTeam.price;
-      const discountAmount = Math.round(basePrice * (validation.percentage / 100) * 100) / 100;
+      const discountAmount = Math.round(basePrice * (data.coupon.percentage / 100) * 100) / 100;
 
       setAppliedCoupon({
-        code: couponCode.trim().toUpperCase(),
+        code: data.coupon.code,
         discount: discountAmount,
-        percentage: validation.percentage
+        percentage: data.coupon.percentage
       });
 
       setCouponCode("");
       setCouponError("");
+      setIsApplyingCoupon(false);
     } catch (error) {
-      setCouponError("Something went wrong. Please try again");
-    } finally {
+      console.error("Error validating coupon:", error);
+      setCouponError("Error validating coupon. Please try again.");
       setIsApplyingCoupon(false);
     }
   };
