@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Home, Users, Calendar, CreditCard, Settings, Menu, X, LogOut, Target } from "lucide-react"
+import { Home, Users, Calendar, CreditCard, Settings, Menu, X, LogOut, Target, MessageSquare } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
+import { useMessageNotifications } from "@/hooks/use-message-notifications"
+import NotificationBell from "@/components/notifications/NotificationBell"
 
 interface ParentData {
   firstname: string
@@ -13,21 +15,31 @@ interface ParentData {
   email: string
 }
 
-const navItems = [
-  { href: "/dashboard", label: "Home", icon: Home },
-  { href: "/dashboard/players", label: "My Players", icon: Users },
-  { href: "/dashboard/skills", label: "Skills & Tiers", icon: Target },
-  { href: "/dashboard/schedule", label: "Schedule", icon: Calendar },
-  { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-]
-
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [parentData, setParentData] = useState<ParentData | null>(null)
+  const [parentId, setParentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
+
+  // Hook de notificaciones
+  const { totalUnread } = useMessageNotifications(parentId)
+
+  const navItems = [
+    { href: "/dashboard", label: "Home", icon: Home },
+    { href: "/dashboard/players", label: "My Players", icon: Users },
+    { href: "/dashboard/skills", label: "Skills & Tiers", icon: Target },
+    { 
+      href: "/dashboard/messages", 
+      label: "Messages", 
+      icon: MessageSquare,
+      badge: (totalUnread > 0 && pathname !== "/dashboard/messages") ? totalUnread : undefined
+    },
+    { href: "/dashboard/schedule", label: "Schedule", icon: Calendar },
+    { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  ]
 
   // Si estamos en la página de login, no mostrar el layout con sidebar
   const isLoginPage = pathname === "/dashboard/login"
@@ -48,6 +60,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         router.push("/dashboard/login")
         return
       }
+
+      setParentId(user.id)
 
       // Get parent data
       const { data: parent } = await supabase
@@ -103,13 +117,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Discipline Rift
           </h1>
         </div>
-        <button
-          onClick={handleLogout}
-          className="p-2 rounded-md hover:bg-gray-100"
-          title="Logout"
-        >
-          <LogOut className="h-5 w-5 text-gray-600" />
-        </button>
+        
+        <div className="flex items-center gap-2">
+          <NotificationBell parentId={parentId} size="sm" />
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-md hover:bg-gray-100"
+            title="Logout"
+          >
+            <LogOut className="h-5 w-5 text-gray-600" />
+          </button>
+        </div>
       </div>
 
       {/* Sidebar - Desktop */}
@@ -142,7 +160,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           style={isActive ? { backgroundColor: '#0085B7' } : {}}
                         >
                           <Icon className="h-5 w-5 shrink-0" />
-                          {item.label}
+                          <span className="flex-1">{item.label}</span>
+                          {'badge' in item && item.badge && (
+                            <span className="ml-auto inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
+                              {item.badge}
+                            </span>
+                          )}
                         </Link>
                       </li>
                     )
@@ -152,7 +175,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
               {/* User Info & Logout */}
               <li className="mt-auto pb-4">
-                <div className="flex items-center gap-x-4 px-3 py-3 border-t border-gray-200">
+                <div className="flex items-center justify-between px-3 py-3 border-t border-gray-200">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">
                       {parentData?.firstname} {parentData?.lastname}
@@ -161,6 +184,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       {parentData?.email}
                     </p>
                   </div>
+                  <NotificationBell parentId={parentId} size="sm" />
                 </div>
                 <Button
                   onClick={handleLogout}
@@ -210,7 +234,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                               style={isActive ? { backgroundColor: '#0085B7' } : {}}
                             >
                               <Icon className="h-5 w-5 shrink-0" />
-                              {item.label}
+                              <span className="flex-1">{item.label}</span>
+                              {'badge' in item && item.badge && (
+                                <span className="ml-auto inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
+                                  {item.badge}
+                                </span>
+                              )}
                             </Link>
                           </li>
                         )
@@ -220,7 +249,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                   {/* User Info & Logout */}
                   <li className="mt-auto">
-                    <div className="flex items-center gap-x-4 px-3 py-3 border-t border-gray-200">
+                    <div className="flex items-center justify-between px-3 py-3 border-t border-gray-200">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 truncate">
                           {parentData?.firstname} {parentData?.lastname}
@@ -229,6 +258,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           {parentData?.email}
                         </p>
                       </div>
+                      <NotificationBell parentId={parentId} size="sm" />
                     </div>
                     <Button
                       onClick={handleLogout}

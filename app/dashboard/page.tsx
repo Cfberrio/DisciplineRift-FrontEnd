@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
-import { Calendar, Users, CreditCard, Clock, MapPin, User, ChevronRight, TrendingUp } from "lucide-react"
+import { Calendar, Users, CreditCard, Clock, MapPin, User, ChevronRight, TrendingUp, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   getStudentColorById,
@@ -14,6 +14,8 @@ import {
   getCountdownText,
   getInitials
 } from "@/lib/dashboard-utils"
+import { useMessageNotifications } from "@/hooks/use-message-notifications"
+import NotificationBell from "@/components/notifications/NotificationBell"
 
 interface Student {
   studentid: string
@@ -71,8 +73,12 @@ interface NextPractice {
 export default function DashboardHome() {
   const [students, setStudents] = useState<Student[]>([])
   const [nextPractices, setNextPractices] = useState<NextPractice[]>([])
+  const [parentId, setParentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  // Hook de notificaciones
+  const { totalUnread } = useMessageNotifications(parentId)
 
   useEffect(() => {
     fetchDashboardData()
@@ -86,6 +92,8 @@ export default function DashboardHome() {
         router.push("/dashboard/login")
         return
       }
+
+      setParentId(user.id)
 
       // Fetch students via API endpoint
       const { data: { session } } = await supabase.auth.getSession()
@@ -262,6 +270,27 @@ export default function DashboardHome() {
           <p className="text-sm text-gray-500 mt-1">enrollments</p>
         </div>
       </div>
+
+      {/* Notifications Card */}
+      {totalUnread > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Bell className="h-6 w-6 text-[#0085B7]" />
+              <h2 className="text-lg font-semibold text-gray-900">New Messages</h2>
+            </div>
+            <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
+              {totalUnread} new
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            You have unread messages from your coaches
+          </p>
+          <div className="flex justify-center">
+            <NotificationBell parentId={parentId} size="lg" showLabel />
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">

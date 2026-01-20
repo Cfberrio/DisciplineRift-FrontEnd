@@ -28,7 +28,12 @@
     "preview-monday-15": "node scripts/email-previews/generate-monday-15-preview.js",
     "preview-tuesday-16": "node scripts/email-previews/generate-tuesday-16-preview.js",
     "diagnose-emails": "npx tsx scripts/diagnose-email-system.ts",
-    "resend-confirmation-emails": "npx tsx scripts/resend-confirmation-emails.ts"
+    "resend-confirmation-emails": "npx tsx scripts/resend-confirmation-emails.ts",
+    "test:messaging": "npx tsx scripts/test-messaging-full.ts",
+    "test:messaging:ui": "npx tsx scripts/test-messaging-ui.ts",
+    "test:messaging:system": "npx tsx scripts/test-messaging-system.ts",
+    "test:messaging:quick": "npx tsx scripts/quick-test-messaging.ts",
+    "diagnose-message-table": "npx tsx scripts/diagnose-message-table.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

@@ -206,3 +206,25 @@ export interface Newsletter {
   created_at: string;
   updated_at: string;
 }
+
+export interface Message {
+  id: string;
+  teamid: string;
+  sender_role: 'parent' | 'coach';
+  parentid: string | null;
+  coachid: string | null;
+  body: string;
+  created_at: string;
+}
+
+export interface MessageReadStatus {
+  messageid: string;
+  parentid: string;
+  read_at: string;
+}
+
+export interface UnreadCount {
+  teamid: string;
+  coachid: string;
+  count: number;
+}
