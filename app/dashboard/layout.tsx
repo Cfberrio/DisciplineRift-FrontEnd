@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Home, Users, Calendar, CreditCard, Settings, Menu, X, LogOut, Target, MessageSquare, Ticket } from "lucide-react"
+import { Home, Users, Calendar, CreditCard, Settings, Menu, X, LogOut, Target, MessageSquare } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { useMessageNotifications } from "@/hooks/use-message-notifications"
@@ -38,7 +38,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     },
     { href: "/dashboard/schedule", label: "Schedule", icon: Calendar },
     { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
-    { href: "/dashboard/coupons", label: "Coupons", icon: Ticket },
     { href: "/dashboard/settings", label: "Settings", icon: Settings },
   ]
 
