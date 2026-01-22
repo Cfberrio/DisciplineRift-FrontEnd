@@ -1479,4 +1479,150 @@ export async function testSendIncompletePaymentEmail() {
     console.error('❌ Error en prueba:', error);
     return { success: false, error: 'Test failed' };
   }
+}
+
+// ============================================================
+// MENSAJE PENDIENTE - NOTIFICACIÓN DIARIA
+// ============================================================
+
+interface PendingMessageData {
+  recipientEmail: string;
+  recipientName: string;
+  senderName: string;
+  teamName: string;
+  messagePreview: string;
+  messageCount: number;
+  chatUrl: string;
+  recipientRole: 'parent' | 'coach';
+}
+
+const createPendingMessageEmailTemplate = (data: PendingMessageData): string => {
+  const roleText = data.recipientRole === 'parent' 
+    ? `from Coach ${data.senderName}` 
+    : `from ${data.senderName}`;
+
+  const actionText = data.recipientRole === 'parent'
+    ? 'your child\'s progress'
+    : 'the team';
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Pending Message - Discipline Rift</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Arial', sans-serif; background-color: #f4f4f4;">
+      <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 0;">
+            <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
+                    💬 You have ${data.messageCount} unread message${data.messageCount > 1 ? 's' : ''}
+                  </h1>
+                </td>
+              </tr>
+
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px 30px;">
+                  <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px;">
+                    Hi ${data.recipientName},
+                  </h2>
+                  
+                  <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                    You have <strong>${data.messageCount} pending message${data.messageCount > 1 ? 's' : ''}</strong> ${roleText} 
+                    about <strong>${data.teamName}</strong>.
+                  </p>
+
+                  <!-- Message Preview Box -->
+                  <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                    <p style="margin: 0 0 10px 0; color: #999999; font-size: 12px; text-transform: uppercase; font-weight: bold;">
+                      Latest Message:
+                    </p>
+                    <p style="margin: 0; color: #333333; font-size: 14px; font-style: italic; line-height: 1.5;">
+                      "${data.messagePreview}${data.messagePreview.length > 100 ? '...' : ''}"
+                    </p>
+                  </div>
+
+                  <p style="margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                    Stay connected and engaged with ${actionText}. Quick responses help maintain 
+                    clear communication and ensure everyone is on the same page.
+                  </p>
+
+                  <!-- CTA Button -->
+                  <table role="presentation" style="margin: 0 auto;">
+                    <tr>
+                      <td style="border-radius: 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <a href="${data.chatUrl}" 
+                           style="display: inline-block; padding: 16px 40px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 6px;">
+                          View Messages →
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin: 30px 0 0 0; color: #999999; font-size: 14px; text-align: center;">
+                    This is an automated daily reminder sent at 7:00 PM EST
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef;">
+                  <p style="margin: 0 0 10px 0; color: #666666; font-size: 14px;">
+                    <strong>Discipline Rift</strong>
+                  </p>
+                  <p style="margin: 0; color: #999999; font-size: 12px;">
+                    Building champions through discipline and dedication
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+};
+
+export async function sendPendingMessageNotification(data: PendingMessageData) {
+  try {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      throw new Error('Gmail credentials not configured');
+    }
+
+    const transporter = createTransporter();
+    const htmlContent = createPendingMessageEmailTemplate(data);
+
+    const mailOptions = {
+      from: {
+        name: 'Discipline Rift',
+        address: process.env.GMAIL_USER!,
+      },
+      to: data.recipientEmail,
+      subject: `💬 You have ${data.messageCount} unread message${data.messageCount > 1 ? 's' : ''} - ${data.teamName}`,
+      html: htmlContent,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    
+    console.log('✅ Pending message notification sent:', result.messageId);
+    return { success: true, messageId: result.messageId };
+    
+  } catch (error) {
+    console.error('❌ Error sending pending message notification:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
 } 
