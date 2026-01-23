@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Message } from '@/lib/supabase'
 import { Send, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 interface ChatPanelProps {
   teamId: string
@@ -211,27 +210,33 @@ export default function ChatPanel({ teamId, parentId, coachId, coachName }: Chat
 
       {/* Input area */}
       <div className="border-t border-gray-200 p-3 bg-white">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
           <input
             type="text"
-            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0085B7] focus:border-transparent"
+            className="w-full sm:flex-1 border border-gray-300 rounded-md px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0085B7] focus:border-transparent"
             placeholder={`Write a message to Coach ${coachName}...`}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={sending}
           />
-          <Button
+          <button
             onClick={sendMessage}
             disabled={!text.trim() || sending}
-            className="bg-[#0085B7] hover:bg-[#006a94] text-white px-4"
+            className="w-full sm:w-auto bg-[#0085B7] hover:bg-[#006a94] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md py-2.5 sm:py-2 sm:px-3 sm:h-10 sm:w-10 flex items-center justify-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0085B7] focus:ring-offset-2"
           >
             {sending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="sm:hidden text-sm">Sending...</span>
+              </>
             ) : (
-              <Send className="h-4 w-4" />
+              <>
+                <Send className="h-4 w-4" />
+                <span className="sm:hidden text-sm">Send Message</span>
+              </>
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </div>
