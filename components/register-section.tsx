@@ -2659,7 +2659,7 @@ export default function RegisterSection() {
                       <span className="text-gray-700 leading-relaxed flex-1" style={{ fontSize: '13px', lineHeight: '1.5' }}>
                         By checking this box, you agree to receive recurring SMS updates from Discipline Rift. Message frequency varies. Message and data rates may apply. Reply STOP to cancel, HELP for help. View our{" "}
                         <a
-                          href="/Site_terms.pdf"
+                          href="/privacy-policy-updated.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
@@ -2669,7 +2669,7 @@ export default function RegisterSection() {
                         </a>
                         {", "}
                         <a
-                          href="/Site_terms.pdf"
+                          href="/terms-of-use-updated.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"
@@ -2679,7 +2679,7 @@ export default function RegisterSection() {
                         </a>
                         {", and "}
                         <a
-                          href="/SMS_TERMS.pdf"
+                          href="/terms-of-use-updated.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-dr-blue hover:underline"

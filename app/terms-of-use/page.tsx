@@ -12,8 +12,8 @@ export default function TermsOfUsePage() {
     <LegalDocumentViewer
       title="Terms of Use"
       description="Learn about opt-in requirements, frequency expectations, and message policies for our SMS communications."
-      pdfPath="/SMS_TERMS.pdf"
-      downloadName="Terms_of_Use.pdf"
+      pdfPath="/terms-of-use-updated.pdf"
+      downloadName="terms-of-use-updated.pdf"
       extraNote="Message & data rates may apply."
     />
   )
