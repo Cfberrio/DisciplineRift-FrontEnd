@@ -215,6 +215,11 @@ export interface Message {
   coachid: string | null;
   body: string;
   created_at: string;
+  // Media attachment fields
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  attachment_type?: string | null;
+  attachment_size?: number | null;
 }
 
 export interface MessageReadStatus {

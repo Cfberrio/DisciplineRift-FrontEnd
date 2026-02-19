@@ -18,6 +18,8 @@ interface LastMessage {
   sender_role: 'parent' | 'coach';
   body: string;
   created_at: string;
+  attachment_url?: string | null;
+  attachment_type?: string | null;
 }
 
 export async function GET(request: Request) {
@@ -82,12 +84,20 @@ export async function GET(request: Request) {
           );
 
           if (messageCount > 0) {
+            const messagePreview = lastMessage.attachment_url
+              ? lastMessage.attachment_type?.startsWith('image/')
+                ? `📷 Sent a photo${lastMessage.body ? `: ${lastMessage.body}` : ''}`
+                : lastMessage.attachment_type?.startsWith('video/')
+                ? `🎥 Sent a video${lastMessage.body ? `: ${lastMessage.body}` : ''}`
+                : `📎 Sent an attachment${lastMessage.body ? `: ${lastMessage.body}` : ''}`
+              : lastMessage.body.substring(0, 100);
+
             const result = await sendPendingMessageNotification({
               recipientEmail: conv.coachemail,
               recipientName: conv.coachname,
               senderName: conv.parentname,
               teamName: conv.teamname,
-              messagePreview: lastMessage.body.substring(0, 100),
+              messagePreview,
               messageCount,
               chatUrl: `https://disciplinerift.com/dashboard/messages?team=${conv.teamid}&parent=${conv.parentid}`,
               recipientRole: 'coach',
@@ -118,12 +128,20 @@ export async function GET(request: Request) {
           );
 
           if (messageCount > 0) {
+            const messagePreview = lastMessage.attachment_url
+              ? lastMessage.attachment_type?.startsWith('image/')
+                ? `📷 Sent a photo${lastMessage.body ? `: ${lastMessage.body}` : ''}`
+                : lastMessage.attachment_type?.startsWith('video/')
+                ? `🎥 Sent a video${lastMessage.body ? `: ${lastMessage.body}` : ''}`
+                : `📎 Sent an attachment${lastMessage.body ? `: ${lastMessage.body}` : ''}`
+              : lastMessage.body.substring(0, 100);
+
             const result = await sendPendingMessageNotification({
               recipientEmail: conv.parentemail,
               recipientName: conv.parentname,
               senderName: `Coach ${conv.coachname}`,
               teamName: conv.teamname,
-              messagePreview: lastMessage.body.substring(0, 100),
+              messagePreview,
               messageCount,
               chatUrl: `https://disciplinerift.com/dashboard/messages?team=${conv.teamid}&coach=${conv.coachid}`,
               recipientRole: 'parent',
@@ -232,7 +250,7 @@ async function getLastMessage(
 ): Promise<LastMessage | null> {
   const { data, error } = await supabaseAdmin
     .from('message')
-    .select('id, sender_role, body, created_at')
+    .select('id, sender_role, body, created_at, attachment_url, attachment_type')
     .eq('teamid', teamid)
     .eq('parentid', parentid)
     .eq('coachid', coachid)
