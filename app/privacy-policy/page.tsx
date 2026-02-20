@@ -12,8 +12,8 @@ export default function PrivacyPolicyPage() {
     <LegalDocumentViewer
       title="Privacy Policy & Terms of Use"
       description="Review Discipline Rift's Privacy Policy, Terms of Use, and how we handle your personal information including SMS communications."
-      pdfPath="/privacy-policy-updated.pdf"
-      downloadName="privacy-policy-updated.pdf"
+      pdfPath="/Privacy_Policy.pdf"
+      downloadName="Privacy_Policy.pdf"
     />
   )
 }

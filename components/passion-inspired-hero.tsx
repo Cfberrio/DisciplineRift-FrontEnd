@@ -74,7 +74,7 @@ export default function PassionInspiredHero() {
               }`}
             >
               <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl font-medium wild-youth-text-white mb-8 xs:mb-10 sm:mb-12 md:mb-16 hero-text-mobile">
-                November<br />2025, Winter Season
+                March<br />2026, Spring Season
               </h2>
             </div>
 
@@ -121,7 +121,7 @@ export default function PassionInspiredHero() {
                 }`}
               >
                 <h2 className="text-lg xl:text-xl font-medium wild-youth-text-white">
-                  <span className="invisible">Winter Season </span>2026 January<span className="invisible">, </span>Spring Season<span className="invisible"> is here! Join us this</span>
+                  <span className="invisible">Winter Season </span>2026 March<span className="invisible">, </span>Spring Season<span className="invisible"> is here! Join us this</span>
                 </h2>
               </div>
             </div>
