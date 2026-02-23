@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { sendParentGuideEmail } from '@/lib/email-service';
 import {
   normalizeEmail,
   isValidEmailFormat,
@@ -239,15 +238,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ New subscription:', normalizedEmail);
-
-    // Send the Parent Guide email
-    const emailName = (name && typeof name === 'string' && name.trim()) ? name.trim() : 'Parent';
-    const emailResult = await sendParentGuideEmail(normalizedEmail, emailName);
-    if (emailResult.success) {
-      console.log('✅ Parent Guide email sent to:', normalizedEmail);
-    } else {
-      console.error('❌ Failed to send Parent Guide email:', emailResult.error);
-    }
 
     return NextResponse.json(
       { ok: true, msg: 'Subscribed' },
