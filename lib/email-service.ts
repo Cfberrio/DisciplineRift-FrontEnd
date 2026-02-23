@@ -791,76 +791,125 @@ export async function sendPaymentNotificationToCompany(
 }
 
 // Template HTML para el popup de registro de padres
-const createParentGuideEmailTemplate = (email: string, sportInterest?: string) => {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Stay Connected to Your Child's Sports Journey</title>
-    </head>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px;">
-      
-      <p>Hi Parent,</p>
-      
-      <p>
-        Sports can be one of the most rewarding experiences for your child — not just for physical health, 
-        but for building confidence, discipline, and teamwork. Even if you can't be at practice, you can still 
-        play a big role in keeping the spark alive at home.
-      </p>
+const createParentGuideEmailTemplate = (name: string) => {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Here you go! 3-minute Parent Guide</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f8fafc; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { font-size: 26px; font-weight: bold; margin-bottom: 10px; }
+    .header p { font-size: 16px; opacity: 0.9; }
+    .content { padding: 40px 30px; }
+    .content p { font-size: 15px; line-height: 1.7; color: #374151; margin-bottom: 16px; }
+    .content h3 { color: #1e40af; font-size: 17px; font-weight: 700; margin: 28px 0 8px; }
+    .section { margin-bottom: 10px; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; background-color: #f8fafc; }
+    .section h3 { margin-top: 0; }
+    .cta-section { text-align: center; margin: 30px 0; }
+    .cta-button { display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; text-decoration: none; font-weight: 700; font-size: 16px; border-radius: 12px; box-shadow: 0 8px 16px rgba(220,38,38,0.25); }
+    .cta-button-secondary { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #1e40af, #3b82f6); color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; border-radius: 12px; margin-top: 12px; }
+    .closing { margin-top: 30px; font-style: italic; color: #1e40af; font-size: 17px; font-weight: 600; text-align: center; }
+    .footer { background-color: #1f2937; color: #9ca3af; padding: 30px; text-align: center; }
+    .footer h4 { color: white; margin-bottom: 15px; }
+    .contact-info { margin: 20px 0; }
+    .contact-info p { margin: 5px 0; font-size: 14px; }
+    @media (max-width: 600px) {
+      .container { margin: 10px; border-radius: 8px; }
+      .header, .content, .footer { padding: 20px; }
+      .header h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Here you go! 3-minute Parent Guide</h1>
+      <p>From Coach Luis at Discipline Rift</p>
+    </div>
 
-      <p>Here are <strong>5 simple ways</strong> to stay connected to your child's sports journey this season:</p>
+    <div class="content">
+      <p>Hi ${name},</p>
 
-      <ol>
-        <li>
-          <strong>Start Every Week with Curiosity</strong><br>
-          Ask open-ended questions after practice:
-          <blockquote style="margin: 10px 0; padding-left: 15px; border-left: 3px solid #ccc;">
-            "What was the most fun thing you did today?"<br>
-            "Can you show me something new you learned?"
-          </blockquote>
-          This shows interest without pressure and keeps conversations flowing.
-        </li>
+      <p>What if this was the season your child did not just participate...<br>
+      But discovered something about themselves?</p>
 
-        <li>
-          <strong>Create a Home Sports Ritual</strong><br>
-          Set aside 10 minutes a couple of times a week to "play" their sport together — soft toss volleyball in the living room, 
-          mini pickleball rallies, or shadow tennis swings. The goal is bonding, not coaching.
-        </li>
+      <p>The first time they understand a new skill.<br>
+      The first time they try again after struggling.<br>
+      The first time they feel like they belong in a group.</p>
 
-        <li>
-          <strong>Celebrate Small Wins</strong><br>
-          If they share a moment of progress ("I served over the net!"), mark it on a calendar or a "sports milestones" board. 
-          Progress becomes something you both look forward to.
-        </li>
+      <p>Many children stop participating in organized activities before middle school... Not because they lack ability, but because they did not feel supported or capable early on.</p>
 
-        <li>
-          <strong>Let Them Teach You</strong><br>
-          Invite your child to "coach" you. Kids love taking the lead, and explaining skills helps them internalize what they've learned.
-        </li>
+      <p><strong>Here are five simple ways you can strengthen your child's experience starting this week.</strong></p>
 
-        <li>
-          <strong>Share the Story of Sports</strong><br>
-          Watch short highlight clips together and talk about effort, teamwork, and joy — the values that last long after the game ends.
-        </li>
-      </ol>
+      <div class="section">
+        <h3>1. Start Every Week with Curiosity</h3>
+        <p>After each session, ask open ended questions:<br>
+        <em>What felt good today?</em><br>
+        <em>What was challenging?</em><br>
+        <em>Can you show me something new you practiced?</em></p>
+        <p>Curiosity builds reflection. Reflection builds growth.</p>
+      </div>
 
-      <p>
-        Small moments like these create lasting memories and keep your child excited to learn, grow, and play.
-      </p>
+      <div class="section">
+        <h3>2. Create a 10 Minute Ritual</h3>
+        <p>Set aside ten minutes twice a week to move together. The goal is connection, not correction. When children associate structured activity with bonding, they stay engaged longer.</p>
+      </div>
 
-      <p>With love,<br>
-      <strong>The Discipline Rift Team</strong></p>
+      <div class="section">
+        <h3>3. Celebrate Small Wins</h3>
+        <p>Notice effort, not just results.<br>
+        Trying again. Staying focused. Listening well.<br>
+        Confidence grows when progress is seen.</p>
+      </div>
 
-      <p>
-        📧 <a href="mailto:info@disciplinerift.com">info@disciplinerift.com</a><br>
-        📞 <a href="tel:+14076147454">(407) 614-7454</a>
-      </p>
+      <div class="section">
+        <h3>4. Let Them Teach You</h3>
+        <p>Ask your child to explain something they learned. Teaching strengthens understanding and reinforces self belief.</p>
+      </div>
 
-    </body>
-    </html>
-  `
+      <div class="section">
+        <h3>5. Talk About Growth</h3>
+        <p>Have conversations about perseverance, teamwork, and character. These are the qualities that last long after any season ends.</p>
+      </div>
+
+      <p style="margin-top: 28px;">Structured programs can accelerate this growth when they are developmentally appropriate and focused on confidence before competition.</p>
+
+      <p><strong>Our upcoming season is designed with that intention:</strong><br>
+      Small groups.<br>
+      Intentional coaching.<br>
+      Progression based learning.<br>
+      An environment where children feel capable.</p>
+
+      <p>If this feels like the right next step for your child:</p>
+
+      <div class="cta-section">
+        <a href="https://www.disciplinerift.com/register" class="cta-button">REGISTER FOR THE SEASON</a>
+        <br>
+        <a href="https://www.disciplinerift.com/register" class="cta-button-secondary">FIND YOUR SCHOOL</a>
+      </div>
+
+      <p class="closing">What if this season everything shifts?</p>
+    </div>
+
+    <div class="footer">
+      <h4>From Coach Luis</h4>
+      <p style="color: white; font-size: 16px; margin-bottom: 10px;">Discipline Rift</p>
+      <div class="contact-info">
+        <p>📧 info@disciplinerift.com</p>
+        <p>📞 (407) 614-7454</p>
+      </div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #374151;">
+        <p style="font-size: 12px;">This email was sent because you signed up for the Discipline Rift Parent Guide.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`
 }
 
 // Template HTML para recordatorios de sesión
@@ -1044,26 +1093,23 @@ export async function sendSessionReminderEmail(data: {
 }
 
 // Función para enviar el email del Parent Guide desde el popup
-export async function sendParentGuideEmail(email: string, sportInterest?: string) {
+export async function sendParentGuideEmail(email: string, name: string) {
   try {
-    // Verificar que las credenciales de Gmail estén configuradas
     if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
       throw new Error('Gmail credentials not configured')
     }
 
     const transporter = createTransporter()
 
-    // Generar el HTML del correo
-    const htmlContent = createParentGuideEmailTemplate(email, sportInterest)
+    const htmlContent = createParentGuideEmailTemplate(name)
 
-    // Configurar el correo
     const mailOptions = {
       from: {
         name: 'Discipline Rift',
         address: process.env.GMAIL_USER!,
       },
       to: email,
-      subject: "Stay Connected to Your Child's Sports Journey",
+      subject: "Here you go! 3-minute Parent Guide",
       html: htmlContent,
     }
 
