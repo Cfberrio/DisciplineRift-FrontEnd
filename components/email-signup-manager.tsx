@@ -24,12 +24,11 @@ export default function EmailSignupManager() {
     }
   }, [])
 
-  const handleSubscribe = async (email: string, name: string, honeypot: string) => {
+  const handleSubscribe = async (email: string, name: string, honeypot: string, phone: string) => {
     setIsSubmitting(true)
     console.log("Subscribing to newsletter:", email, "Name:", name)
 
     try {
-      // Call the new newsletter subscribe API with soft validation
       const response = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: {
@@ -39,6 +38,7 @@ export default function EmailSignupManager() {
           email,
           name,
           honeypot,
+          phone,
         }),
       })
 

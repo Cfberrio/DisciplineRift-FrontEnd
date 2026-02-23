@@ -5,24 +5,23 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { Mail, ArrowRight, Loader2, User, AlertCircle, CheckCircle } from "lucide-react"
+import { Mail, ArrowRight, Loader2, User, AlertCircle, CheckCircle, Phone } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { validateEmail, getSuggestedEmail, normalizeEmail } from "@/lib/email-validation"
 
 interface EmailSignupModalProps {
-  onSubscribe: (email: string, name: string, honeypot: string) => Promise<void>
+  onSubscribe: (email: string, name: string, honeypot: string, phone: string) => Promise<void>
   isSubmitting: boolean
 }
 
 export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSignupModalProps) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
   const [honeypot, setHoneypot] = useState("")
   const [error, setError] = useState("")
   const [suggestion, setSuggestion] = useState<string | null>(null)
   const [validationWarning, setValidationWarning] = useState("")
-  const [consentTransactional, setConsentTransactional] = useState(false)
-  const [consentMarketing, setConsentMarketing] = useState(false)
 
   // Real-time validation on email change
   useEffect(() => {
@@ -78,7 +77,7 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
     }
 
     setError("")
-    await onSubscribe(email, name, honeypot)
+    await onSubscribe(email, name, honeypot, phone)
   }
 
   return (
@@ -88,11 +87,10 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           <Mail className="h-8 w-8 text-blue-700" />
         </div>
         <DialogTitle className="font-ethnocentric text-xl sm:text-2xl md:text-3xl lg:text-4xl text-yellow-300 tracking-wide mb-2 leading-tight">
-          What If Sports Could Unlock Your Child's Potential?
+          What if this was the season your child found their place?
         </DialogTitle>
         <DialogDescription className="text-blue-100 text-sm sm:text-base leading-relaxed mb-2">
-          Discover how volleyball, tennis, or pickleball can help your child build confidence, discipline, and teamwork—all while having fun.
-          <br /><strong>Sign up to get season updates, expert tips, and priority registration.</strong>
+          Get this 3-minute Parent Guide to help them stay in sports, grow, and fall in love with the game.
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 sm:py-6 space-y-4">
@@ -175,6 +173,18 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           </p>
         )}
 
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-300" />
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="Phone Number (optional)"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 h-12 text-base rounded-md border-2 bg-blue-600/50 text-white placeholder-blue-300 focus:bg-blue-600 focus:border-yellow-400 focus:ring-yellow-400"
+          />
+        </div>
+
         {/* Error message */}
         {error && (
           <p id="form-error" className="text-sm text-red-300 bg-red-900/50 px-3 py-2 rounded-md flex items-center gap-2">
@@ -183,66 +193,13 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           </p>
         )}
 
-        {/* Consent Checkboxes */}
-        <div className="space-y-1.5 sm:space-y-4">
-          <div className="flex flex-row items-start gap-2 sm:gap-3 p-1.5 sm:p-4 bg-blue-600/30 rounded-lg border border-blue-400/30">
-            <div className="relative flex-shrink-0 mt-0.5">
-              <input
-                type="checkbox"
-                id="consentTransactional"
-                checked={consentTransactional}
-                onChange={(e) => setConsentTransactional(e.target.checked)}
-                className="opacity-0 absolute w-3 h-3 sm:w-5 sm:h-5 cursor-pointer"
-              />
-              <div className={`w-3 h-3 sm:w-5 sm:h-5 border-2 rounded-sm cursor-pointer flex items-center justify-center transition-colors ${consentTransactional ? 'bg-yellow-400 border-yellow-400' : 'bg-blue-700 border-blue-300'}`}>
-                {consentTransactional && (
-                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-blue-700" viewBox="0 0 12 10" fill="none">
-                    <polyline points="1.5 6 4.5 9 10.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </div>
-            </div>
-            <label
-              htmlFor="consentTransactional"
-              className="text-xs sm:text-sm text-left text-blue-100 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
-            >
-              By checking this box, I agree to receive transactional SMS from Discipline Rift (Torres Rivero LLC) related to my account or services I request (e.g., registration confirmations, practice reminders, schedule updates, and account notifications). Message frequency varies. Msg & data rates may apply. Reply STOP to cancel; HELP for help.
-            </label>
-          </div>
-
-          <div className="flex flex-row items-start gap-2 sm:gap-3 p-1.5 sm:p-4 bg-blue-600/30 rounded-lg border border-blue-400/30">
-            <div className="relative flex-shrink-0 mt-0.5">
-              <input
-                type="checkbox"
-                id="consentMarketing"
-                checked={consentMarketing}
-                onChange={(e) => setConsentMarketing(e.target.checked)}
-                className="opacity-0 absolute w-3 h-3 sm:w-5 sm:h-5 cursor-pointer"
-              />
-              <div className={`w-3 h-3 sm:w-5 sm:h-5 border-2 rounded-sm cursor-pointer flex items-center justify-center transition-colors ${consentMarketing ? 'bg-yellow-400 border-yellow-400' : 'bg-blue-700 border-blue-300'}`}>
-                {consentMarketing && (
-                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-blue-700" viewBox="0 0 12 10" fill="none">
-                    <polyline points="1.5 6 4.5 9 10.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </div>
-            </div>
-            <label
-              htmlFor="consentMarketing"
-              className="text-xs sm:text-sm text-left text-blue-100 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
-            >
-              By checking this box, I agree to receive marketing and promotional SMS from Discipline Rift (e.g., seasonal announcements, enrollment openings, special offers). Message frequency varies. Msg & data rates may apply. Reply STOP to cancel; HELP for help. Consent is not a condition of purchase. We do not sell or share mobile numbers for marketing/promotional purposes.
-            </label>
-          </div>
-        </div>
-
         <Button
           type="submit"
           disabled={isSubmitting}
           className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-700 font-bold rounded-md h-12 text-lg transition-all duration-300 transform hover:scale-105 shadow-md"
         >
           {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ArrowRight className="mr-2 h-5 w-5" />}
-          {isSubmitting ? "GETTING GUIDE..." : "Get My Parent Guide"}
+          {isSubmitting ? "SENDING GUIDE..." : "Send Me the Parent Guide"}
         </Button>
 
         {/* Privacy Policy and Terms Links */}

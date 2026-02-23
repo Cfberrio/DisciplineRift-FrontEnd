@@ -92,7 +92,7 @@ async function verifyMxRecords(domain: string): Promise<boolean> {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, name, sport, honeypot } = body;
+    const { email, name, sport, honeypot, phone } = body;
 
     // Honeypot check - if filled, pretend success but don't insert
     if (honeypot && honeypot.trim() !== '') {
@@ -206,6 +206,11 @@ export async function POST(request: NextRequest) {
     // Include sport if provided
     if (sport && typeof sport === 'string' && sport.trim()) {
       insertData.sport = sport.trim();
+    }
+
+    // Include phone if provided
+    if (phone && typeof phone === 'string' && phone.trim()) {
+      insertData.phone = phone.trim();
     }
 
     // Insert new subscription
