@@ -202,14 +202,24 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           {isSubmitting ? "SENDING GUIDE..." : "Send Me the Parent Guide"}
         </Button>
 
-        {/* Privacy Policy and Terms Links */}
-        <p className="text-xs sm:text-sm text-center text-blue-200">
-          For more information, please review our{" "}
+        {/* Optional consent checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            className="mt-1 h-4 w-4 rounded border-blue-300 accent-yellow-400 flex-shrink-0"
+          />
+          <span className="text-xs sm:text-sm text-blue-200 leading-relaxed">
+            I'd like to receive season updates, tips from Coach Luis, and priority registration info. You can unsubscribe anytime.
+          </span>
+        </label>
+
+        <p className="text-xs text-center text-blue-300">
+          By submitting, you agree to our{" "}
           <a 
             href="/privacy-policy" 
             target="_blank"
             rel="noopener noreferrer"
-            className="text-yellow-300 hover:text-yellow-400 underline font-semibold"
+            className="text-yellow-300 hover:text-yellow-400 underline"
           >
             Privacy Policy
           </a>
@@ -218,23 +228,12 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
             href="/terms-of-use" 
             target="_blank"
             rel="noopener noreferrer"
-            className="text-yellow-300 hover:text-yellow-400 underline font-semibold"
+            className="text-yellow-300 hover:text-yellow-400 underline"
           >
             Terms of Use
           </a>.
         </p>
       </form>
-      <DialogFooter className="px-6 sm:px-8 pb-6 sm:pb-8 text-center space-y-3">
-        <div className="w-full">
-          <p className="text-sm font-semibold text-yellow-300 mb-1">
-            How to Stay Connected to Your Child's Sports Journey
-          </p>
-          <p className="text-xs text-blue-200">
-            5 simple ways to spark excitement and build a love for sports at home.
-          </p>
-        </div>
-        
-      </DialogFooter>
       {/* DialogClose is automatically added by shadcn/ui Dialog for the 'X' button */}
     </DialogContent>
   )
