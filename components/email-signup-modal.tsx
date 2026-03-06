@@ -202,37 +202,15 @@ export default function EmailSignupModal({ onSubscribe, isSubmitting }: EmailSig
           {isSubmitting ? "SENDING GUIDE..." : "Send Me the Parent Guide"}
         </Button>
 
-        {/* Optional consent checkbox */}
-        <label className="flex items-start gap-3 cursor-pointer">
+        <label className="flex items-start gap-2 cursor-pointer">
           <input
             type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-blue-300 accent-yellow-400 flex-shrink-0"
+            className="mt-0.5 h-4 w-4 rounded border-blue-300 accent-yellow-400 flex-shrink-0"
           />
-          <span className="text-xs sm:text-sm text-blue-200 leading-relaxed">
-            I'd like to receive season updates, tips from Coach Luis, and priority registration info. You can unsubscribe anytime.
+          <span className="text-xs text-blue-200 leading-snug">
+            I agree to receive SMS & emails with updates, reminders, and offers. Reply STOP to cancel.
           </span>
         </label>
-
-        <p className="text-xs text-center text-blue-300">
-          By submitting, you agree to our{" "}
-          <a 
-            href="/privacy-policy" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-yellow-300 hover:text-yellow-400 underline"
-          >
-            Privacy Policy
-          </a>
-          {" "}and{" "}
-          <a 
-            href="/terms-of-use" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-yellow-300 hover:text-yellow-400 underline"
-          >
-            Terms of Use
-          </a>.
-        </p>
       </form>
       {/* DialogClose is automatically added by shadcn/ui Dialog for the 'X' button */}
     </DialogContent>

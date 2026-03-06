@@ -330,58 +330,34 @@ export default function ContactSection() {
                 </div>
 
                 {/* Consent Checkboxes */}
-                <div className="space-y-1.5 sm:space-y-4">
-                  <div className="flex flex-row items-start gap-2 sm:gap-3 p-1.5 sm:p-4 bg-white/50 rounded-lg border border-gray-200">
-                    <div className="relative flex-shrink-0 mt-0.5">
-                      <input
-                        type="checkbox"
-                        id="consentTransactional"
-                        name="consentTransactional"
-                        checked={formData.consentTransactional}
-                        onChange={handleChange}
-                        className="opacity-0 absolute w-3 h-3 sm:w-5 sm:h-5 cursor-pointer"
-                      />
-                      <div className={`w-3 h-3 sm:w-5 sm:h-5 border-2 rounded-sm cursor-pointer flex items-center justify-center transition-colors ${formData.consentTransactional ? 'bg-dr-blue border-dr-blue' : 'bg-white border-gray-300'}`}>
-                        {formData.consentTransactional && (
-                          <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" viewBox="0 0 12 10" fill="none">
-                            <polyline points="1.5 6 4.5 9 10.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        )}
-                      </div>
-                    </div>
-                    <label
-                      htmlFor="consentTransactional"
-                      className="text-xs sm:text-sm text-left text-gray-700 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
-                    >
-                      By checking this box, I agree to receive transactional SMS from Discipline Rift (Torres Rivero LLC) related to my account or services I request (e.g., registration confirmations, practice reminders, schedule updates, and account notifications). Message frequency varies. Msg & data rates may apply. Reply STOP to cancel; HELP for help.
-                    </label>
-                  </div>
+                <div className="space-y-2">
+                  <label htmlFor="consentTransactional" className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="consentTransactional"
+                      name="consentTransactional"
+                      checked={formData.consentTransactional}
+                      onChange={handleChange}
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-[#0085B7] flex-shrink-0"
+                    />
+                    <span className="text-xs sm:text-sm text-gray-700 leading-snug">
+                      I agree to receive account-related SMS (confirmations, reminders, updates). Msg & data rates may apply. Reply STOP to cancel.
+                    </span>
+                  </label>
 
-                  <div className="flex flex-row items-start gap-2 sm:gap-3 p-1.5 sm:p-4 bg-white/50 rounded-lg border border-gray-200">
-                    <div className="relative flex-shrink-0 mt-0.5">
-                      <input
-                        type="checkbox"
-                        id="consentMarketing"
-                        name="consentMarketing"
-                        checked={formData.consentMarketing}
-                        onChange={handleChange}
-                        className="opacity-0 absolute w-3 h-3 sm:w-5 sm:h-5 cursor-pointer"
-                      />
-                      <div className={`w-3 h-3 sm:w-5 sm:h-5 border-2 rounded-sm cursor-pointer flex items-center justify-center transition-colors ${formData.consentMarketing ? 'bg-dr-blue border-dr-blue' : 'bg-white border-gray-300'}`}>
-                        {formData.consentMarketing && (
-                          <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" viewBox="0 0 12 10" fill="none">
-                            <polyline points="1.5 6 4.5 9 10.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        )}
-                      </div>
-                    </div>
-                    <label
-                      htmlFor="consentMarketing"
-                      className="text-xs sm:text-sm text-left text-gray-700 leading-tight sm:leading-relaxed flex-1 cursor-pointer"
-                    >
-                      By checking this box, I agree to receive marketing and promotional SMS from Discipline Rift (e.g., seasonal announcements, enrollment openings, special offers). Message frequency varies. Msg & data rates may apply. Reply STOP to cancel; HELP for help. Consent is not a condition of purchase. We do not sell or share mobile numbers for marketing/promotional purposes.
-                    </label>
-                  </div>
+                  <label htmlFor="consentMarketing" className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="consentMarketing"
+                      name="consentMarketing"
+                      checked={formData.consentMarketing}
+                      onChange={handleChange}
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-[#0085B7] flex-shrink-0"
+                    />
+                    <span className="text-xs sm:text-sm text-gray-700 leading-snug">
+                      I agree to receive promotional SMS (season announcements, offers). Msg & data rates may apply. Reply STOP to cancel.
+                    </span>
+                  </label>
                 </div>
 
                 {/* Success/Error Messages */}
