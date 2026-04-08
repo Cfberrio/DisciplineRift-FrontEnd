@@ -213,7 +213,9 @@ async function getActiveConversations(): Promise<Conversation[]> {
       staff:coachid (name, email)
     `)
     .not('parentid', 'is', null)
-    .not('coachid', 'is', null);
+    .not('coachid', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(500);
 
   if (error) {
     console.error('Error fetching conversations:', error);
@@ -307,8 +309,8 @@ async function wasAlreadyNotifiedToday(
   coachid: string,
   lastMessageId: string
 ): Promise<boolean> {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 
   const { data, error } = await supabaseAdmin
     .from('message_notification_log')
@@ -317,7 +319,7 @@ async function wasAlreadyNotifiedToday(
     .eq('parentid', parentid)
     .eq('coachid', coachid)
     .eq('last_message_id', lastMessageId)
-    .gte('sent_at', today.toISOString())
+    .gte('sent_at', todayUTC.toISOString())
     .limit(1);
 
   if (error) {
