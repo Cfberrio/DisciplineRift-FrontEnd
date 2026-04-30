@@ -116,7 +116,6 @@ export default function MessagesClient() {
         .select(`
           teamid,
           coachid,
-          cancel,
           team:teamid(teamid, name, status),
           staff:coachid(id, name)
         `)
@@ -140,11 +139,7 @@ export default function MessagesClient() {
       const teamMap = new Map<string, TeamWithCoach>()
 
       sessions?.forEach((session: any) => {
-        // Filtrar sessions canceladas (cancel es TEXT, puede ser null o string)
-        const isCancelled = session.cancel && session.cancel.toLowerCase() === 'true'
-        
         if (
-          !isCancelled &&
           session.team &&
           session.staff &&
           ['open', 'ongoing', 'closed'].includes(session.team.status)

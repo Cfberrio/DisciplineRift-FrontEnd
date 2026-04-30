@@ -313,28 +313,10 @@ export async function getAllSchoolsTeamsAndSessions(): Promise<{
               parsedDaysOfWeek = ["Monday", "Wednesday", "Friday"];
             }
 
-            // Parse canceled dates from the cancel field
-            let canceledDates: string[] = [];
-            try {
-              if (session.cancel && typeof session.cancel === 'string' && session.cancel.trim()) {
-                // Handle different formats: JSON array, comma-separated, or single date
-                const cancelString = session.cancel.trim();
-                if (cancelString.startsWith('[') && cancelString.endsWith(']')) {
-                  // JSON array format: ["2024-01-15", "2024-01-22"]
-                  canceledDates = JSON.parse(cancelString);
-                } else if (cancelString.includes(',')) {
-                  // Comma-separated format: "2024-01-15,2024-01-22"
-                  canceledDates = cancelString.split(',').map(date => date.trim()).filter(date => date.length > 0);
-                } else {
-                  // Single date format: "2024-01-15"
-                  canceledDates = [cancelString];
-                }
-                console.log(`[QUERY] ✅ Found ${canceledDates.length} canceled dates for session ${session.sessionid}:`, canceledDates);
-              }
-            } catch (parseError) {
-              console.warn(`[QUERY] ⚠️ Error parsing canceled dates for session ${session.sessionid}:`, parseError);
-              canceledDates = [];
-            }
+            const canceledDates: string[] = (session.cancel ?? "")
+              .split(",")
+              .map((d: string) => d.trim())
+              .filter(Boolean);
 
             // Calculate individual sessions using shared utility
             const individualSessions = buildPracticeOccurrences({

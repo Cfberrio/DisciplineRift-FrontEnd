@@ -79,8 +79,12 @@ export async function GET(request: Request) {
         if (!enrollment.isactive) return // Only active enrollments
 
         enrollment.team?.session?.forEach((session: any) => {
-          // Check if session is cancelled
-          if (session.cancel) return
+          const canceledDates = new Set(
+            (session.cancel ?? "")
+              .split(",")
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          )
 
           const startDate = new Date(session.startdate)
           const endDate = new Date(session.enddate)
@@ -123,8 +127,15 @@ export async function GET(request: Request) {
 
             // Add all occurrences
             while (currentDate <= endDate) {
+              const occurrenceDateISO = currentDate.toISOString().split('T')[0]
+
+              if (canceledDates.has(occurrenceDateISO)) {
+                currentDate.setDate(currentDate.getDate() + 7)
+                continue
+              }
+
               scheduleEvents.push({
-                id: `${session.sessionid}-${currentDate.toISOString().split('T')[0]}`,
+                id: `${session.sessionid}-${occurrenceDateISO}`,
                 sessionId: session.sessionid,
                 studentId: student.studentid,
                 studentName: `${student.firstname} ${student.lastname}`,
@@ -132,7 +143,7 @@ export async function GET(request: Request) {
                 teamName: enrollment.team.name,
                 schoolName: enrollment.team.school?.name || 'School TBD',
                 location: enrollment.team.school?.location || 'Location TBD',
-                date: currentDate.toISOString().split('T')[0],
+                date: occurrenceDateISO,
                 dayOfWeek: dayName,
                 startTime: session.starttime,
                 endTime: session.endtime,

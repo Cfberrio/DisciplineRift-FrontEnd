@@ -428,28 +428,10 @@ export async function sendPaymentConfirmationEmail(
         daysOfWeek = ["Monday", "Wednesday", "Friday"];
       }
 
-      // Parse canceled dates from the cancel field
-      let canceledDates: string[] = [];
-      try {
-        if (session.cancel && typeof session.cancel === 'string' && session.cancel.trim()) {
-          // Handle different formats: JSON array, comma-separated, or single date
-          const cancelString = session.cancel.trim();
-          if (cancelString.startsWith('[') && cancelString.endsWith(']')) {
-            // JSON array format: ["2024-01-15", "2024-01-22"]
-            canceledDates = JSON.parse(cancelString);
-          } else if (cancelString.includes(',')) {
-            // Comma-separated format: "2024-01-15,2024-01-22"
-            canceledDates = cancelString.split(',').map((date: string) => date.trim()).filter((date: string) => date.length > 0);
-          } else {
-            // Single date format: "2024-01-15"
-            canceledDates = [cancelString];
-          }
-          console.log(`[EMAIL] ✅ Found ${canceledDates.length} canceled dates for email generation:`, canceledDates);
-        }
-      } catch (parseError) {
-        console.warn(`[EMAIL] ⚠️ Error parsing canceled dates for email:`, parseError);
-        canceledDates = [];
-      }
+      const canceledDates: string[] = (session.cancel ?? "")
+        .split(",")
+        .map((d: string) => d.trim())
+        .filter(Boolean);
 
       // Calculate practice occurrences
       // Ensure times are in HH:MM format (remove seconds if present)
